@@ -6,12 +6,26 @@ android {
     namespace 'com.barnabwhy.picozen'
     compileSdk 33
 
+    signingConfigs {
+    debug {
+        storeFile file(var1)
+        storePassword var2
+        keyPassword var3
+        keyAlias var4
+    }
+    release {
+        storeFile file(var1)
+        storePassword var2
+        keyPassword var3
+        keyAlias var4
+    }
+
     defaultConfig {
         applicationId "com.barnabwhy.picozen"
         minSdk 29
         targetSdk 33
         versionCode 1
-        versionName "0.0.1"
+        versionName "0.0.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

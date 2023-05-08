@@ -31,7 +31,7 @@ jobs:
     - name: Rename output
       run: |
         cd app/build/outputs/apk/release
-        mv app-release.apk PicoZen.apk
+        mv app-release-unsigned.apk PicoZen.apk
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:

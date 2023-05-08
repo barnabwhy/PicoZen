@@ -23,7 +23,6 @@ jobs:
     - name: Create Android signing key from secret
       run: |
         sed -i 's/C:\\\\Users\\\\Username\\\\/.\//g' build.gradle
-        cat build.gradle
         echo -n "${{ secrets.ANDROID_SIGNING_KEY }}" | base64 --decode > android_signing_key.jks
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew

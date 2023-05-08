@@ -5,6 +5,7 @@ import static androidx.core.content.FileProvider.getUriForFile;
 import static com.barnabwhy.picozen.SettingsProvider.KEY_CURRENT_TAB;
 import com.barnabwhy.picozen.BuildConfig;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -30,6 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -39,7 +41,12 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+import io.noties.markwon.AbstractMarkwonPlugin;
+import io.noties.markwon.LinkResolverDef;
 import io.noties.markwon.Markwon;
+import io.noties.markwon.MarkwonConfiguration;
+import io.noties.markwon.SoftBreakAddsNewLinePlugin;
+import io.noties.markwon.core.CorePlugin;
 
 public class MainActivity extends AppCompatActivity {
     private ConstraintLayout mainView;
@@ -107,9 +114,17 @@ public class MainActivity extends AppCompatActivity {
                         out.append(buffer, 0, numRead);
                     }
                     JSONObject json = new JSONObject(out.toString());
-
-                    final Markwon markwon = Markwon.create(mainContext);
-                    markwon.setMarkdown(findViewById(R.id.changelog), json.getString("body"));
+                    String str = json.getString("body");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final Markwon markwon = Markwon.builder(mainContext)
+                                    .usePlugin(CorePlugin.create())
+                                    .usePlugin(SoftBreakAddsNewLinePlugin.create())
+                                    .build();
+                            markwon.setMarkdown((TextView)findViewById(R.id.changelog), str);
+                        }
+                    });
                 } catch (Exception e) {
                     Log.e("Error", e.toString());
                 }

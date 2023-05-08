@@ -506,8 +506,8 @@ public class AppsAdapter extends BaseAdapter
                         activity.runOnUiThread(callback);
                     } else if(downloadIconFromStore(pkg, file, "cn", 0)) {
                         activity.runOnUiThread(callback);
-                    //} else if (downloadIconFromUrl(ICONS1_URL + pkg + ".png", file)) {
-                    //    activity.runOnUiThread(callback);
+                    } else if (downloadIconFromUrl(ICONS1_URL + pkg + ".png", file)) {
+                        activity.runOnUiThread(callback);
                     //} else if (downloadIconFromUrl(ICONS_FALLBACK_URL + pkg + "&set=banners", file)) {
                     //    activity.runOnUiThread(callback);
                     } else {

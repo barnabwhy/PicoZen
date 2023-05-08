@@ -5,11 +5,11 @@
         <item name="android:windowBackground">#00000000</item>
 
         <!-- Primary brand color. -->
-        <item name="colorPrimary">#00000000</item>
+        <item name="colorPrimary">@color/link</item>
         <item name="colorPrimaryVariant">#00000000</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">#00000000</item>
+        <item name="colorSecondary">@color/link</item>
         <item name="colorSecondaryVariant">#00000000</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->

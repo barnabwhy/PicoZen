@@ -30,10 +30,10 @@ jobs:
       run: ./gradlew assembleRelease
     - name: Rename output
       run: |
-        cd App/build/outputs/apk/release
-        mv App-release.apk PicoZen.apk
+        cd app/build/outputs/apk/release
+        mv app-release.apk PicoZen.apk
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: PicoZen
-        path: Launcher/App/build/outputs/apk/release/PicoZen.apk
+        path: app/build/outputs/apk/release/PicoZen.apk

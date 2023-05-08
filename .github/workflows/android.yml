@@ -33,7 +33,7 @@ jobs:
         ls app
         cd app/build/outputs/apk/release
         ls
-        mv app-release.apk PicoZen.apk
+        mv app-release-unsigned.apk PicoZen.apk
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:

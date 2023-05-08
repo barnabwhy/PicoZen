@@ -3,6 +3,7 @@ package com.barnabwhy.picozen;
 import static androidx.core.content.FileProvider.getUriForFile;
 
 import static com.barnabwhy.picozen.SettingsProvider.KEY_CURRENT_TAB;
+import com.barnabwhy.picozen.BuildConfig;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL u = new URL("https://api.github.com/repos/barnabwhy/PicoZen/releases/tags/"); // ADD VERSION
+                    URL u = new URL("https://api.github.com/repos/barnabwhy/PicoZen/releases/tags/" + BuildConfig.VERSION_NAME);
                     InputStream stream = u.openStream();
                     int bufferSize = 1024;
                     char[] buffer = new char[bufferSize];

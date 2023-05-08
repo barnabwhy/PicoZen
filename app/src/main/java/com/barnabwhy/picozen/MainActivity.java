@@ -34,6 +34,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -298,6 +299,9 @@ public class MainActivity extends AppCompatActivity {
             ButtonManager.isAccessibilityInitialized(this);
             ButtonManager.requestAccessibility(this);
         });
+
+        TextView versionText = dialog.findViewById(R.id.version_number);
+        versionText.setText(String.format(getResources().getString(R.string.version_text), BuildConfig.VERSION_NAME));
 
         View iconRefresh = dialog.findViewById(R.id.refresh_icon_cache);
         iconRefresh.setOnClickListener(view -> {

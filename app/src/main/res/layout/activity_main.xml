@@ -230,9 +230,22 @@
                     android:padding="15dp" />
 
                 <Spinner
+                    android:id="@+id/group"
+                    android:theme="@style/spinnerItemStyle"
+                    android:layout_width="160dp"
+                    android:layout_height="40dp"
+                    android:dropDownVerticalOffset="45dp"
+                    android:popupBackground="@drawable/bg_list_item_hover_s"
+                    android:background="@drawable/bg_list_item_s"
+                    android:spinnerMode="dropdown"
+                    android:textColor="@android:color/white"
+                    android:scaleType="fitCenter"
+                    android:layout_marginHorizontal="10dp" />
+
+                <Spinner
                     android:id="@+id/sort"
                     android:theme="@style/spinnerItemStyle"
-                    android:layout_width="240dp"
+                    android:layout_width="160dp"
                     android:layout_height="40dp"
                     android:dropDownVerticalOffset="45dp"
                     android:popupBackground="@drawable/bg_list_item_hover_s"
@@ -258,6 +271,16 @@
                 android:scrollbars="none"
                 android:overScrollMode="never">
             </GridView>
+            <TextView
+                android:id="@+id/app_grid_empty"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/empty_group"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout

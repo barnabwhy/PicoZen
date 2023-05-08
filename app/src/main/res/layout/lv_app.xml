@@ -48,4 +48,25 @@
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_margin="15dp" />
+
+    <View
+        android:id="@+id/favorite_btn"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/bg_ico_btn_hover"
+        android:scaleType="fitCenter"
+        android:foreground="@drawable/ic_favorite"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp" />
+
+    <View
+        android:id="@+id/hidden_btn"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/bg_ico_btn_hover"
+        android:scaleType="fitCenter"
+        android:foreground="@drawable/ic_hidden"
+        android:layout_alignParentBottom="true"
+        android:layout_marginVertical="10dp"
+        android:layout_marginHorizontal="50dp" />
 </RelativeLayout>

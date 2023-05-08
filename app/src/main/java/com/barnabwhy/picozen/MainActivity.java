@@ -271,6 +271,30 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        // Set group button
+        Spinner groupSpinner = findViewById(R.id.group);
+        ArrayAdapter<CharSequence> groupApdater = ArrayAdapter.createFromResource(this, R.array.group_options, R.layout.spinner_item);
+        groupApdater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        groupSpinner.setAdapter(groupApdater);
+        groupSpinner.setSelection(sharedPreferences.getInt(SettingsProvider.KEY_GROUP_SPINNER, 0));
+        groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                //persist sort settings
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt(SettingsProvider.KEY_GROUP_SPINNER, pos);
+                editor.apply();
+
+                //update UI
+                appGridView.setAdapter(new AppsAdapter((MainActivity)mainContext));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     @SuppressLint("ClickableViewAccessibility")

@@ -16,13 +16,20 @@
     <string name="made_with_love">Made by Barnaby</string>
     <string name="gh_repo">barnabwhy/PicoZen</string>
     <string name="version_text">v%1$s</string>
+    <string name="empty_group">Empty group</string>
 
     <string-array name="sort_options">
-        <item>↓ Name</item>
-        <item>↑ Name</item>
-        <item>↓ Recent</item>
-        <item>↑ Recent</item>
-        <item>↓ Install date</item>
-        <item>↑ Install date</item>
+        <item>↓\t Name</item>
+        <item>↑\t Name</item>
+        <item>↓\t Recent</item>
+        <item>↑\t Recent</item>
+        <item>↓\t Install date</item>
+        <item>↑\t Install date</item>
+    </string-array>
+
+    <string-array name="group_options">
+        <item>☰\t All</item>
+        <item>★\t Favorites</item>
+        <item>—\t Hidden</item>
     </string-array>
 </resources>

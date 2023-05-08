@@ -23,6 +23,9 @@ public class SettingsProvider
     public static final String KEY_SORT_SPINNER = "KEY_SORT_SPINNER";
     public static final String KEY_SORT_FIELD = "KEY_SORT_FIELD";
     public static final String KEY_SORT_ORDER = "KEY_SORT_ORDER";
+    public static final String KEY_GROUP_SPINNER = "KEY_GROUP_SPINNER";
+    public static final String KEY_FAVORITE_APPS = "KEY_FAVORITE_APPS";
+    public static final String KEY_HIDDEN_APPS = "KEY_HIDDEN_APPS";
     public static final String KEY_RECENTS = "KEY_RECENTS";
 
     private final String KEY_APP_GROUPS = "prefAppGroups";

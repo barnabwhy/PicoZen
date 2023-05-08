@@ -1,0 +1,30 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.PicoZen" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowBackground">#00000000</item>
+
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#00000000</item>
+        <item name="colorPrimaryVariant">#00000000</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">#00000000</item>
+        <item name="colorSecondaryVariant">#00000000</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+    <style name="Theme.PicoZen" parent="Base.Theme.PicoZen" />
+
+    <style name="CustomDialog" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:backgroundDimAmount">0</item>
+    </style>
+
+    <style name="spinnerItemStyle" parent="@android:style/Widget.TextView.SpinnerItem">
+        <item name="android:textColor">@color/text</item>
+    </style>
+</resources>

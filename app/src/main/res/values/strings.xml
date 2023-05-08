@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">PicoZen</string>
+    <string name="list_home">Home</string>
+    <string name="list_apps">Apps</string>
+    <string name="settings">Settings</string>
+    <string name="list_tweaks">Tweaks</string>
+    <string name="list_sideload">Sideload</string>
+    <string name="currently_in_development">Currently in development</string>
+    <string name="start_shortcut">Open PicoZen with Library icon from the system dashboard</string>
+    <string name="shortcut_prompt">Open PicoZen with the Library shortcut (Experimental)</string>
+    <string name="configure">Configure</string>
+    <string name="refresh">Refresh</string>
+    <string name="refresh_icon_cache">Refresh icon cache</string>
+    <string name="changelog_empty">There\'s nothing here</string>
+    <string name="changelog_header">What\'s new:</string>
+    <string name="made_with_love">Made by Barnaby</string>
+    <string name="gh_repo">barnabwhy/PicoZen</string>
+
+    <string-array name="sort_options">
+        <item>↓ Name</item>
+        <item>↑ Name</item>
+        <item>↓ Recent</item>
+        <item>↑ Recent</item>
+        <item>↓ Install date</item>
+        <item>↑ Install date</item>
+    </string-array>
+</resources>

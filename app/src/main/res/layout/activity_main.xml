@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="@drawable/bg_app"
+    android:clipToOutline="true"
+    android:hapticFeedbackEnabled="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <LinearLayout
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="15dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textStyle="bold"
+                android:textSize="35sp"
+                android:padding="15dp" />
+            <LinearLayout
+                android:id="@+id/list_view"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:showDividers="middle"
+                android:divider="@drawable/divider">
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
+                    <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_home" />
+                    <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
+                        android:text="@string/list_home" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
+                    <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_apps" />
+                    <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
+                        android:text="@string/list_apps" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
+                    <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_tweaks" />
+                    <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
+                        android:textColor="@color/text_disabled"
+                        android:text="@string/list_tweaks" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
+                    <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_sideload" />
+                    <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
+                        android:textColor="@color/text_disabled"
+                        android:text="@string/list_sideload" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <RelativeLayout android:layout_width="match_parent" android:layout_height="60dp">
+                <View
+                    android:id="@+id/settings_btn"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/bg_ico_btn"
+                    android:scaleType="fitCenter"
+                    android:foreground="@drawable/ic_settings" />
+                <TextView
+                    android:id="@+id/settings_tooltip"
+                    android:layout_width="wrap_content" android:layout_height="40dp" android:gravity="center_vertical"
+                    android:paddingHorizontal="15dp"
+                    android:textSize="13sp" android:textStyle="bold"
+                    android:background="@drawable/bg_tooltip"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/settings"
+                    android:visibility="gone" />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/home_page"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:background="@drawable/bg_content"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/list_home"
+                android:textStyle="bold"
+                android:textSize="35sp"
+                android:padding="15dp" />
+            <LinearLayout
+                android:id="@+id/home_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:showDividers="middle"
+                android:divider="@drawable/divider">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="5"
+                    android:padding="15dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:layout_marginBottom="10dp"
+                        android:text="@string/changelog_header" />
+                    <ScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:overScrollMode="never">
+                        <TextView
+                            android:id="@+id/changelog"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:text="@string/changelog_empty" />
+                    </ScrollView>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:showDividers="middle"
+                    android:divider="@drawable/divider"
+                    android:layout_marginBottom="5dp">
+
+                    <RelativeLayout
+                        android:id="@+id/link_github"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_app_icon"
+                        android:foregroundGravity="center"
+                        android:foreground="@drawable/ic_github">
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/link_discord"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_discord"
+                        android:foregroundGravity="center"
+                        android:foreground="@drawable/ic_discord">
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_app_icon"
+                        android:foregroundGravity="center">
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_app_icon"
+                        android:foregroundGravity="center">
+                    </RelativeLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="10dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:textSize="10sp"
+                        android:text="@string/made_with_love" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:textSize="10sp"
+                        android:text="@string/gh_repo" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/apps_page"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:background="@drawable/bg_content"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="@string/list_apps"
+                    android:textStyle="bold"
+                    android:textSize="35sp"
+                    android:padding="15dp" />
+
+                <Spinner
+                    android:id="@+id/sort"
+                    android:theme="@style/spinnerItemStyle"
+                    android:layout_width="240dp"
+                    android:layout_height="40dp"
+                    android:dropDownVerticalOffset="45dp"
+                    android:popupBackground="@drawable/bg_list_item_hover_s"
+                    android:background="@drawable/bg_list_item_s"
+                    android:spinnerMode="dropdown"
+                    android:textColor="@android:color/white"
+                    android:scaleType="fitCenter" />
+
+            </LinearLayout>
+            <GridView
+                android:id="@+id/app_grid"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:columnWidth="101dp"
+                android:gravity="center"
+                android:horizontalSpacing="10dp"
+                android:numColumns="auto_fit"
+                android:scrollbarStyle="outsideOverlay"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="10dp"
+                android:baselineAligned="false"
+                android:scrollbars="none"
+                android:overScrollMode="never">
+            </GridView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tweaks_page"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:background="@drawable/bg_content"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/list_tweaks"
+                android:textStyle="bold"
+                android:textSize="35sp"
+                android:padding="15dp" />
+            <LinearLayout
+                android:id="@+id/tweaks_List"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/currently_in_development"
+                    android:padding="15dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sideload_page"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:background="@drawable/bg_content"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/list_sideload"
+                android:textStyle="bold"
+                android:textSize="35sp"
+                android:padding="15dp" />
+            <LinearLayout
+                android:id="@+id/sideload_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/currently_in_development"
+                    android:padding="15dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <View
+        android:id="@+id/dialog_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_dialog_overlay"
+        android:visibility="gone" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

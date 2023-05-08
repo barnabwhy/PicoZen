@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="library_accessibility_event_packages">
+        <!-- Pico package known, Oculus yet to be added -->
+        <item>com.pvr.appmanager</item>
+    </string-array>
+</resources>

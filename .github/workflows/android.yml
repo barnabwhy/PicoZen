@@ -30,7 +30,7 @@ jobs:
       run: ./gradlew assembleRelease
     - name: Rename output
       run: |
-        ls app/release
+        ls app
         cd app/build/outputs/apk/release
         ls
         mv app-release.apk PicoZen.apk

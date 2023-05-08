@@ -7,17 +7,18 @@ android {
     compileSdk 33
 
     signingConfigs {
-    debug {
-        storeFile file(var1)
-        storePassword var2
-        keyPassword var3
-        keyAlias var4
-    }
-    release {
-        storeFile file(var1)
-        storePassword var2
-        keyPassword var3
-        keyAlias var4
+        debug {
+            storeFile file(var1)
+            storePassword var2
+            keyPassword var3
+            keyAlias var4
+        }
+        release {
+            storeFile file(var1)
+            storePassword var2
+            keyPassword var3
+            keyAlias var4
+        }
     }
 
     defaultConfig {

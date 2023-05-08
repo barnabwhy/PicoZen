@@ -22,7 +22,7 @@ jobs:
 
     - name: Create Android signing key from secret
       run: |
-        sed -i 's/C:\\\\Users\\\\Username\\\\/..\//g' build.gradle
+        sed -i 's/C:\\\\Users\\\\Username\\\\//g' build.gradle
         echo -n "${{ secrets.ANDROID_SIGNING_KEY }}" | base64 --decode > android_signing_key.jks
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -30,10 +30,10 @@ jobs:
       run: ./gradlew assembleRelease
     - name: Rename output
       run: |
-        cd app/build/outputs/apk/release
-        mv app-release-unsigned.apk PicoZen.apk
+        cd app/release
+        mv app-release.apk PicoZen.apk
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: PicoZen
-        path: app/build/outputs/apk/release/PicoZen.apk
+        path: app/release/PicoZen.apk

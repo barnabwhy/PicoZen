@@ -41,6 +41,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.noties.markwon.AbstractMarkwonPlugin;
 import io.noties.markwon.LinkResolverDef;
@@ -93,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        checkForUpdates();
 
         sharedPreferences = getSharedPreferences(getPackageName() + "_preferences", Context.MODE_PRIVATE);
         settingsProvider = SettingsProvider.getInstance(this);
@@ -235,12 +239,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
             v.setOnClickListener(view -> {
-                listView.getChildAt(selectedPage).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.bg_list_item, getTheme()));
-                findViewById(pageList[selectedPage]).setVisibility(View.GONE);
-                selectedPage = finalI;
-                sharedPreferences.edit().putInt(KEY_CURRENT_TAB, finalI).apply();
-                v.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.bg_list_item_s, getTheme()));
-                findViewById(pageList[finalI]).setVisibility(View.VISIBLE);
+                selectPage(finalI);
             });
 
             appGridView.setAdapter(new AppsAdapter(this));
@@ -327,6 +326,81 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    private void selectPage(int i) {
+        final int[] pageList = { R.id.apps_page, R.id.tweaks_page, R.id.sideload_page, R.id.about_page };
+        LinearLayout listView = findViewById(R.id.list_view);
+        View v = listView.getChildAt(i);
+        listView.getChildAt(selectedPage).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.bg_list_item, getTheme()));
+        findViewById(pageList[selectedPage]).setVisibility(View.GONE);
+        selectedPage = i;
+        sharedPreferences.edit().putInt(KEY_CURRENT_TAB, i).apply();
+        v.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.bg_list_item_s, getTheme()));
+        findViewById(pageList[i]).setVisibility(View.VISIBLE);
+    }
+
+    private void checkForUpdates() {
+        Context mainContext = this;
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    URL u = new URL("https://api.github.com/repos/barnabwhy/PicoZen/releases/tags/" + BuildConfig.VERSION_NAME);
+                    InputStream stream = u.openStream();
+                    int bufferSize = 1024;
+                    char[] buffer = new char[bufferSize];
+                    StringBuilder out = new StringBuilder();
+                    Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
+                    for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+                        out.append(buffer, 0, numRead);
+                    }
+                    JSONObject json = new JSONObject(out.toString());
+                    String str = json.getString("body");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final Markwon markwon = Markwon.builder(mainContext)
+                                    .usePlugin(CorePlugin.create())
+                                    .usePlugin(SoftBreakAddsNewLinePlugin.create())
+                                    .build();
+                            markwon.setMarkdown((TextView)findViewById(R.id.changelog), str);
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("Error", e.toString());
+                }
+
+                try {
+                    URL u = new URL("https://api.github.com/repos/barnabwhy/PicoZen/releases/latest");
+                    InputStream stream = u.openStream();
+                    int bufferSize = 1024;
+                    char[] buffer = new char[bufferSize];
+                    StringBuilder out = new StringBuilder();
+                    Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
+                    for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+                        out.append(buffer, 0, numRead);
+                    }
+                    JSONObject json = new JSONObject(out.toString());
+                    String str = json.getString("tag_name");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TextView verText = (TextView)findViewById(R.id.new_version);
+                            verText.setText(String.format(getResources().getString(R.string.new_version_available), str));
+                            verText.setVisibility(str.equals(BuildConfig.VERSION_NAME) ? View.GONE : View.VISIBLE);
+                            verText.setOnClickListener(view -> {
+                                Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/releases/"+str);
+                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                startActivity(intent);
+                            });
+
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("Error", e.toString());
+                }
+            }
+        };
+        thread.start();
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -370,6 +444,13 @@ public class MainActivity extends AppCompatActivity {
         toggleEditMode.setOnClickListener(view -> {
             appsAdapter.toggleEditMode();
             ((TextView)toggleEditMode.findViewById(R.id.toggle_edit_mode_btn)).setText(appsAdapter.getEditModeEnabled() ? R.string.disable : R.string.enable);
+        });
+
+        View checkUpdatesBtn = dialog.findViewById(R.id.check_for_updates_btn);
+        checkUpdatesBtn.setOnClickListener(view -> {
+            checkForUpdates();
+            selectPage(3); // go to about
+            dialog.dismiss();
         });
 
         View closeBtn = dialog.findViewById(R.id.close_btn);

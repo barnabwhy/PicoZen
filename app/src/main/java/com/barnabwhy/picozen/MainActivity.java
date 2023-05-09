@@ -334,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    URL u = new URL("https://api.github.com/repos/barnabwhy/PicoZen/releases/tags/" + BuildConfig.VERSION_NAME);
+                    URL u = new URL("https://pico.doesnt-like.me/picozen/releases/tags/" + BuildConfig.VERSION_NAME);
                     InputStream stream = u.openStream();
                     int bufferSize = 1024;
                     char[] buffer = new char[bufferSize];
@@ -360,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 try {
-                    URL u = new URL("https://api.github.com/repos/barnabwhy/PicoZen/releases/latest");
+                    URL u = new URL("https://pico.doesnt-like.me/picozen/releases/latest");
                     InputStream stream = u.openStream();
                     int bufferSize = 1024;
                     char[] buffer = new char[bufferSize];

@@ -170,11 +170,13 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout listView = findViewById(R.id.list_view);
 
         selectedPage = sharedPreferences.getInt(KEY_CURRENT_TAB, 0);
-        final int[] pageList = { R.id.home_page, R.id.apps_page, R.id.tweaks_page, R.id.sideload_page };
+        final int[] pageList = { R.id.apps_page, R.id.tweaks_page, R.id.sideload_page, R.id.about_page };
 
-        //final int childCount = listView.getChildCount();
-        final int childCount = 2;
+        final int childCount = listView.getChildCount();
         for (int i = 0; i < childCount; i++) {
+            if(i > 0 && i < 3)
+                continue; // temp, while tweaks and sideload tools don't exist
+
             View v = listView.getChildAt(i);
             int finalI = i;
             if (finalI == selectedPage) {

@@ -14,8 +14,10 @@ import androidx.core.content.res.ResourcesCompat;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.net.Uri;
@@ -62,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
     private AppsAdapter.SORT_FIELD mSortField = AppsAdapter.SORT_FIELD.APP_NAME;
     private AppsAdapter.SORT_ORDER mSortOrder = AppsAdapter.SORT_ORDER.ASCENDING;
+
+    BroadcastReceiver updateAppsReciver;
 
     public static boolean foregrounded() {
         ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
@@ -263,6 +267,55 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        registerAppUpdateReciever();
+
+        // automatic update checks
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask checkForUpdatesTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        try {
+                            checkForUpdates();
+                        } catch (Exception e) {
+                            Log.e("checkForUpdatesTask", e.toString());
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(checkForUpdatesTask, 0, 600000); //execute every 10 minutes
+    }
+
+    private void registerAppUpdateReciever() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("picozen.applist.update");
+        updateAppsReciver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                ((AppsAdapter)appGridView.getAdapter()).updateAppList();
+            }
+        };
+        registerReceiver(updateAppsReciver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(updateAppsReciver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerAppUpdateReciever();
+        ((AppsAdapter)appGridView.getAdapter()).updateAppList();
+        checkForUpdates();
+    }
+
     private void selectPage(int i) {
         final int[] pageList = { R.id.apps_page, R.id.tweaks_page, R.id.sideload_page, R.id.about_page };
         LinearLayout listView = findViewById(R.id.list_view);
@@ -377,7 +430,6 @@ public class MainActivity extends AppCompatActivity {
 
         View toggleEditMode = dialog.findViewById(R.id.toggle_edit_mode);
         ((TextView)toggleEditMode.findViewById(R.id.toggle_edit_mode_btn)).setText(appsAdapter.getEditModeEnabled() ? R.string.disable : R.string.enable);
-
         toggleEditMode.setOnClickListener(view -> {
             appsAdapter.toggleEditMode();
             ((TextView)toggleEditMode.findViewById(R.id.toggle_edit_mode_btn)).setText(appsAdapter.getEditModeEnabled() ? R.string.disable : R.string.enable);

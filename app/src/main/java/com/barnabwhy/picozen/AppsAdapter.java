@@ -54,6 +54,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AppsAdapter extends BaseAdapter
@@ -91,6 +93,25 @@ public class AppsAdapter extends BaseAdapter
 
         isEditMode = false;
         updateAppList();
+
+        // redundancy for package broadcast receiver
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask updateAppListTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        try {
+                            updateAppList();
+                        } catch (Exception e) {
+                            Log.e("updateAppListTask", e.toString());
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(updateAppListTask, 0, 600000); //execute every 10 minutes
     }
 
     public static int getPixelFromDip(int dip) {

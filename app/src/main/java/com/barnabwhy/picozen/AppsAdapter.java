@@ -612,7 +612,7 @@ public class AppsAdapter extends BaseAdapter
         new Thread(() -> {
             try {
                 synchronized (pkg) {
-                    if (downloadIconFromUrl(ICONS_URL + pkg + "/banner.png", file)) {
+                    if (downloadIconFromUrl(ICONS_URL + pkg + "/banner.png?useBackup=1", file)) {
                         activity.runOnUiThread(callback);
                     }
                     //if (ignoredIcons.contains(STYLES[style] + "." + file.getName())) {

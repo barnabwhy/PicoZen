@@ -129,6 +129,36 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     Log.e("Error", e.toString());
                 }
+
+                try {
+                    URL u = new URL("https://api.github.com/repos/barnabwhy/PicoZen/releases/latest");
+                    InputStream stream = u.openStream();
+                    int bufferSize = 1024;
+                    char[] buffer = new char[bufferSize];
+                    StringBuilder out = new StringBuilder();
+                    Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
+                    for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+                        out.append(buffer, 0, numRead);
+                    }
+                    JSONObject json = new JSONObject(out.toString());
+                    String str = json.getString("tag_name");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TextView verText = (TextView)findViewById(R.id.new_version);
+                            verText.setText(String.format(getResources().getString(R.string.new_version_available), str));
+                            verText.setVisibility(str.equals(BuildConfig.VERSION_NAME) ? View.GONE : View.VISIBLE);
+                            verText.setOnClickListener(view -> {
+                                Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/releases/"+str);
+                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                startActivity(intent);
+                            });
+
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("Error", e.toString());
+                }
             }
         };
         findViewById(R.id.link_github).setOnClickListener(view -> {

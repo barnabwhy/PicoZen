@@ -3,8 +3,6 @@ An alternate library and utility app for PICO XR. Designed to look and feel like
 
 ![image](https://user-images.githubusercontent.com/22575741/237024433-783b7aee-b855-4c83-acac-31be40d3ff91.png)
 
-----
-
 **Features**
 - All apps in one place
 - PICO OS design

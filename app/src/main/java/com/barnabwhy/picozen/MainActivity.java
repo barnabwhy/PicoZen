@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.apply();
 
                 //update UI
-                appGridView.setAdapter(new AppsAdapter((MainActivity)mainContext));
+                ((AppsAdapter)appGridView.getAdapter()).updateAppList();
             }
 
             @Override
@@ -324,13 +324,20 @@ public class MainActivity extends AppCompatActivity {
             ButtonManager.requestAccessibility(this);
         });
 
-        TextView versionText = dialog.findViewById(R.id.version_number);
-        versionText.setText(String.format(getResources().getString(R.string.version_text), BuildConfig.VERSION_NAME));
-
         View iconRefresh = dialog.findViewById(R.id.refresh_icon_cache);
         iconRefresh.setOnClickListener(view -> {
             AppsAdapter.clearAllIcons(this);
-            ((AppsAdapter) appGridView.getAdapter()).sort(mSortField, mSortOrder);
+            ((AppsAdapter) appGridView.getAdapter()).notifyDataSetChanged();
+        });
+
+        AppsAdapter appsAdapter = (AppsAdapter)appGridView.getAdapter();
+
+        View toggleEditMode = dialog.findViewById(R.id.toggle_edit_mode);
+        ((TextView)toggleEditMode.findViewById(R.id.toggle_edit_mode_btn)).setText(appsAdapter.getEditModeEnabled() ? R.string.disable : R.string.enable);
+
+        toggleEditMode.setOnClickListener(view -> {
+            appsAdapter.toggleEditMode();
+            ((TextView)toggleEditMode.findViewById(R.id.toggle_edit_mode_btn)).setText(appsAdapter.getEditModeEnabled() ? R.string.disable : R.string.enable);
         });
 
         View closeBtn = dialog.findViewById(R.id.close_btn);
@@ -348,6 +355,9 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
+
+        TextView versionText = dialog.findViewById(R.id.version_number);
+        versionText.setText(String.format(getResources().getString(R.string.version_text), BuildConfig.VERSION_NAME));
 
         dialog.setOnDismissListener(d -> {
             dialogOverlay.setVisibility(View.GONE);

@@ -17,6 +17,9 @@
     <string name="gh_repo">barnabwhy/PicoZen</string>
     <string name="version_text">v%1$s</string>
     <string name="empty_group">Empty group</string>
+    <string name="edit_mode">Edit mode</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
 
     <string-array name="sort_options">
         <item>↓\t Name</item>

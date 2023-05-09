@@ -74,13 +74,13 @@ public class AppsAdapter extends BaseAdapter
     private final SettingsProvider settingsProvider;
     public static SharedPreferences sharedPreferences;
     private GridView appGridView;
+    private boolean isEditMode;
 
     public AppsAdapter(MainActivity context)
     {
         mainActivityContext = context;
 
         appGridView = mainActivityContext.findViewById(R.id.app_grid);
-        TextView appGridEmpty = mainActivityContext.findViewById(R.id.app_grid_empty);
         itemScale = getPixelFromDip(200);
         appGridView.setColumnWidth(itemScale);
         sharedPreferences = context.getSharedPreferences(context.getPackageName() + "_preferences", Context.MODE_PRIVATE);
@@ -89,8 +89,27 @@ public class AppsAdapter extends BaseAdapter
         favoriteList = sharedPreferences.getStringSet(SettingsProvider.KEY_FAVORITE_APPS, new HashSet<String> ());
         hiddenList = sharedPreferences.getStringSet(SettingsProvider.KEY_HIDDEN_APPS, new HashSet<String> ());
 
+        isEditMode = false;
+        updateAppList();
+    }
+
+    public static int getPixelFromDip(int dip) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, mainActivityContext.getResources().getDisplayMetrics());
+    }
+
+    public boolean getEditModeEnabled() {
+        return isEditMode;
+    }
+
+    public void toggleEditMode() {
+        isEditMode = !isEditMode;
+        notifyDataSetChanged();
+    }
+
+    public void updateAppList() {
         appList = getAppList(sharedPreferences.getInt(SettingsProvider.KEY_GROUP_SPINNER, 0));
 
+        TextView appGridEmpty = mainActivityContext.findViewById(R.id.app_grid_empty);
         if(appList.size() == 0) {
             appGridView.setVisibility(View.GONE);
             appGridEmpty.setVisibility(View.VISIBLE);
@@ -99,13 +118,8 @@ public class AppsAdapter extends BaseAdapter
             appGridEmpty.setVisibility(View.GONE);
         }
 
-        SORT_FIELD sortField = SORT_FIELD.values()[0];
-        SORT_ORDER sortOrder = SORT_ORDER.values()[0];
-        this.sort(sortField, sortOrder);
-    }
-
-    public static int getPixelFromDip(int dip) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, mainActivityContext.getResources().getDisplayMetrics());
+        this.sort(SORT_FIELD.values()[sharedPreferences.getInt(SettingsProvider.KEY_SORT_FIELD, 0)], SORT_ORDER.values()[sharedPreferences.getInt(SettingsProvider.KEY_SORT_ORDER, 0)]);
+        notifyDataSetChanged();
     }
 
     private static class ViewHolder {
@@ -115,6 +129,7 @@ public class AppsAdapter extends BaseAdapter
         ImageView progressBar;
         View favoriteBtn;
         View hiddenBtn;
+        boolean hasBanner;
     }
 
     public int getCount()
@@ -202,80 +217,6 @@ public class AppsAdapter extends BaseAdapter
             holder.hiddenBtn = convertView.findViewById(R.id.hidden_btn);
             convertView.setTag(holder);
 
-            holder.favoriteBtn.setForeground(ResourcesCompat.getDrawable(mainActivityContext.getResources(), favoriteList.contains(currentApp.packageName) ? R.drawable.ic_favorite_active : R.drawable.ic_favorite, mainActivityContext.getTheme()));
-            holder.hiddenBtn.setForeground(ResourcesCompat.getDrawable(mainActivityContext.getResources(), hiddenList.contains(currentApp.packageName) ? R.drawable.ic_hidden_active : R.drawable.ic_hidden, mainActivityContext.getTheme()));
-
-            holder.favoriteBtn.setOnClickListener(view -> {
-                ApplicationInfo app = appList.get(position);
-                boolean isFavorite = favoriteList.contains(app.packageName);
-
-                if(isFavorite) {
-                    favoriteList.remove(app.packageName);
-                } else {
-                    favoriteList.add(app.packageName);
-                    if (hiddenList.contains(app.packageName)) {
-                        hiddenList.remove(app.packageName);
-                    }
-                }
-                sharedPreferences.edit().putStringSet(SettingsProvider.KEY_FAVORITE_APPS, favoriteList).apply();
-                sharedPreferences.edit().putStringSet(SettingsProvider.KEY_HIDDEN_APPS, hiddenList).apply();
-
-                if(sharedPreferences.getInt(SettingsProvider.KEY_GROUP_SPINNER, 0) == 0) {
-                    holder.favoriteBtn.setForeground(ResourcesCompat.getDrawable(mainActivityContext.getResources(), isFavorite ? R.drawable.ic_favorite : R.drawable.ic_favorite_active, mainActivityContext.getTheme()));
-                } else {
-                    // Reload view if state of current group changes
-                    appList = getAppList(sharedPreferences.getInt(SettingsProvider.KEY_GROUP_SPINNER, 0));
-                    this.sort(SORT_FIELD.values()[sharedPreferences.getInt(SettingsProvider.KEY_SORT_FIELD, 0)], SORT_ORDER.values()[sharedPreferences.getInt(SettingsProvider.KEY_SORT_ORDER, 0)]);
-                }
-            });
-
-            holder.hiddenBtn.setOnClickListener(view -> {
-                ApplicationInfo app = appList.get(position);
-                boolean isHidden = hiddenList.contains(app.packageName);
-
-                if(isHidden) {
-                    hiddenList.remove(app.packageName);
-                } else {
-                    hiddenList.add(app.packageName);
-                    if (favoriteList.contains(app.packageName)) {
-                        favoriteList.remove(app.packageName);
-                    }
-                }
-                sharedPreferences.edit().putStringSet(SettingsProvider.KEY_FAVORITE_APPS, favoriteList).apply();
-                sharedPreferences.edit().putStringSet(SettingsProvider.KEY_HIDDEN_APPS, hiddenList).apply();
-
-                // Reload view if state of current group changes
-                appList = getAppList(sharedPreferences.getInt(SettingsProvider.KEY_GROUP_SPINNER, 0));
-                this.sort(SORT_FIELD.values()[sharedPreferences.getInt(SettingsProvider.KEY_SORT_FIELD, 0)], SORT_ORDER.values()[sharedPreferences.getInt(SettingsProvider.KEY_SORT_ORDER, 0)]);
-            });
-
-            AtomicInteger hovering = new AtomicInteger();
-            View.OnGenericMotionListener listener = (View view, MotionEvent event) -> {
-                if (event.getActionMasked() == MotionEvent.ACTION_HOVER_ENTER) {
-                    hovering.getAndIncrement();
-
-                    if(hovering.get() == 1) {
-                        holder.layout.findViewById(R.id.app_icon_overlay).setVisibility(View.VISIBLE);
-                        holder.layout.findViewById(R.id.textLabel).setVisibility(View.VISIBLE);
-                    }
-                } else if (event.getActionMasked() == MotionEvent.ACTION_HOVER_EXIT) {
-                    hovering.getAndDecrement();
-
-                    if(hovering.get() == 0) {
-                        holder.layout.findViewById(R.id.app_icon_overlay).setVisibility(View.INVISIBLE);
-                        holder.layout.findViewById(R.id.textLabel).setVisibility((appList.size() > position && iconCache.containsKey("banners."+appList.get(position).packageName)) ? View.INVISIBLE : View.VISIBLE);
-                    }
-                }
-                if(hovering.get() < 0) {
-                    hovering.set(0);
-                }
-                return false;
-            };
-
-            convertView.setOnGenericMotionListener(listener);
-            holder.favoriteBtn.setOnGenericMotionListener(listener);
-            holder.hiddenBtn.setOnGenericMotionListener(listener);
-
             // Set clipToOutline to true on imageView (Workaround for bug)
             holder.layout.setClipToOutline(true);
 
@@ -304,6 +245,80 @@ public class AppsAdapter extends BaseAdapter
             // ViewHolder already exists, reuse it
             holder = (ViewHolder) convertView.getTag();
         }
+
+        holder.favoriteBtn.setForeground(ResourcesCompat.getDrawable(mainActivityContext.getResources(), favoriteList.contains(currentApp.packageName) ? R.drawable.ic_favorite_active : R.drawable.ic_favorite, mainActivityContext.getTheme()));
+        holder.hiddenBtn.setForeground(ResourcesCompat.getDrawable(mainActivityContext.getResources(), hiddenList.contains(currentApp.packageName) ? R.drawable.ic_hidden_active : R.drawable.ic_hidden, mainActivityContext.getTheme()));
+
+        holder.favoriteBtn.setOnClickListener(view -> {
+            ApplicationInfo app = appList.get(position);
+            boolean isFavorite = favoriteList.contains(app.packageName);
+
+            if(isFavorite) {
+                favoriteList.remove(app.packageName);
+            } else {
+                favoriteList.add(app.packageName);
+                if (hiddenList.contains(app.packageName)) {
+                    hiddenList.remove(app.packageName);
+                }
+            }
+            sharedPreferences.edit().putStringSet(SettingsProvider.KEY_FAVORITE_APPS, favoriteList).apply();
+            sharedPreferences.edit().putStringSet(SettingsProvider.KEY_HIDDEN_APPS, hiddenList).apply();
+
+            if(sharedPreferences.getInt(SettingsProvider.KEY_GROUP_SPINNER, 0) == 0) {
+                holder.favoriteBtn.setForeground(ResourcesCompat.getDrawable(mainActivityContext.getResources(), isFavorite ? R.drawable.ic_favorite : R.drawable.ic_favorite_active, mainActivityContext.getTheme()));
+            } else {
+                // Reload view if state of current group changes
+                updateAppList();
+            }
+        });
+
+        holder.hiddenBtn.setOnClickListener(view -> {
+            ApplicationInfo app = appList.get(position);
+            boolean isHidden = hiddenList.contains(app.packageName);
+
+            if(isHidden) {
+                hiddenList.remove(app.packageName);
+            } else {
+                hiddenList.add(app.packageName);
+                if (favoriteList.contains(app.packageName)) {
+                    favoriteList.remove(app.packageName);
+                }
+            }
+            sharedPreferences.edit().putStringSet(SettingsProvider.KEY_FAVORITE_APPS, favoriteList).apply();
+            sharedPreferences.edit().putStringSet(SettingsProvider.KEY_HIDDEN_APPS, hiddenList).apply();
+
+            // Reload view if state of current group changes
+            updateAppList();
+        });
+
+        AtomicInteger hovering = new AtomicInteger();
+        View.OnGenericMotionListener listener = (View view, MotionEvent event) -> {
+            int action = event.getAction();
+            if (action == MotionEvent.ACTION_HOVER_ENTER || action == MotionEvent.ACTION_DOWN) {
+                hovering.getAndIncrement();
+
+                holder.layout.findViewById(R.id.app_icon_overlay).setVisibility(View.VISIBLE);
+                holder.textView.setVisibility(View.VISIBLE);
+            } else if (action == MotionEvent.ACTION_HOVER_EXIT || action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                hovering.getAndDecrement();
+
+                if(hovering.get() <= 0) {
+                    holder.layout.findViewById(R.id.app_icon_overlay).setVisibility(View.INVISIBLE);
+                    holder.textView.setVisibility(holder.hasBanner ? View.INVISIBLE : View.VISIBLE);
+                }
+            }
+            if(hovering.get() < 0) {
+                hovering.set(0);
+            }
+            return false;
+        };
+
+        holder.layout.setOnGenericMotionListener(listener);
+        holder.favoriteBtn.setOnGenericMotionListener(listener);
+        holder.hiddenBtn.setOnGenericMotionListener(listener);
+
+        holder.favoriteBtn.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
+        holder.hiddenBtn.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
 
         // set value into textview
         PackageManager pm = mainActivityContext.getPackageManager();
@@ -474,6 +489,7 @@ public class AppsAdapter extends BaseAdapter
         return new File(context.getCacheDir(), pkg + ".webp");
     }
 
+    private final String ICONS_URL = "https://pico.doesnt-like.me/assets/";
     private final String ICONS1_URL = "https://raw.githubusercontent.com/Veticia/binaries/main/banners/";
     private static final String ICONS_FALLBACK_URL = "https://pilauncher.lwiczka.pl/get_icon.php?id=";
     protected static final HashMap<String, Drawable> iconCache = new HashMap<>();
@@ -555,6 +571,7 @@ public class AppsAdapter extends BaseAdapter
 
     public static void setAppIconType(ViewHolder holder, boolean isBanner) {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) holder.imageView.getLayoutParams();
+        holder.hasBanner = isBanner;
         if(isBanner) {
             params.height = (int)(itemScale * 0.5625);
             params.rightMargin = 0;
@@ -595,21 +612,24 @@ public class AppsAdapter extends BaseAdapter
         new Thread(() -> {
             try {
                 synchronized (pkg) {
+                    if (downloadIconFromUrl(ICONS_URL + pkg + "/banner.png", file)) {
+                        activity.runOnUiThread(callback);
+                    }
                     //if (ignoredIcons.contains(STYLES[style] + "." + file.getName())) {
                     //ignored icon
                     //} else
-                    if(downloadIconFromStore(pkg, file, "us", 0)) {
-                        activity.runOnUiThread(callback);
-                    } else if(downloadIconFromStore(pkg, file, "cn", 0)) {
-                        activity.runOnUiThread(callback);
-                    } else if (downloadIconFromUrl(ICONS1_URL + pkg + ".png", file)) {
-                        activity.runOnUiThread(callback);
-                    //} else if (downloadIconFromUrl(ICONS_FALLBACK_URL + pkg + "&set=banners", file)) {
-                    //    activity.runOnUiThread(callback);
-                    } else {
-                        Log.d("Missing icon", file.getName());
-                        ignoredIcons.add("banners." + file.getName());
-                    }
+//                    if(downloadIconFromStore(pkg, file, "us", 0)) {
+//                        activity.runOnUiThread(callback);
+//                    } else if(downloadIconFromStore(pkg, file, "cn", 0)) {
+//                        activity.runOnUiThread(callback);
+//                    } else if (downloadIconFromUrl(ICONS1_URL + pkg + ".png", file)) {
+//                        activity.runOnUiThread(callback);
+//                    } else if (downloadIconFromUrl(ICONS_FALLBACK_URL + pkg + "&set=banners", file)) {
+//                        activity.runOnUiThread(callback);
+//                    } else {
+//                        Log.d("Missing icon", file.getName());
+//                        ignoredIcons.add("banners." + file.getName());
+//                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

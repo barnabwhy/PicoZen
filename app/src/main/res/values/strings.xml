@@ -11,7 +11,7 @@
     <string name="configure">Configure</string>
     <string name="refresh">Refresh</string>
     <string name="refresh_icon_cache">Refresh icon cache</string>
-    <string name="changelog_empty">There\'s nothing here</string>
+    <string name="changelog_empty">The changelog could not be fetched. You are likely not connected to the internet or are using a pre-release build.</string>
     <string name="changelog_header">What\'s new:</string>
     <string name="made_with_love">Made by Barnaby</string>
     <string name="gh_repo">barnabwhy/PicoZen</string>

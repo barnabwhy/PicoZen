@@ -104,67 +104,6 @@ public class MainActivity extends AppCompatActivity {
         mainView = findViewById(R.id.main_layout);
         mainView.setClipToOutline(true);
 
-        Context mainContext = this;
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    URL u = new URL("https://api.github.com/repos/barnabwhy/PicoZen/releases/tags/" + BuildConfig.VERSION_NAME);
-                    InputStream stream = u.openStream();
-                    int bufferSize = 1024;
-                    char[] buffer = new char[bufferSize];
-                    StringBuilder out = new StringBuilder();
-                    Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
-                    for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
-                        out.append(buffer, 0, numRead);
-                    }
-                    JSONObject json = new JSONObject(out.toString());
-                    String str = json.getString("body");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final Markwon markwon = Markwon.builder(mainContext)
-                                    .usePlugin(CorePlugin.create())
-                                    .usePlugin(SoftBreakAddsNewLinePlugin.create())
-                                    .build();
-                            markwon.setMarkdown((TextView)findViewById(R.id.changelog), str);
-                        }
-                    });
-                } catch (Exception e) {
-                    Log.e("Error", e.toString());
-                }
-
-                try {
-                    URL u = new URL("https://api.github.com/repos/barnabwhy/PicoZen/releases/latest");
-                    InputStream stream = u.openStream();
-                    int bufferSize = 1024;
-                    char[] buffer = new char[bufferSize];
-                    StringBuilder out = new StringBuilder();
-                    Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
-                    for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
-                        out.append(buffer, 0, numRead);
-                    }
-                    JSONObject json = new JSONObject(out.toString());
-                    String str = json.getString("tag_name");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            TextView verText = (TextView)findViewById(R.id.new_version);
-                            verText.setText(String.format(getResources().getString(R.string.new_version_available), str));
-                            verText.setVisibility(str.equals(BuildConfig.VERSION_NAME) ? View.GONE : View.VISIBLE);
-                            verText.setOnClickListener(view -> {
-                                Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/releases/"+str);
-                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                                startActivity(intent);
-                            });
-
-                        }
-                    });
-                } catch (Exception e) {
-                    Log.e("Error", e.toString());
-                }
-            }
-        };
         findViewById(R.id.link_github).setOnClickListener(view -> {
             Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/");
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -175,8 +114,6 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
         });
-
-        thread.start();
 
         appGridView = findViewById(R.id.app_grid);
 

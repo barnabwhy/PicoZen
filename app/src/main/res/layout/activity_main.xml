@@ -342,8 +342,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="10sp"
                         android:textStyle="bold"
-                        android:textColor="@color/link"
-                        android:visibility="gone" />
+                        android:textColor="@color/link" />
                     <TextView
                         android:layout_width="0dp"
                         android:layout_weight="1"

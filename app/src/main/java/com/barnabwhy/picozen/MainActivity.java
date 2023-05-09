@@ -375,8 +375,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             TextView verText = (TextView)findViewById(R.id.new_version);
-                            verText.setText(String.format(getResources().getString(R.string.new_version_available), str));
-                            verText.setVisibility(str.equals(BuildConfig.VERSION_NAME) ? View.GONE : View.VISIBLE);
+                            verText.setText(String.format(str.equals(BuildConfig.VERSION_NAME) ? getResources().getString(R.string.latest_version) : getResources().getString(R.string.new_version_available), str));
                             verText.setOnClickListener(view -> {
                                 Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/releases/"+str);
                                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);

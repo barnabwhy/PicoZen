@@ -27,6 +27,7 @@ public class SettingsProvider
     public static final String KEY_FAVORITE_APPS = "KEY_FAVORITE_APPS";
     public static final String KEY_HIDDEN_APPS = "KEY_HIDDEN_APPS";
     public static final String KEY_RECENTS = "KEY_RECENTS";
+    public static final String KEY_FTP_HOST = "KEY_FTP_HOST";
 
     private final String KEY_APP_GROUPS = "prefAppGroups";
     private final String KEY_APP_LIST = "prefAppList";

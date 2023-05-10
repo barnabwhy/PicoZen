@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="20dp">
+        <LinearLayout
+                android:id="@+id/layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:showDividers="middle"
+                android:divider="@drawable/divider">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/download"
+                    android:textStyle="bold"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="15dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="15dp" />
+
+                <TextView
+                    android:id="@+id/file_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="15dp" />
+
+                <RelativeLayout
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_list_item_s">
+                        <View
+                            android:id="@+id/progress_bar"
+                            android:layout_height="wrap_content"
+                            android:layout_width="0px"
+                            android:background="@color/link"
+                            android:visibility="gone" />
+                        <TextView
+                            android:padding="15dp"
+                            android:id="@+id/progress_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textStyle="bold" />
+                </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:showDividers="middle"
+            android:divider="@drawable/divider"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="20dp">
+                <TextView
+                    android:id="@+id/dismiss_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_list_item_s"
+                    android:text="@string/dismiss"
+                    android:textColor="@color/link"
+                    android:padding="15dp"
+                    android:visibility="gone" />
+                <TextView
+                    android:id="@+id/install_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_list_item_s"
+                    android:text="@string/install"
+                    android:textColor="@color/link"
+                    android:padding="15dp"
+                    android:visibility="gone" />
+        </LinearLayout>
+</RelativeLayout>

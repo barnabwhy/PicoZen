@@ -57,7 +57,8 @@
         android:scaleType="fitCenter"
         android:foreground="@drawable/ic_favorite"
         android:layout_alignParentBottom="true"
-        android:layout_margin="10dp" />
+        android:layout_margin="10dp"
+        android:visibility="gone" />
 
     <View
         android:id="@+id/hidden_btn"
@@ -68,5 +69,18 @@
         android:foreground="@drawable/ic_hidden"
         android:layout_alignParentBottom="true"
         android:layout_marginVertical="10dp"
-        android:layout_marginHorizontal="50dp" />
+        android:layout_marginStart="50dp"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/delete_btn"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/bg_ico_btn_hover"
+        android:scaleType="fitCenter"
+        android:foreground="@drawable/ic_delete"
+        android:layout_alignParentBottom="true"
+        android:layout_marginVertical="10dp"
+        android:layout_marginStart="90dp"
+        android:visibility="gone" />
 </RelativeLayout>

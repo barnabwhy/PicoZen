@@ -24,6 +24,13 @@
     <string name="disable">Disable</string>
     <string name="check_for_updates">Check for updates</string>
     <string name="check">Check</string>
+    <string name="change">Change</string>
+    <string name="sideload_ftp_server">Sideload FTP server</string>
+    <string name="download">Download</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="an_error_occurred">An error occurred</string>
+    <string name="fetch_files_error">Couldn\'t fetch files</string>
+    <string name="install">Install</string>
 
     <string-array name="sort_options">
         <item>↓\t Name</item>

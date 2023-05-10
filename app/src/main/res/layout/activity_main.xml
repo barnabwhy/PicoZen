@@ -56,7 +56,6 @@
                     <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
                         android:src="@drawable/ic_sideload" />
                     <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
-                        android:textColor="@color/text_disabled"
                         android:text="@string/list_sideload" />
                 </LinearLayout>
 
@@ -216,20 +215,25 @@
                 android:textStyle="bold"
                 android:textSize="35sp"
                 android:padding="15dp" />
-            <LinearLayout
-                android:id="@+id/sideload_list"
+            <GridView
+                android:id="@+id/sideload_grid"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/currently_in_development"
-                    android:padding="15dp" />
-
-            </LinearLayout>
+                android:numColumns="1"
+                android:verticalSpacing="5dp"
+                android:overScrollMode="never"
+                android:scrollbars="none" />
+            <TextView
+                android:id="@+id/sideload_grid_empty"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/fetch_files_error"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout

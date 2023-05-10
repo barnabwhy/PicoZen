@@ -2,10 +2,13 @@ package com.barnabwhy.picozen;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -14,6 +17,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -64,7 +68,7 @@ public class AppsAdapter extends BaseAdapter
     private static File iconFile;
     private static String packageName;
     private static long lastClickTime;
-    private static MainActivity mainActivityContext;
+    private final MainActivity mainActivityContext;
     private List<ApplicationInfo> appList;
     private final Set<String> favoriteList;
     private final Set<String> hiddenList;
@@ -75,7 +79,7 @@ public class AppsAdapter extends BaseAdapter
     private static int itemScale;
     private final SettingsProvider settingsProvider;
     public static SharedPreferences sharedPreferences;
-    private GridView appGridView;
+    private final GridView appGridView;
     private boolean isEditMode;
 
     public AppsAdapter(MainActivity context)
@@ -114,7 +118,7 @@ public class AppsAdapter extends BaseAdapter
         timer.schedule(updateAppListTask, 0, 600000); //execute every 10 minutes
     }
 
-    public static int getPixelFromDip(int dip) {
+    public int getPixelFromDip(int dip) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, mainActivityContext.getResources().getDisplayMetrics());
     }
 
@@ -150,6 +154,7 @@ public class AppsAdapter extends BaseAdapter
         ImageView progressBar;
         View favoriteBtn;
         View hiddenBtn;
+        View deleteBtn;
         boolean hasBanner;
     }
 
@@ -236,6 +241,7 @@ public class AppsAdapter extends BaseAdapter
             holder.progressBar = convertView.findViewById(R.id.progress_bar);
             holder.favoriteBtn = convertView.findViewById(R.id.favorite_btn);
             holder.hiddenBtn = convertView.findViewById(R.id.hidden_btn);
+            holder.deleteBtn = convertView.findViewById(R.id.delete_btn);
             convertView.setTag(holder);
 
             // Set clipToOutline to true on imageView (Workaround for bug)
@@ -312,6 +318,15 @@ public class AppsAdapter extends BaseAdapter
             updateAppList();
         });
 
+//        holder.deleteBtn.setOnClickListener(view -> {
+//            ApplicationInfo app = appList.get(position);
+//
+//            Intent intent = new Intent(mainActivityContext, mainActivityContext.getClass());
+//            PendingIntent sender = PendingIntent.getActivity(mainActivityContext, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+//            PackageInstaller mPackageInstaller = mainActivityContext.getPackageManager().getPackageInstaller();
+//            mPackageInstaller.uninstall(app.packageName, sender.getIntentSender());
+//        });
+
         AtomicInteger hovering = new AtomicInteger();
         View.OnGenericMotionListener listener = (View view, MotionEvent event) -> {
             int action = event.getAction();
@@ -337,9 +352,11 @@ public class AppsAdapter extends BaseAdapter
         holder.layout.setOnGenericMotionListener(listener);
         holder.favoriteBtn.setOnGenericMotionListener(listener);
         holder.hiddenBtn.setOnGenericMotionListener(listener);
+        holder.deleteBtn.setOnGenericMotionListener(listener);
 
         holder.favoriteBtn.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
         holder.hiddenBtn.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
+//        holder.deleteBtn.setVisibility(isEditMode ? View.VISIBLE : View.GONE);
 
         // set value into textview
         PackageManager pm = mainActivityContext.getPackageManager();
@@ -590,7 +607,7 @@ public class AppsAdapter extends BaseAdapter
         clearIconCache();
     }
 
-    public static void setAppIconType(ViewHolder holder, boolean isBanner) {
+    public void setAppIconType(ViewHolder holder, boolean isBanner) {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) holder.imageView.getLayoutParams();
         holder.hasBanner = isBanner;
         if(isBanner) {
@@ -612,7 +629,7 @@ public class AppsAdapter extends BaseAdapter
         }
     }
 
-    public static boolean updateIcon(ViewHolder holder, File file, String pkg) {
+    public boolean updateIcon(ViewHolder holder, File file, String pkg) {
         try {
             Drawable drawable = Drawable.createFromPath(file.getAbsolutePath());
             if (drawable != null) {
@@ -762,7 +779,7 @@ public class AppsAdapter extends BaseAdapter
 
     // Generate palette asynchronously and use it on a different
     // thread using onGenerated()
-    public static void createIconPaletteAsync(String pkg, Bitmap bitmap, ViewHolder holder) {
+    public void createIconPaletteAsync(String pkg, Bitmap bitmap, ViewHolder holder) {
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
             public void onGenerated(Palette p) {
                 // Use generated instance

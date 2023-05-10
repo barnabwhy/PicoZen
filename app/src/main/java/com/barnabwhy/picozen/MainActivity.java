@@ -3,9 +3,7 @@ package com.barnabwhy.picozen;
 import static androidx.core.content.FileProvider.getUriForFile;
 
 import static com.barnabwhy.picozen.SettingsProvider.KEY_CURRENT_TAB;
-import com.barnabwhy.picozen.BuildConfig;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -30,13 +28,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,10 +44,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.noties.markwon.AbstractMarkwonPlugin;
-import io.noties.markwon.LinkResolverDef;
 import io.noties.markwon.Markwon;
-import io.noties.markwon.MarkwonConfiguration;
 import io.noties.markwon.SoftBreakAddsNewLinePlugin;
 import io.noties.markwon.core.CorePlugin;
 
@@ -59,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private SettingsProvider settingsProvider;
 
     private GridView appGridView;
+    private GridView sideloadGridView;
 
     private int selectedPage;
 
@@ -120,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         appGridView = findViewById(R.id.app_grid);
+        sideloadGridView = findViewById(R.id.sideload_grid);
 
         mainView.post(() -> {
             View settingsBtn = findViewById(R.id.settings_btn);
@@ -149,8 +146,8 @@ public class MainActivity extends AppCompatActivity {
 
         final int childCount = listView.getChildCount();
         for (int i = 0; i < childCount; i++) {
-            if(i > 0 && i < 3)
-                continue; // temp, while tweaks and sideload tools don't exist
+            if(i == 1)
+                continue; // temp, while tweaks doesn't exist
 
             View v = listView.getChildAt(i);
             int finalI = i;
@@ -184,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
             appGridView.setAdapter(new AppsAdapter(this));
+            sideloadGridView.setAdapter(new SideloadAdapter(this));
         }
 
         // Set sort button
@@ -326,6 +324,10 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences.edit().putInt(KEY_CURRENT_TAB, i).apply();
         v.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.bg_list_item_s, getTheme()));
         findViewById(pageList[i]).setVisibility(View.VISIBLE);
+
+        if(i == 2) {
+            ((SideloadAdapter)sideloadGridView.getAdapter()).updateCurrentDirectory();
+        }
     }
 
     private void checkForUpdates() {
@@ -439,6 +441,14 @@ public class MainActivity extends AppCompatActivity {
             checkForUpdates();
             selectPage(3); // go to about
             dialog.dismiss();
+        });
+
+        EditText ftpHostInput = dialog.findViewById(R.id.ftp_host_input);
+        View ftpHostBtn = dialog.findViewById(R.id.ftp_host_btn);
+        ftpHostInput.setText(sharedPreferences.getString(SettingsProvider.KEY_FTP_HOST, ""));
+        ftpHostBtn.setOnClickListener(view -> {
+            sharedPreferences.edit().putString(SettingsProvider.KEY_FTP_HOST, String.valueOf(ftpHostInput.getText())).apply();
+            ((SideloadAdapter)sideloadGridView.getAdapter()).updateCurrentDirectory();
         });
 
         View closeBtn = dialog.findViewById(R.id.close_btn);

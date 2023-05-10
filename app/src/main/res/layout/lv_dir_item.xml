@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_list_item_s">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_sideload"
+            android:id="@+id/ic_download"
+            android:layout_margin="15dp" />
+        <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_open_folder"
+            android:id="@+id/ic_open_folder"
+            android:layout_margin="15dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginVertical="15dp" />
+        <TextView
+            android:id="@+id/modified"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Never"
+            android:textSize="16sp"
+            android:layout_margin="15dp" />
+        <TextView
+            android:id="@+id/size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0B"
+            android:textSize="16sp"
+            android:layout_margin="15dp" />
+    </LinearLayout>
+</RelativeLayout>

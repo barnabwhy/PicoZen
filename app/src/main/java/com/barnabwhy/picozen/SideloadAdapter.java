@@ -3,10 +3,8 @@ package com.barnabwhy.picozen;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -95,13 +94,24 @@ public class SideloadAdapter extends BaseAdapter {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                dirList = getDirsAtPath(currentPath);
-                fileList = getFilesAtPath(currentPath);
+                if (sharedPreferences.getString(SettingsProvider.KEY_FTP_HOST, "").equals("")) {
+                    dirList = new ArrayList<>();
+                    fileList = new ArrayList<>();
+                } else {
+                    dirList = getDirsAtPath(currentPath);
+                    fileList = getFilesAtPath(currentPath);
+                }
 
                 mainActivityContext.runOnUiThread(() -> {
-                    if(dirList.size() == 0 && fileList.size() == 0) {
+                    if (dirList.size() == 0 && fileList.size() == 0) {
                         mainActivityContext.findViewById(R.id.sideload_grid).setVisibility(View.GONE);
                         mainActivityContext.findViewById(R.id.sideload_grid_empty).setVisibility(View.VISIBLE);
+
+                        if (sharedPreferences.getString(SettingsProvider.KEY_FTP_HOST, "").equals("")) {
+                            ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.no_sideload_ftp_server);
+                        } else {
+                            ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.fetch_files_error);
+                        }
                     } else {
                         mainActivityContext.findViewById(R.id.sideload_grid).setVisibility(View.VISIBLE);
                         mainActivityContext.findViewById(R.id.sideload_grid_empty).setVisibility(View.GONE);
@@ -285,8 +295,18 @@ public class SideloadAdapter extends BaseAdapter {
                             dialog.set(showDownloadDialog());
                         });
 
+                        AtomicBoolean cancelled = new AtomicBoolean(false);
                         AtomicLong lastProgressTime = new AtomicLong();
-                        downloadFile(current, (progress) -> {
+                        downloadFile(current, (file) -> {
+                            mainActivityContext.runOnUiThread(() -> {
+                                ((TextView)dialog.get().findViewById(R.id.file_name)).setText(file.getName());
+                                dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.VISIBLE);
+                                dialog.get().findViewById(R.id.cancel_btn).setOnClickListener(view -> {
+                                    cancelled.set(true);
+                                    file.delete();
+                                });
+                            });
+                        }, (progress) -> {
                             if(progress != current.size && System.currentTimeMillis() - lastProgressTime.get() < 100)
                                 return;
 
@@ -306,6 +326,7 @@ public class SideloadAdapter extends BaseAdapter {
                         }, outFile -> {
                             mainActivityContext.runOnUiThread(() -> {
                                 dialog.get().setCancelable(true);
+                                dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.GONE);
                                 dialog.get().findViewById(R.id.dismiss_btn).setVisibility(View.VISIBLE);
                                 dialog.get().findViewById(R.id.dismiss_btn).setOnClickListener(view -> {
                                     dialog.get().dismiss();
@@ -321,10 +342,11 @@ public class SideloadAdapter extends BaseAdapter {
                             });
                         }, () -> {
                             mainActivityContext.runOnUiThread(() -> {
-                                ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(R.string.an_error_occurred);
+                                ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(cancelled.get() ? R.string.download_cancelled : R.string.an_error_occurred);
                                 dialog.get().findViewById(R.id.progress_bar).setVisibility(View.GONE);
 
                                 dialog.get().setCancelable(true);
+                                dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.GONE);
                                 dialog.get().findViewById(R.id.dismiss_btn).setVisibility(View.VISIBLE);
                                 dialog.get().findViewById(R.id.dismiss_btn).setOnClickListener(view -> {
                                     dialog.get().dismiss();
@@ -344,12 +366,22 @@ public class SideloadAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private void downloadFile(DirItem item, Consumer<Long> progressCallback, Consumer<File> completeCallback, Runnable errorCallback) {
+    private void downloadFile(DirItem item, Consumer<File> startCallback, Consumer<Long> progressCallback, Consumer<File> completeCallback, Runnable errorCallback) {
+        File file = null;
         try {
             String fileUrl = FILES_PATH + item.path + "?download&host=" + sharedPreferences.getString(SettingsProvider.KEY_FTP_HOST, "");
             final File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                Files.createDirectories(Paths.get(dir.getAbsolutePath() + "/PicoZen"));
-            final File file = new File(dir.getAbsolutePath() + "/PicoZen/" + item.name);
+            Files.createDirectories(Paths.get(dir.getAbsolutePath() + "/PicoZen"));
+            file = new File(dir.getAbsolutePath() + "/PicoZen/" + item.name);
+            Log.i("File", file.getName());
+            int i = 1;
+            while(file.exists()) {
+                file = new File(dir.getAbsolutePath() + "/PicoZen/" + item.name.substring(0, item.name.lastIndexOf(".") -1) + " (" + i + ")." + item.name.substring(item.name.lastIndexOf(".") + 1));
+                i++;
+                Log.i("File", file.getName());
+            }
+            startCallback.accept(file);
+            Log.i("Download", "Started");
             if(downloadFileFromUrl(fileUrl, file, progressCallback)) {
                 completeCallback.accept(file);
             } else {
@@ -358,6 +390,9 @@ public class SideloadAdapter extends BaseAdapter {
             }
         } catch(Exception e) {
             Log.e("Error", e.toString());
+            if(file != null && file.exists()) {
+                file.delete();
+            }
             errorCallback.run();
         }
     }
@@ -379,13 +414,25 @@ public class SideloadAdapter extends BaseAdapter {
             int length;
             byte[] buffer = new byte[65536];
             FileOutputStream fos = new FileOutputStream(outputFile);
+
             while ((length = dis.read(buffer)) > 0) {
+                if(!outputFile.canWrite()) {
+                    fos.flush();
+                    fos.close();
+                    is.close();
+                    dis.close();
+                    return false;
+                }
+
                 fos.write(buffer, 0, length);
+                fos.flush();
                 processed += length;
                 progressCallback.accept(processed);
             }
             fos.flush();
             fos.close();
+            is.close();
+            dis.close();
 
             return true;
         } catch (Exception e) {

@@ -29,8 +29,11 @@
     <string name="download">Download</string>
     <string name="dismiss">Dismiss</string>
     <string name="an_error_occurred">An error occurred</string>
+    <string name="download_cancelled">Download cancelled</string>
     <string name="fetch_files_error">Couldn\'t fetch files</string>
+    <string name="no_sideload_ftp_server">An FTP server has not been set in settings</string>
     <string name="install">Install</string>
+    <string name="cancel">Cancel</string>
 
     <string-array name="sort_options">
         <item>↓\t Name</item>

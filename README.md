@@ -6,11 +6,11 @@ An alternate library and utility app for PICO XR. Designed to look and feel like
 **Features**
 - All apps in one place
 - PICO OS design
+- Sideloading tools (PicoZen does not condone piracy, these tools are for the download of legally obtained files through a wireless connection)
 
 ----
 
 **Upcoming**
-- Sideloading tools
 - System tweaks
 
 ----

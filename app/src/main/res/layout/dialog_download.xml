@@ -66,20 +66,20 @@
                     android:textColor="@color/link"
                     android:padding="15dp" />
                 <TextView
-                    android:id="@+id/dismiss_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_list_item_s"
-                    android:text="@string/dismiss"
-                    android:textColor="@color/link"
-                    android:padding="15dp"
-                    android:visibility="gone" />
-                <TextView
                     android:id="@+id/install_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_list_item_s"
                     android:text="@string/install"
+                    android:textColor="@color/link"
+                    android:padding="15dp"
+                    android:visibility="gone" />
+                <TextView
+                    android:id="@+id/dismiss_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_list_item_s"
+                    android:text="@string/dismiss"
                     android:textColor="@color/link"
                     android:padding="15dp"
                     android:visibility="gone" />

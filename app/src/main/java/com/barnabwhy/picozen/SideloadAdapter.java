@@ -3,8 +3,12 @@ package com.barnabwhy.picozen;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,13 +24,18 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -36,10 +45,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class SideloadAdapter extends BaseAdapter {
     private static final String FILES_PATH = "https://files-pico.doesnt-like.me";
@@ -325,24 +337,105 @@ public class SideloadAdapter extends BaseAdapter {
                             });
                         }, outFile -> {
                             mainActivityContext.runOnUiThread(() -> {
-                                dialog.get().setCancelable(true);
-                                dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.GONE);
-                                dialog.get().findViewById(R.id.dismiss_btn).setVisibility(View.VISIBLE);
-                                dialog.get().findViewById(R.id.dismiss_btn).setOnClickListener(view -> {
-                                    dialog.get().dismiss();
-                                });
-//                                dialog.get().findViewById(R.id.install_btn).setVisibility(View.VISIBLE);
-//                                dialog.get().findViewById(R.id.install_btn).setOnClickListener(view -> {
-//                                    Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-//                                    intent.setData(Uri.fromFile(outFile));
-//                                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                                    mainActivityContext.startActivity(intent);
-//                                });
-                                currentDownload = null;
+                                class CompleteData {
+                                    Exception error;
+                                    File installableFile;
+                                    File obbDir;
+                                };
+
+                                Consumer<CompleteData> onComplete = (data) -> {
+                                    if (data.error != null) {
+                                        ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.an_error_occurred), data.error.getLocalizedMessage()));
+                                        dialog.get().findViewById(R.id.progress_bar).setVisibility(View.GONE);
+                                    } else {
+                                        ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(R.string.download_complete);
+                                        if (data.installableFile != null) {
+                                            dialog.get().findViewById(R.id.install_btn).setVisibility(View.VISIBLE);
+                                            File finalInstallableFile = data.installableFile;
+                                            File finalObbDir = data.obbDir;
+                                            dialog.get().findViewById(R.id.install_btn).setOnClickListener(view -> {
+                                                if (finalObbDir != null) {
+                                                    File obbDest = new File(Environment.getExternalStorageDirectory().getPath() + "/Android/obb/" + finalObbDir.getName());
+                                                    finalObbDir.renameTo(obbDest);
+                                                }
+                                                Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+                                                intent.setData(FileProvider.getUriForFile(mainActivityContext, BuildConfig.APPLICATION_ID + ".provider", finalInstallableFile));
+                                                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                                mainActivityContext.startActivity(intent);
+                                            });
+                                        }
+                                    }
+
+                                    dialog.get().setCancelable(true);
+                                    dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.GONE);
+                                    dialog.get().findViewById(R.id.dismiss_btn).setVisibility(View.VISIBLE);
+                                    dialog.get().findViewById(R.id.dismiss_btn).setOnClickListener(view -> {
+                                        dialog.get().dismiss();
+                                    });
+                                    currentDownload = null;
+                                };
+
+                                if (getFileExtension(outFile).equals(".zip")) {
+                                    ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(R.string.extracting_zip);
+                                    Thread zipThread = new Thread(() -> {
+                                        Exception error = null;
+                                        File installableFile = null;
+                                        File obbDir = null;
+
+                                        try {
+                                            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/PicoZen/" + outFile.getName().substring(0, outFile.getName().lastIndexOf(".")));
+                                            unzip(outFile, dir);
+
+                                            File[] files = dir.listFiles();
+                                            for (File file : Objects.requireNonNull(files)) {
+                                                if (getFileExtension(file).equals(".apk")) {
+                                                    installableFile = file;
+                                                    break;
+                                                }
+                                            }
+                                            if (installableFile != null) {
+                                                for (File file : Objects.requireNonNull(files)) {
+                                                    if (file.getName().equals(getPackageName(mainActivityContext, installableFile))) {
+                                                        obbDir = file;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            error = e;
+                                        }
+
+                                        CompleteData completeData = new CompleteData();
+                                        completeData.error = error;
+                                        completeData.installableFile = installableFile;
+                                        completeData.obbDir = obbDir;
+
+                                        mainActivityContext.runOnUiThread(() -> {
+                                            onComplete.accept(completeData);
+                                        });
+                                    });
+                                    zipThread.start();
+                                } else {
+                                    File installableFile = null;
+                                    if (getFileExtension(outFile).equals(".apk")) {
+                                        installableFile = outFile;
+                                    }
+
+                                    CompleteData completeData = new CompleteData();
+                                    completeData.error = null;
+                                    completeData.installableFile = installableFile;
+                                    completeData.obbDir = null;
+                                    onComplete.accept(completeData);
+                                }
                             });
-                        }, () -> {
+                        }, e -> {
                             mainActivityContext.runOnUiThread(() -> {
-                                ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(cancelled.get() ? R.string.download_cancelled : R.string.an_error_occurred);
+                                if(cancelled.get()) {
+                                    ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(R.string.download_cancelled);
+                                } else {
+                                    ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.an_error_occurred), e.getLocalizedMessage()));
+                                }
                                 dialog.get().findViewById(R.id.progress_bar).setVisibility(View.GONE);
 
                                 dialog.get().setCancelable(true);
@@ -366,7 +459,7 @@ public class SideloadAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private void downloadFile(DirItem item, Consumer<File> startCallback, Consumer<Long> progressCallback, Consumer<File> completeCallback, Runnable errorCallback) {
+    private void downloadFile(DirItem item, Consumer<File> startCallback, Consumer<Long> progressCallback, Consumer<File> completeCallback, Consumer<Exception> errorCallback) {
         File file = null;
         try {
             String fileUrl = FILES_PATH + item.path + "?download&host=" + sharedPreferences.getString(SettingsProvider.KEY_FTP_HOST, "");
@@ -376,7 +469,7 @@ public class SideloadAdapter extends BaseAdapter {
             Log.i("File", file.getName());
             int i = 1;
             while(file.exists()) {
-                file = new File(dir.getAbsolutePath() + "/PicoZen/" + item.name.substring(0, item.name.lastIndexOf(".") -1) + " (" + i + ")." + item.name.substring(item.name.lastIndexOf(".") + 1));
+                file = new File(dir.getAbsolutePath() + "/PicoZen/" + item.name.substring(0, item.name.lastIndexOf(".")) + " (" + i + ")." + item.name.substring(item.name.lastIndexOf(".") + 1));
                 i++;
                 Log.i("File", file.getName());
             }
@@ -386,14 +479,14 @@ public class SideloadAdapter extends BaseAdapter {
                 completeCallback.accept(file);
             } else {
                 file.delete();
-                errorCallback.run();
+                errorCallback.accept(null);
             }
         } catch(Exception e) {
             Log.e("Error", e.toString());
             if(file != null && file.exists()) {
                 file.delete();
             }
-            errorCallback.run();
+            errorCallback.accept(e);
         }
     }
 
@@ -505,5 +598,51 @@ public class SideloadAdapter extends BaseAdapter {
         }
 
         return String.format("%01.2f %s", size, currentByteType);
+    }
+
+    public static void unzip(File zipFile, File targetDirectory) throws IOException {
+        try (ZipInputStream zis = new ZipInputStream(
+                new BufferedInputStream(Files.newInputStream(zipFile.toPath())))) {
+            ZipEntry ze;
+            int count;
+            byte[] buffer = new byte[8192];
+            while ((ze = zis.getNextEntry()) != null) {
+                File file = new File(targetDirectory, ze.getName());
+                File dir = ze.isDirectory() ? file : file.getParentFile();
+                if (!dir.isDirectory() && !dir.mkdirs())
+                    throw new FileNotFoundException("Failed to ensure directory: " +
+                            dir.getAbsolutePath());
+                if (ze.isDirectory())
+                    continue;
+                try (FileOutputStream fout = new FileOutputStream(file)) {
+                    while ((count = zis.read(buffer)) != -1)
+                        fout.write(buffer, 0, count);
+                }
+            /* if time should be restored as well
+            long time = ze.getTime();
+            if (time > 0)
+                file.setLastModified(time);
+            */
+            }
+        }
+    }
+
+    private static String getFileExtension(File file) {
+        String name = file.getName();
+        int lastIndexOf = name.lastIndexOf(".");
+        if (lastIndexOf == -1) {
+            return ""; // empty extension
+        }
+        return name.substring(lastIndexOf);
+    }
+
+    public static String getPackageName(Context context, File file) {
+        PackageManager packageManager = context.getPackageManager();
+        PackageInfo info = packageManager.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+        if (info != null) {
+            ApplicationInfo appInfo = info.applicationInfo;
+            return appInfo.packageName;
+        }
+        return null;
     }
 }

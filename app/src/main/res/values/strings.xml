@@ -28,8 +28,10 @@
     <string name="sideload_ftp_server">Sideload FTP server</string>
     <string name="download">Download</string>
     <string name="dismiss">Dismiss</string>
-    <string name="an_error_occurred">An error occurred</string>
+    <string name="an_error_occurred">An error occurred (%1$s)</string>
     <string name="download_cancelled">Download cancelled</string>
+    <string name="extracting_zip">Extracting ZIP</string>
+    <string name="download_complete">Download complete</string>
     <string name="fetch_files_error">Couldn\'t fetch files</string>
     <string name="no_sideload_ftp_server">An FTP server has not been set in settings</string>
     <string name="install">Install</string>

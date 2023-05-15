@@ -25,8 +25,8 @@ android {
         applicationId "com.barnabwhy.picozen"
         minSdk 29
         targetSdk 33
-        versionCode 21
-        versionName "0.2.1"
+        versionCode 30
+        versionName "0.3.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

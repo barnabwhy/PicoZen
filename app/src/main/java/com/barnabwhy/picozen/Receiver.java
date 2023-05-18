@@ -1,5 +1,8 @@
 package com.barnabwhy.picozen;
 
+import static com.barnabwhy.picozen.MainActivity.sharedPreferences;
+import static com.barnabwhy.picozen.SettingsProvider.KEY_START_ON_BOOT;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,8 +11,7 @@ public class Receiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-//            boolean autorunEnabled = sharedPreferences.getBoolean(KEY_AUTORUN, true);
-            boolean autorunEnabled = false;
+            boolean autorunEnabled = sharedPreferences.getBoolean(KEY_START_ON_BOOT, false);
             if (autorunEnabled) {
                 Intent i = new Intent(context, MainActivity.class);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

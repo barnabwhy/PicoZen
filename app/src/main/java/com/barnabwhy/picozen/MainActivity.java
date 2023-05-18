@@ -3,6 +3,7 @@ package com.barnabwhy.picozen;
 import static androidx.core.content.FileProvider.getUriForFile;
 
 import static com.barnabwhy.picozen.SettingsProvider.KEY_CURRENT_TAB;
+import static com.barnabwhy.picozen.SettingsProvider.KEY_START_ON_BOOT;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -449,6 +450,14 @@ public class MainActivity extends AppCompatActivity {
         ftpHostBtn.setOnClickListener(view -> {
             sharedPreferences.edit().putString(SettingsProvider.KEY_FTP_HOST, String.valueOf(ftpHostInput.getText())).apply();
             ((SideloadAdapter)sideloadGridView.getAdapter()).updateCurrentDirectory();
+        });
+
+        View toggleStartOnBoot = dialog.findViewById(R.id.toggle_start_on_boot);
+        ((TextView)toggleStartOnBoot.findViewById(R.id.toggle_start_on_boot_btn)).setText(sharedPreferences.getBoolean(KEY_START_ON_BOOT, false) ? R.string.disable : R.string.enable);
+        toggleStartOnBoot.setOnClickListener(view -> {
+            boolean val = sharedPreferences.getBoolean(KEY_START_ON_BOOT, false);
+            sharedPreferences.edit().putBoolean(KEY_START_ON_BOOT, !val).apply();
+            ((TextView)toggleStartOnBoot.findViewById(R.id.toggle_start_on_boot_btn)).setText(!val ? R.string.disable : R.string.enable);
         });
 
         View closeBtn = dialog.findViewById(R.id.close_btn);

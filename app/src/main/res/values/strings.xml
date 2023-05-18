@@ -26,6 +26,7 @@
     <string name="check">Check</string>
     <string name="change">Change</string>
     <string name="sideload_ftp_server">Sideload FTP server</string>
+    <string name="start_on_boot">Start PicoZen on device boot</string>
     <string name="download">Download</string>
     <string name="dismiss">Dismiss</string>
     <string name="an_error_occurred">An error occurred (%1$s)</string>

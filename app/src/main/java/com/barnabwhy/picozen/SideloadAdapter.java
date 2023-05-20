@@ -114,6 +114,7 @@ public class SideloadAdapter extends BaseAdapter {
                 } else {
                     dirList = getDirsAtPath(currentPath);
                     fileList = getFilesAtPath(currentPath);
+                    checkStoragePermissions();
                 }
 
                 mainActivityContext.runOnUiThread(() -> {

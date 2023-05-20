@@ -423,8 +423,6 @@ public class SideloadAdapter extends BaseAdapter {
                                                 });
                                             });
 
-                                            outFile.delete();
-
                                             File[] files = dir.listFiles();
                                             for (File file : Objects.requireNonNull(files)) {
                                                 if (getFileExtension(file).equals(".apk")) {
@@ -444,6 +442,8 @@ public class SideloadAdapter extends BaseAdapter {
                                             e.printStackTrace();
                                             error = e;
                                         }
+
+                                        outFile.delete();
 
                                         CompleteData completeData = new CompleteData();
                                         completeData.error = error;

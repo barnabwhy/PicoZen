@@ -341,11 +341,16 @@ public class SideloadAdapter extends BaseAdapter {
                                     Exception error;
                                     File installableFile;
                                     File obbDir;
+                                    boolean cancelled;
                                 };
 
                                 Consumer<CompleteData> onComplete = (data) -> {
                                     if (data.error != null) {
-                                        ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.an_error_occurred), data.error.getLocalizedMessage()));
+                                        if(data.cancelled) {
+                                            ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(R.string.download_cancelled);
+                                        } else {
+                                            ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.an_error_occurred), data.error.getLocalizedMessage()));
+                                        }
                                         dialog.get().findViewById(R.id.progress_bar).setVisibility(View.GONE);
                                     } else {
                                         ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(R.string.download_complete);
@@ -377,6 +382,7 @@ public class SideloadAdapter extends BaseAdapter {
 
                                 if (getFileExtension(outFile).equals(".zip")) {
                                     ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(R.string.extracting_zip);
+
                                     Thread zipThread = new Thread(() -> {
                                         Exception error = null;
                                         File installableFile = null;
@@ -384,6 +390,22 @@ public class SideloadAdapter extends BaseAdapter {
 
                                         try {
                                             File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/PicoZen/" + outFile.getName().substring(0, outFile.getName().lastIndexOf(".")));
+
+                                            mainActivityContext.runOnUiThread(() -> {
+                                                dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.VISIBLE);
+                                                dialog.get().findViewById(R.id.cancel_btn).setOnClickListener(view -> {
+                                                    cancelled.set(true);
+                                                    outFile.delete();
+                                                    if (dir.exists()) {
+                                                        String deleteCmd = "rm -r " + dir.getAbsolutePath();
+                                                        Runtime runtime = Runtime.getRuntime();
+                                                        try {
+                                                            runtime.exec(deleteCmd);
+                                                        } catch (IOException e) { }
+                                                    }
+                                                });
+                                            });
+
                                             unzip(outFile, dir);
 
                                             File[] files = dir.listFiles();
@@ -410,6 +432,7 @@ public class SideloadAdapter extends BaseAdapter {
                                         completeData.error = error;
                                         completeData.installableFile = installableFile;
                                         completeData.obbDir = obbDir;
+                                        completeData.cancelled = cancelled.get();
 
                                         mainActivityContext.runOnUiThread(() -> {
                                             onComplete.accept(completeData);
@@ -426,6 +449,7 @@ public class SideloadAdapter extends BaseAdapter {
                                     completeData.error = null;
                                     completeData.installableFile = installableFile;
                                     completeData.obbDir = null;
+                                    completeData.cancelled = false;
                                     onComplete.accept(completeData);
                                 }
                             });
@@ -607,6 +631,9 @@ public class SideloadAdapter extends BaseAdapter {
             int count;
             byte[] buffer = new byte[8192];
             while ((ze = zis.getNextEntry()) != null) {
+                if(!zipFile.exists()) {
+                    throw new IOException();
+                }
                 File file = new File(targetDirectory, ze.getName());
                 File dir = ze.isDirectory() ? file : file.getParentFile();
                 if (!dir.isDirectory() && !dir.mkdirs())

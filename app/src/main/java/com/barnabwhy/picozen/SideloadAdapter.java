@@ -45,12 +45,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public class SideloadAdapter extends BaseAdapter {
@@ -381,7 +383,7 @@ public class SideloadAdapter extends BaseAdapter {
                                 };
 
                                 if (getFileExtension(outFile).equals(".zip")) {
-                                    ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(R.string.extracting_zip);
+                                    ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.extracting_zip)));
 
                                     Thread zipThread = new Thread(() -> {
                                         Exception error = null;
@@ -406,7 +408,21 @@ public class SideloadAdapter extends BaseAdapter {
                                                 });
                                             });
 
-                                            unzip(outFile, dir);
+                                            long uncompressedSize = 0;
+                                            ZipFile f = new ZipFile(outFile);
+                                            Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) f.entries();
+                                            while(entries.hasMoreElements()) {
+                                                ZipEntry entry = entries.nextElement();
+                                                uncompressedSize += entry.getSize();
+                                            }
+
+                                            long finalUncompressedSize = uncompressedSize;
+                                            unzip(outFile, dir, processedBytes -> {
+                                                mainActivityContext.runOnUiThread(() -> {
+                                                    ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.extracting_zip_progress), bytesReadable(processedBytes) + "/" + bytesReadable(finalUncompressedSize)));
+                                                });
+                                            });
+
                                             outFile.delete();
 
                                             File[] files = dir.listFiles();
@@ -625,12 +641,13 @@ public class SideloadAdapter extends BaseAdapter {
         return String.format("%01.2f %s", size, currentByteType);
     }
 
-    public static void unzip(File zipFile, File targetDirectory) throws IOException {
+    public static void unzip(File zipFile, File targetDirectory, Consumer<Long> progressCallback) throws IOException {
         try (ZipInputStream zis = new ZipInputStream(
                 new BufferedInputStream(Files.newInputStream(zipFile.toPath())))) {
             ZipEntry ze;
             int count;
             byte[] buffer = new byte[8192];
+            long processedBytes = 0;
             while ((ze = zis.getNextEntry()) != null) {
                 if(!zipFile.exists()) {
                     throw new IOException();
@@ -643,9 +660,10 @@ public class SideloadAdapter extends BaseAdapter {
                 if (ze.isDirectory())
                     continue;
                 try (FileOutputStream fout = new FileOutputStream(file)) {
-                    while ((count = zis.read(buffer)) != -1)
                     while ((count = zis.read(buffer)) != -1) {
                         fout.write(buffer, 0, count);
+                        processedBytes += count;
+                        progressCallback.accept(processedBytes);
                         if(!zipFile.exists()) {
                             throw new IOException();
                         }

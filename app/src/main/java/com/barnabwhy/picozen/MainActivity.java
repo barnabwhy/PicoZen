@@ -22,7 +22,9 @@ import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -407,10 +409,12 @@ public class MainActivity extends AppCompatActivity {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.show();
 
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(dialog.getWindow().getAttributes());
-        lp.width = 560;
-        lp.height = 640;
+        lp.width = getPixelFromDip(480); // 600px on PICO 4
+        lp.height = displayMetrics.heightPixels - getPixelFromDip(80); // 700px on PICO 4
 
         dialog.getWindow().setAttributes(lp);
         dialog.findViewById(R.id.layout).requestLayout();
@@ -500,5 +504,9 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    public int getPixelFromDip(int dip) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, this.getResources().getDisplayMetrics());
     }
 }

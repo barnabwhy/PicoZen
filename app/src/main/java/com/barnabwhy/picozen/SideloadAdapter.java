@@ -644,7 +644,12 @@ public class SideloadAdapter extends BaseAdapter {
                     continue;
                 try (FileOutputStream fout = new FileOutputStream(file)) {
                     while ((count = zis.read(buffer)) != -1)
+                    while ((count = zis.read(buffer)) != -1) {
                         fout.write(buffer, 0, count);
+                        if(!zipFile.exists()) {
+                            throw new IOException();
+                        }
+                    }
                 }
             /* if time should be restored as well
             long time = ze.getTime();

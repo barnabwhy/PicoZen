@@ -607,8 +607,8 @@ public class SideloadAdapter extends BaseAdapter {
 
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(dialog.getWindow().getAttributes());
-        lp.width = 560;
-        lp.height = 320;
+        lp.width = mainActivityContext.getPixelFromDip(480); // 600px on PICO 4
+        lp.height = mainActivityContext.getPixelFromDip(256); // 320px on PICO 4
 
         dialog.getWindow().setAttributes(lp);
         dialog.findViewById(R.id.layout).requestLayout();

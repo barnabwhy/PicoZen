@@ -407,6 +407,7 @@ public class SideloadAdapter extends BaseAdapter {
                                             });
 
                                             unzip(outFile, dir);
+                                            outFile.delete();
 
                                             File[] files = dir.listFiles();
                                             for (File file : Objects.requireNonNull(files)) {

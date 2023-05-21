@@ -6,6 +6,7 @@
     <color name="text">#d6d6d6</color>
     <color name="text_disabled">#30d6d6d6</color>
     <color name="link">#428af8</color>
+    <color name="alert">#ff5852</color>
     <color name="bg_darker">#111111</color>
     <color name="bg_dark">#1e1e1e</color>
     <color name="bg_med">#292929</color>

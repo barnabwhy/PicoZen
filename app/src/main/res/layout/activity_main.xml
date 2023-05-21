@@ -61,6 +61,13 @@
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
                     <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_saves" />
+                    <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
+                        android:text="@string/list_saves" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
+                    <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
                         android:src="@drawable/ic_about" />
                     <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
                         android:text="@string/list_about" />
@@ -230,6 +237,43 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:text="@string/fetch_files_error"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/saves_page"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:background="@drawable/bg_content"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/list_saves"
+                android:textStyle="bold"
+                android:textSize="35sp"
+                android:padding="15dp" />
+            <GridView
+                android:id="@+id/saves_grid"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:numColumns="1"
+                android:verticalSpacing="5dp"
+                android:overScrollMode="never"
+                android:scrollbars="none" />
+            <TextView
+                android:id="@+id/save_grid_empty"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/saves_empty"
                 android:gravity="center"
                 android:textStyle="bold"
                 android:textSize="20sp"

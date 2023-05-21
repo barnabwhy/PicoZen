@@ -44,6 +44,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -58,8 +60,17 @@ public class MainActivity extends AppCompatActivity {
 
     private GridView appGridView;
     private GridView sideloadGridView;
+    private GridView savesGridView;
 
     private int selectedPage;
+
+    private enum PAGES {
+        APPS,
+        TWEAKS,
+        SIDELOAD,
+        SAVES,
+        ABOUT
+    }
 
     private AppsAdapter.SORT_FIELD mSortField = AppsAdapter.SORT_FIELD.APP_NAME;
     private AppsAdapter.SORT_ORDER mSortOrder = AppsAdapter.SORT_ORDER.ASCENDING;
@@ -120,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
         appGridView = findViewById(R.id.app_grid);
         sideloadGridView = findViewById(R.id.sideload_grid);
+        savesGridView = findViewById(R.id.saves_grid);
 
         mainView.post(() -> {
             View settingsBtn = findViewById(R.id.settings_btn);
@@ -145,21 +157,28 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout listView = findViewById(R.id.list_view);
 
         selectedPage = sharedPreferences.getInt(KEY_CURRENT_TAB, 0);
-        final int[] pageList = { R.id.apps_page, R.id.tweaks_page, R.id.sideload_page, R.id.about_page };
+
+        final HashMap<PAGES, Integer> pages = new HashMap<>();
+        pages.put(PAGES.APPS, R.id.apps_page);
+        //pages.put(PAGES.TWEAKS, R.id.tweaks_page);
+        pages.put(PAGES.SIDELOAD, R.id.sideload_page);
+        pages.put(PAGES.SAVES, R.id.saves_page);
+        pages.put(PAGES.ABOUT, R.id.about_page);
 
         final int childCount = listView.getChildCount();
         for (int i = 0; i < childCount; i++) {
-            if(i == 1)
+            PAGES page = PAGES.values()[i];
+            if(!pages.containsKey(page))
                 continue; // temp, while tweaks doesn't exist
 
             View v = listView.getChildAt(i);
             int finalI = i;
             if (finalI == selectedPage) {
                 v.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.bg_list_item_s, getTheme()));
-                findViewById(pageList[i]).setVisibility(View.VISIBLE);
+                findViewById(pages.get(page)).setVisibility(View.VISIBLE);
             } else {
                 v.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.bg_list_item, getTheme()));
-                findViewById(pageList[i]).setVisibility(View.GONE);
+                findViewById(pages.get(page)).setVisibility(View.GONE);
             }
 
             v.setOnHoverListener((View view, MotionEvent event) -> {
@@ -185,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
             appGridView.setAdapter(new AppsAdapter(this));
             sideloadGridView.setAdapter(new SideloadAdapter(this));
+            savesGridView.setAdapter(new SavesAdapter(this));
         }
 
         // Set sort button
@@ -318,15 +338,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void selectPage(int i) {
-        final int[] pageList = { R.id.apps_page, R.id.tweaks_page, R.id.sideload_page, R.id.about_page };
+        final HashMap<PAGES, Integer> pages = new HashMap<>();
+        pages.put(PAGES.APPS, R.id.apps_page);
+        pages.put(PAGES.TWEAKS, R.id.tweaks_page);
+        pages.put(PAGES.SIDELOAD, R.id.sideload_page);
+        pages.put(PAGES.SAVES, R.id.saves_page);
+        pages.put(PAGES.ABOUT, R.id.about_page);
+
+        PAGES page = PAGES.values()[selectedPage];
+
         LinearLayout listView = findViewById(R.id.list_view);
         View v = listView.getChildAt(i);
         listView.getChildAt(selectedPage).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.bg_list_item, getTheme()));
-        findViewById(pageList[selectedPage]).setVisibility(View.GONE);
+        findViewById(pages.get(page)).setVisibility(View.GONE);
         selectedPage = i;
+        page = PAGES.values()[selectedPage];
         sharedPreferences.edit().putInt(KEY_CURRENT_TAB, i).apply();
         v.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.bg_list_item_s, getTheme()));
-        findViewById(pageList[i]).setVisibility(View.VISIBLE);
+        findViewById(pages.get(page)).setVisibility(View.VISIBLE);
 
         if(i == 2) {
             ((SideloadAdapter)sideloadGridView.getAdapter()).updateCurrentDirectory();
@@ -444,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
         View checkUpdatesBtn = dialog.findViewById(R.id.check_for_updates_btn);
         checkUpdatesBtn.setOnClickListener(view -> {
             checkForUpdates();
-            selectPage(3); // go to about
+            selectPage(4); // go to about
             dialog.dismiss();
         });
 

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="20dp">
+        <LinearLayout
+            android:id="@+id/layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:showDividers="middle"
+            android:divider="@drawable/divider">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/save_manager"
+                    android:textStyle="bold"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="15dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="15dp" />
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:scrollbars="none"
+                    android:overScrollMode="never">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:showDividers="middle"
+                            android:divider="@drawable/divider">
+                                <TextView
+                                    android:id="@+id/app_name"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textStyle="bold"
+                                    android:gravity="center_vertical"
+                                    android:paddingHorizontal="15dp" />
+
+                                <TextView
+                                    android:id="@+id/package_name"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:paddingHorizontal="15dp" />
+
+                                <TextView
+                                    android:id="@+id/files_size"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textStyle="bold"
+                                    android:gravity="center_vertical"
+                                    android:paddingHorizontal="15dp" />
+
+                                <TextView
+                                    android:id="@+id/backup_size"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textStyle="bold"
+                                    android:gravity="center_vertical"
+                                    android:text="@string/backup_none"
+                                    android:paddingHorizontal="15dp" />
+
+                                <RelativeLayout
+                                    android:layout_marginTop="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_list_item_s">
+                                        <TextView
+                                            android:padding="20dp"
+                                            android:id="@+id/backup_btn"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:textStyle="bold"
+                                            android:gravity="center"
+                                            android:text="@string/backup" />
+                                </RelativeLayout>
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_list_item_s">
+                                        <TextView
+                                            android:padding="20dp"
+                                            android:id="@+id/restore_btn"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:textStyle="bold"
+                                            android:gravity="center"
+                                            android:text="@string/restore" />
+                                </RelativeLayout>
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_list_item_s">
+                                        <TextView
+                                            android:padding="20dp"
+                                            android:id="@+id/delete_backup_btn"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:textStyle="bold"
+                                            android:textColor="@color/alert"
+                                            android:gravity="center"
+                                            android:text="@string/delete_backup" />
+                                </RelativeLayout>
+                        </LinearLayout>
+                </ScrollView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:showDividers="middle"
+            android:divider="@drawable/divider"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="20dp">
+                <TextView
+                    android:id="@+id/cancel_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_list_item_s"
+                    android:text="@string/cancel"
+                    android:textColor="@color/link"
+                    android:padding="15dp" />
+        </LinearLayout>
+</RelativeLayout>

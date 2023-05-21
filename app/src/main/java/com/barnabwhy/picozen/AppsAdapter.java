@@ -82,12 +82,16 @@ public class AppsAdapter extends BaseAdapter
     private final GridView appGridView;
     private boolean isEditMode;
 
+    public static List<String> hiddenApps;
+
     public AppsAdapter(MainActivity context)
     {
+        hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.picovr.init.overlay", "com.picovr.provision", "com.pvr.appmanager", "com.pvr.seethrough.setting", "com.pvr.scenemanager");
+
         mainActivityContext = context;
 
         appGridView = mainActivityContext.findViewById(R.id.app_grid);
-        itemScale = getPixelFromDip(200);
+        itemScale = mainActivityContext.getPixelFromDip(200);
         appGridView.setColumnWidth(itemScale);
         sharedPreferences = context.getSharedPreferences(context.getPackageName() + "_preferences", Context.MODE_PRIVATE);
         settingsProvider = SettingsProvider.getInstance(mainActivityContext);
@@ -116,10 +120,6 @@ public class AppsAdapter extends BaseAdapter
             }
         };
         timer.schedule(updateAppListTask, 0, 600000); //execute every 10 minutes
-    }
-
-    public int getPixelFromDip(int dip) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, mainActivityContext.getResources().getDisplayMetrics());
     }
 
     public boolean getEditModeEnabled() {
@@ -174,8 +174,6 @@ public class AppsAdapter extends BaseAdapter
     }
 
     public ArrayList<ApplicationInfo> getAppList(int group) {
-        final List<String> hiddenApps = Arrays.asList(mainActivityContext.getPackageName(), "com.android.traceur", "com.picovr.init.overlay", "com.picovr.provision", "com.pvr.appmanager", "com.pvr.seethrough.setting", "com.pvr.scenemanager");
-
         ArrayList<ApplicationInfo> installedApps = new ArrayList<>();
         PackageManager pm = mainActivityContext.getPackageManager();
         for (ApplicationInfo app : pm.getInstalledApplications(PackageManager.GET_META_DATA)) {
@@ -619,9 +617,9 @@ public class AppsAdapter extends BaseAdapter
             holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             holder.textView.setVisibility(View.INVISIBLE);
         } else {
-            params.height = getPixelFromDip(40);
-            params.rightMargin = getPixelFromDip(15);
-            params.bottomMargin = getPixelFromDip(15);
+            params.height = mainActivityContext.getPixelFromDip(40);
+            params.rightMargin = mainActivityContext.getPixelFromDip(15);
+            params.bottomMargin = mainActivityContext.getPixelFromDip(15);
             params.topMargin = (int)(itemScale * 0.5625 - params.height - params.bottomMargin);
             holder.imageView.setLayoutParams(params);
             holder.imageView.setScaleType(ImageView.ScaleType.FIT_END);

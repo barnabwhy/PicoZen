@@ -384,7 +384,7 @@ public class SideloadAdapter extends BaseAdapter {
                                 };
 
                                 if (getFileExtension(outFile).equals(".zip")) {
-                                    ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.extracting_zip)));
+                                    ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(R.string.extracting_zip);
 
                                     Thread zipThread = new Thread(() -> {
                                         Exception error = null;

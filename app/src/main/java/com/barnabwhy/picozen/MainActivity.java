@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
         findViewById(R.id.link_discord).setOnClickListener(view -> {
-            Uri uri = Uri.parse("https://discord.gg/yTvpqq7Rzk");
+            Uri uri = Uri.parse("https://discord.gg/D4DBD2N6sA");
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
         });

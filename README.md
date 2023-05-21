@@ -15,6 +15,12 @@ An alternate library and utility app for PICO XR. Designed to look and feel like
 
 ----
 
+**Discord**
+
+https://discord.gg/D4DBD2N6sA
+
+----
+
 **Thanks**
 - [Veticia](https://github.com/Veticia) for their work on [PiLauncherNext](https://github.com/Veticia/PiLauncherNext) which some components were adapted from.
 - [basti564](https://github.com/basti564) for their work on [DreamGrid](https://github.com/basti564/DreamGrid) which some components were adapted from.

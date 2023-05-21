@@ -66,6 +66,17 @@
                                     android:text="@string/backup_none"
                                     android:paddingHorizontal="15dp" />
 
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/alert"
+                                    android:gravity="center_vertical"
+                                    android:text="@string/backup_warning"
+                                    android:textSize="12sp"
+                                    android:paddingTop="5dp"
+                                    android:paddingHorizontal="15dp" />
+
                                 <RelativeLayout
                                     android:layout_marginTop="10dp"
                                     android:layout_width="match_parent"

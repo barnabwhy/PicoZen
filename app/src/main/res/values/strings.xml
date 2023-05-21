@@ -52,6 +52,7 @@
     <string name="backup_fail">Backup (Failed)</string>
     <string name="restore_fail">Restore (Failed)</string>
     <string name="delete_backup">Delete backup</string>
+    <string name="backup_warning">WARNING: Restoring from a corrupt backup can cause data loss</string>
 
     <string-array name="sort_options">
         <item>↓\t Name</item>

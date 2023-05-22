@@ -40,6 +40,7 @@
     <string name="install">Install</string>
     <string name="cancel">Cancel</string>
     <string name="saves_empty">No supported apps found</string>
+    <string name="saves_android_files_bad">Saves manager is currently unsupported on Android 11 and newer</string>
     <string name="name">Name</string>
     <string name="save_manager">Save Manager</string>
     <string name="files_size">Files: %1$s</string>

@@ -556,35 +556,37 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean checkPermission() {
-        if (SDK_INT >= Build.VERSION_CODES.R) {
-            Log.i("Permissions", "Checking Storage Permissions (Android >= 11)");
-            return Environment.isExternalStorageManager();
-        } else {
-            Log.i("Permissions", "Checking Storage Permissions (Android <=10)");
+    public boolean checkPermission() {
+//        if (SDK_INT >= Build.VERSION_CODES.R) {
+//            Log.i("Permissions", "Checking Storage Permissions (Android >= 11)");
+//            return Environment.isExternalStorageManager();
+//        } else {
+//            Log.i("Permissions", "Checking Storage Permissions (Android <=10)");
+            Log.i("Permissions", "Checking Storage Permissions");
             int writePermissionCode = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);//get current write permission
             int readPermissionCode = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);//get current read permission
             return writePermissionCode == PackageManager.PERMISSION_GRANTED && readPermissionCode == PackageManager.PERMISSION_GRANTED;
-        }
+//        }
     }
 
     private void requestPermission() {
-        if (SDK_INT >= Build.VERSION_CODES.R) {
-            try {
-                Log.i("Permissions", "Asking For Storage Permissions (Android >=11)");
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                intent.addCategory("android.intent.category.DEFAULT");
-                intent.setData(Uri.parse(String.format("package:%s",getApplicationContext().getPackageName())));
-                startActivityForResult(intent, 2296);
-            } catch (Exception e) {
-                Intent intent = new Intent();
-                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                startActivityForResult(intent, 2296);
-            }
-        } else {
-            Log.i("Permissions", "Asking For Storage Permissions (Android <=10)");
+//        if (SDK_INT >= Build.VERSION_CODES.R) {
+//            try {
+//                Log.i("Permissions", "Asking For Storage Permissions (Android >=11)");
+//                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+//                intent.addCategory("android.intent.category.DEFAULT");
+//                intent.setData(Uri.parse(String.format("package:%s",getApplicationContext().getPackageName())));
+//                startActivityForResult(intent, 2296);
+//            } catch (Exception e) {
+//                Intent intent = new Intent();
+//                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+//                startActivityForResult(intent, 2296);
+//            }
+//        } else {
+//            Log.i("Permissions", "Asking For Storage Permissions (Android <=10)");
+            Log.i("Permissions", "Asking For Storage Permissions");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
-        }
+//        }
     }
 }

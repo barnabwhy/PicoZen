@@ -114,7 +114,7 @@ public class SideloadAdapter extends BaseAdapter {
                 } else {
                     dirList = getDirsAtPath(currentPath);
                     fileList = getFilesAtPath(currentPath);
-                    checkStoragePermissions();
+                    mainActivityContext.checkStoragePermissions();
                 }
 
                 mainActivityContext.runOnUiThread(() -> {
@@ -298,7 +298,7 @@ public class SideloadAdapter extends BaseAdapter {
                 Thread thread = new Thread() {
                     @Override
                     public void run() {
-                        checkStoragePermissions();
+                        mainActivityContext.checkStoragePermissions();
 
                         if(currentDownload != null)
                             return;
@@ -573,24 +573,6 @@ public class SideloadAdapter extends BaseAdapter {
         } catch (Exception e) {
             Log.e("Error", e.toString());
             return false;
-        }
-    }
-
-    private void checkStoragePermissions() {
-        Log.i("Permissions", "Checking Storage Permissions");
-
-        int writePermissionCode = ContextCompat.checkSelfPermission(mainActivityContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);//get current write permission
-        int readPermissionCode = ContextCompat.checkSelfPermission(mainActivityContext, Manifest.permission.READ_EXTERNAL_STORAGE);//ge current read permission
-        Log.i("Permissions", "Fetching Read & Write Codes: " + readPermissionCode + "/" + writePermissionCode);
-
-        //if permissions to read and write to external storage is not granted
-        if (writePermissionCode != PackageManager.PERMISSION_GRANTED || readPermissionCode != PackageManager.PERMISSION_GRANTED) {
-            //request read and write permissions
-            ActivityCompat.requestPermissions(mainActivityContext, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
-            ActivityCompat.requestPermissions(mainActivityContext, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
-            Log.i("Permissions", "Asking For Storage Permissions");
-        } else {//else: if permissions to read and write is already granted
-//            permissionsGranted = true;//set permissions granted bool to true
         }
     }
 

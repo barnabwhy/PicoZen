@@ -60,6 +60,8 @@ public class SavesAdapter extends BaseAdapter {
     }
 
     public void updateAppList() {
+        mainActivityContext.checkStoragePermissions();
+
         appList = getAppList(sharedPreferences.getInt(SettingsProvider.KEY_GROUP_SPINNER, 0));
 
         TextView saveGridEmpty = mainActivityContext.findViewById(R.id.save_grid_empty);

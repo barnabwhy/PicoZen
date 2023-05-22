@@ -8,8 +8,11 @@ import static com.barnabwhy.picozen.SettingsProvider.KEY_START_ON_BOOT;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -19,6 +22,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -111,6 +115,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         checkForUpdates();
+
+        checkStoragePermissions();
 
         sharedPreferences = getSharedPreferences(getPackageName() + "_preferences", Context.MODE_PRIVATE);
         settingsProvider = SettingsProvider.getInstance(this);
@@ -357,8 +363,10 @@ public class MainActivity extends AppCompatActivity {
         v.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.bg_list_item_s, getTheme()));
         findViewById(pages.get(page)).setVisibility(View.VISIBLE);
 
-        if(i == 2) {
+        if (page == PAGES.SIDELOAD) {
             ((SideloadAdapter)sideloadGridView.getAdapter()).updateCurrentDirectory();
+        } else if (page == PAGES.SAVES) {
+            ((SavesAdapter)savesGridView.getAdapter()).updateAppList();
         }
     }
 
@@ -537,5 +545,21 @@ public class MainActivity extends AppCompatActivity {
 
     public int getPixelFromDip(int dip) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, this.getResources().getDisplayMetrics());
+    }
+
+    public void checkStoragePermissions() {
+        Log.i("Permissions", "Checking Storage Permissions");
+
+        int writePermissionCode = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);//get current write permission
+        int readPermissionCode = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);//ge current read permission
+        Log.i("Permissions", "Fetching Read & Write Codes: " + readPermissionCode + "/" + writePermissionCode);
+
+        //if permissions to read and write to external storage is not granted
+        if (writePermissionCode != PackageManager.PERMISSION_GRANTED || readPermissionCode != PackageManager.PERMISSION_GRANTED) {
+            //request read and write permissions
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
+            Log.i("Permissions", "Asking For Storage Permissions");
+        }
     }
 }

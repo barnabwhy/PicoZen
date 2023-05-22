@@ -1,6 +1,5 @@
 package com.barnabwhy.picozen;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +7,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,8 +20,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import org.json.JSONArray;
@@ -32,7 +28,6 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -114,7 +109,7 @@ public class SideloadAdapter extends BaseAdapter {
                 } else {
                     dirList = getDirsAtPath(currentPath);
                     fileList = getFilesAtPath(currentPath);
-                    mainActivityContext.checkStoragePermissions();
+                    mainActivityContext.ensureStoragePermissions();
                 }
 
                 mainActivityContext.runOnUiThread(() -> {
@@ -298,7 +293,7 @@ public class SideloadAdapter extends BaseAdapter {
                 Thread thread = new Thread() {
                     @Override
                     public void run() {
-                        mainActivityContext.checkStoragePermissions();
+                        mainActivityContext.ensureStoragePermissions();
 
                         if(currentDownload != null)
                             return;

@@ -60,7 +60,7 @@ public class SavesAdapter extends BaseAdapter {
     }
 
     public void updateAppList() {
-        mainActivityContext.checkStoragePermissions();
+        mainActivityContext.ensureStoragePermissions();
 
         appList = getAppList(sharedPreferences.getInt(SettingsProvider.KEY_GROUP_SPINNER, 0));
 

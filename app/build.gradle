@@ -24,7 +24,8 @@ android {
     defaultConfig {
         applicationId "com.barnabwhy.picozen"
         minSdk 29
-        targetSdk 33
+        //noinspection ExpiredTargetSdkVersion
+        targetSdk 29
         versionCode 51
         versionName "0.5.1"
 

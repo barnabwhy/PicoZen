@@ -28,52 +28,58 @@
                 android:textStyle="bold"
                 android:textSize="35sp"
                 android:padding="15dp" />
-            <LinearLayout
-                android:id="@+id/list_view"
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:showDividers="middle"
-                android:divider="@drawable/divider">
+                android:overScrollMode="never"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:id="@+id/list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:showDividers="middle"
+                    android:divider="@drawable/divider">
 
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
-                    <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_apps" />
-                    <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
-                        android:text="@string/list_apps" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
+                        <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+                            android:src="@drawable/ic_apps" />
+                        <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
+                            android:text="@string/list_apps" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
+                        <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+                            android:src="@drawable/ic_tweaks" />
+                        <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
+                            android:textColor="@color/text_disabled"
+                            android:text="@string/list_tweaks" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
+                        <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+                            android:src="@drawable/ic_sideload" />
+                        <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
+                            android:text="@string/list_sideload" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
+                        <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+                            android:src="@drawable/ic_saves" />
+                        <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
+                            android:text="@string/list_saves" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
+                        <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+                            android:src="@drawable/ic_about" />
+                        <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
+                            android:text="@string/list_about" />
+                    </LinearLayout>
+
                 </LinearLayout>
-
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
-                    <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_tweaks" />
-                    <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
-                        android:textColor="@color/text_disabled"
-                        android:text="@string/list_tweaks" />
-                </LinearLayout>
-
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
-                    <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_sideload" />
-                    <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
-                        android:text="@string/list_sideload" />
-                </LinearLayout>
-
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
-                    <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_saves" />
-                    <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
-                        android:text="@string/list_saves" />
-                </LinearLayout>
-
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
-                    <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_about" />
-                    <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
-                        android:text="@string/list_about" />
-                </LinearLayout>
-
-            </LinearLayout>
+            </ScrollView>
 
             <RelativeLayout android:layout_width="match_parent" android:layout_height="60dp">
                 <View

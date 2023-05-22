@@ -1,11 +1,14 @@
 package com.barnabwhy.picozen;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -60,7 +63,7 @@ public class SavesAdapter extends BaseAdapter {
     }
 
     public void updateAppList() {
-        mainActivityContext.checkStoragePermissions();
+        mainActivityContext.ensureStoragePermissions();
 
         appList = getAppList(sharedPreferences.getInt(SettingsProvider.KEY_GROUP_SPINNER, 0));
 
@@ -68,6 +71,10 @@ public class SavesAdapter extends BaseAdapter {
         if(appList.size() == 0) {
             savesGridView.setVisibility(View.GONE);
             saveGridEmpty.setVisibility(View.VISIBLE);
+
+            if(SDK_INT >= Build.VERSION_CODES.R) {
+                saveGridEmpty.setText(R.string.saves_android_files_bad);
+            }
         } else {
             savesGridView.setVisibility(View.VISIBLE);
             saveGridEmpty.setVisibility(View.GONE);

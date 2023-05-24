@@ -1,6 +1,7 @@
 package com.barnabwhy.picozen.Sideload.Providers;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.View;
 
 import com.barnabwhy.picozen.MainActivity;
@@ -52,4 +53,7 @@ abstract public class AbstractProvider {
     public abstract void setHolder(int position, SideloadAdapter.ViewHolder holder);
     abstract public void updateList();
     public abstract void downloadFile(SideloadItem item, Consumer<File> startCallback, Consumer<Long> progressCallback, Consumer<File> completeCallback, Consumer<Exception> errorCallback);
+    public void cleanup() {
+        Log.i("Provider", "Cleaning up provider");
+    };
 }

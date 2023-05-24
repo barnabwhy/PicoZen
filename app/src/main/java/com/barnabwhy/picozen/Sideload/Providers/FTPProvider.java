@@ -32,31 +32,28 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class FTPProvider extends AbstractProvider {
-    private final FTPClient ftp;
+    private FTPClient ftp;
     private String currentPath = "/";
     private String server = "";
-    private boolean connecting = false;
+    private boolean ready = false;
     private boolean updating = false;
+    private Thread ftpThread;
 
     public FTPProvider(SharedPreferences sharedPreferences, MainActivity mainActivityContext, Runnable notifyCallback) {
         super(sharedPreferences, mainActivityContext, notifyCallback);
-        ftp = new FTPClient();
-        connectFtp();
+        connectFtp(true);
     }
 
-    private void connectFtp() {
-        new Thread(() -> {
-            if((!connecting && !ftp.isConnected()) || !sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals(server)) {
+    private void connectFtp(boolean force) {
+        ftpThread = new Thread(() -> {
+            if(force || (ftp != null && ready && !ftp.isConnected())) {
                 try {
-                    if(connecting || ftp.isConnected()) {
-                        try {
-                            ftp.abort();
-                            ftp.logout();
-                            ftp.disconnect();
-                        } catch(Exception e) { }
+                    if(ready) {
+                        ftp = null;
                     }
+                    ready = false;
 
-                    connecting = true;
+                    ftp = new FTPClient();
 
                     int reply;
                     server = sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "");
@@ -81,6 +78,7 @@ public class FTPProvider extends AbstractProvider {
 
                     if (!FTPReply.isPositiveCompletion(reply)) {
                         ftp.disconnect();
+                        ready = false;
                         Log.e("FTP", "Server refused connection.");
                     } else {
                         Log.i("FTP", "Server connected.");
@@ -91,19 +89,27 @@ public class FTPProvider extends AbstractProvider {
                         ftp.enterLocalPassiveMode();
 
                         Log.i("FTP", "Server login complete.");
+                        ready = true;
                     }
                 } catch (IOException e) {
                     Log.e("FTP Error", e.getLocalizedMessage());
                     e.printStackTrace();
                 }
 
-                connecting = false;
                 mainActivityContext.runOnUiThread(this::updateList);
             }
-        }).start();
+        });
+        ftpThread.setPriority(8);
+        ftpThread.start();
     }
 
     protected void finalize() {
+        cleanup();
+    }
+
+    @Override
+    public void cleanup() {
+        super.cleanup();
         new Thread(() -> {
             try {
                 ftp.abort();
@@ -121,7 +127,6 @@ public class FTPProvider extends AbstractProvider {
 
         currentPath = newPath;
         Log.i("Path", newPath);
-        updating = false;
         updateList();
     }
 
@@ -150,7 +155,7 @@ public class FTPProvider extends AbstractProvider {
 
     private void getItemsAtPath(String path, Runnable completeCallback) {
         if (!sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals(server)) {
-            connectFtp();
+            connectFtp(true);
             return;
         }
 
@@ -160,9 +165,9 @@ public class FTPProvider extends AbstractProvider {
             String backPath = "/" + String.join("/", Arrays.asList(pathSegments).subList(0, pathSegments.length-1));
             items.add(new SideloadItem(SideloadItemType.DIRECTORY, "../", backPath, -1, ""));
         }
-        if(!updating) {
+        if(ready && !updating) {
             updating = true;
-            new Thread(() -> {
+            Thread thread = new Thread(() -> {
                 try {
                     if (ftp.isAvailable() && ftp.isConnected()) {
                         if(!path.equals(currentPath))
@@ -196,18 +201,20 @@ public class FTPProvider extends AbstractProvider {
                     } else {
                         updating = false;
                         Log.i("FTP", "Tried to update files but not connected, attempting to connect");
-                        connectFtp();
+                        connectFtp(false);
                     }
                 } catch (Exception e) {
                     Log.e("FTP Error", e.toString());
                     updating = false;
                 }
-            }).start();
+            });
+            thread.setPriority(8);
+            thread.start();
         }
     }
 
     @Override
     public void downloadFile(SideloadItem item, Consumer<File> startCallback, Consumer<Long> progressCallback, Consumer<File> completeCallback, Consumer<Exception> errorCallback) {
-        errorCallback.accept(new Exception("Empty provider doesn't support file downloads"));
+        errorCallback.accept(new Exception("Provider doesn't support file downloads"));
     }
 }

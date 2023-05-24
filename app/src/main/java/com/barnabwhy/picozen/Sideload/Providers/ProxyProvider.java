@@ -36,6 +36,7 @@ public class ProxyProvider extends AbstractProvider {
 
     public ProxyProvider(SharedPreferences sharedPreferences, MainActivity mainActivityContext, Runnable notifyCallback) {
         super(sharedPreferences, mainActivityContext, notifyCallback);
+        updateList();
     }
 
     public void updateList() {

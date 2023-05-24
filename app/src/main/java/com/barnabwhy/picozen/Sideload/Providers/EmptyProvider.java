@@ -13,6 +13,7 @@ public class EmptyProvider extends AbstractProvider {
 
     public EmptyProvider(SharedPreferences sharedPreferences, MainActivity mainActivityContext, Runnable notifyCallback) {
         super(sharedPreferences, mainActivityContext, notifyCallback);
+        updateList();
     }
 
     @Override
@@ -27,6 +28,6 @@ public class EmptyProvider extends AbstractProvider {
 
     @Override
     public void downloadFile(SideloadItem item, Consumer<File> startCallback, Consumer<Long> progressCallback, Consumer<File> completeCallback, Consumer<Exception> errorCallback) {
-        errorCallback.accept(new Exception("Empty provider doesn't support file downloads"));
+        errorCallback.accept(new Exception("Provider provider doesn't support file downloads"));
     }
 }

@@ -83,6 +83,9 @@ public class SideloadAdapter extends BaseAdapter {
     }
 
     public void setProvider(SideloadProviderType type) {
+        if(provider != null) {
+            provider.cleanup();
+        }
         if(type == SideloadProviderType.NONE) {
             provider = new EmptyProvider(sharedPreferences, mainActivityContext, this::notifyDataSetChanged);
         } else if(type == SideloadProviderType.FTP) {
@@ -90,7 +93,6 @@ public class SideloadAdapter extends BaseAdapter {
         } else if(type == SideloadProviderType.PROXY) {
             provider = new ProxyProvider(sharedPreferences, mainActivityContext, this::notifyDataSetChanged);
         }
-        provider.updateList();
     }
 
     @Override

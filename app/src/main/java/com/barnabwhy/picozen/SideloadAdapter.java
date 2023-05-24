@@ -71,8 +71,8 @@ public class SideloadAdapter extends BaseAdapter {
 
     public enum SideloadProviderType {
         NONE,
+        PROXY,
         FTP,
-        PROXY
     }
 
     public SideloadAdapter(MainActivity context) {
@@ -97,7 +97,15 @@ public class SideloadAdapter extends BaseAdapter {
 
     @Override
     public void notifyDataSetChanged() {
-        if (getCount() == 0) {
+        if (provider != null && provider.getState() != AbstractProvider.ProviderState.IDLE) {
+            mainActivityContext.findViewById(R.id.sideload_grid).setVisibility(View.GONE);
+            mainActivityContext.findViewById(R.id.sideload_grid_empty).setVisibility(View.VISIBLE);
+            if (provider.getState() == AbstractProvider.ProviderState.CONNECTING) {
+                ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.sideload_connecting);
+            } else {
+                ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.sideload_fetching);
+            }
+        } else if (getCount() == 0) {
             mainActivityContext.findViewById(R.id.sideload_grid).setVisibility(View.GONE);
             mainActivityContext.findViewById(R.id.sideload_grid_empty).setVisibility(View.VISIBLE);
             if (sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0) == 0 || sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals("")) {
@@ -114,7 +122,7 @@ public class SideloadAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return getProvider().getCount();
+        return provider != null ? getProvider().getCount() : 0;
     }
 
     @Override

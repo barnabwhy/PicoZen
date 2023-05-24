@@ -36,6 +36,7 @@ public class ProxyProvider extends AbstractProvider {
 
     public ProxyProvider(SharedPreferences sharedPreferences, MainActivity mainActivityContext, Runnable notifyCallback) {
         super(sharedPreferences, mainActivityContext, notifyCallback);
+        state = ProviderState.IDLE;
         updateList();
     }
 
@@ -46,7 +47,10 @@ public class ProxyProvider extends AbstractProvider {
                 if (sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals("")) {
                     itemList = new ArrayList<>();
                 } else {
+                    state = ProviderState.FETCHING;
+                    mainActivityContext.runOnUiThread(notifyCallback);
                     itemList = getItemsAtPath(currentPath);
+                    state = ProviderState.IDLE;
                     Log.i("Items", "Size: "+itemList.size());
                     mainActivityContext.ensureStoragePermissions();
                 }

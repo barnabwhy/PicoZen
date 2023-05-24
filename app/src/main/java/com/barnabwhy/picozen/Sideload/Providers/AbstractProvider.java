@@ -21,11 +21,24 @@ abstract public class AbstractProvider {
     protected List<SideloadItem> itemList;
     protected Runnable notifyCallback;
 
+    public enum ProviderState {
+        CONNECTING,
+        IDLE,
+        FETCHING,
+    }
+
+    ProviderState state;
+
     public AbstractProvider(SharedPreferences sharedPreferences, MainActivity mainActivityContext, Runnable notifyCallback) {
         itemList = new ArrayList<>();
         this.sharedPreferences = sharedPreferences;
         this.mainActivityContext = mainActivityContext;
         this.notifyCallback = notifyCallback;
+        state = ProviderState.CONNECTING;
+    }
+
+    public ProviderState getState() {
+        return state;
     }
 
     public List<SideloadItem> getList() {

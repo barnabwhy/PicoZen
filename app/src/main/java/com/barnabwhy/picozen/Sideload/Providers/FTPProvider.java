@@ -39,6 +39,8 @@ public class FTPProvider extends AbstractProvider {
         ftpThread = new Thread(() -> {
             if(force || (ftp != null && ready && !ftp.isConnected())) {
                 try {
+                    state = ProviderState.CONNECTING;
+                    mainActivityContext.runOnUiThread(notifyCallback);
                     if(ready) {
                         ftp = null;
                     }
@@ -81,6 +83,8 @@ public class FTPProvider extends AbstractProvider {
 
                         Log.i("FTP", "Server login complete.");
                         ready = true;
+                        state = ProviderState.IDLE;
+                        mainActivityContext.runOnUiThread(notifyCallback);
                     }
                 } catch (IOException e) {
                     Log.e("FTP Error", e.getLocalizedMessage());
@@ -141,14 +145,17 @@ public class FTPProvider extends AbstractProvider {
     }
 
     public void updateList() {
-        getItemsAtPath(currentPath, notifyCallback);
+        getItemsAtPath(currentPath);
     }
 
-    private void getItemsAtPath(String path, Runnable completeCallback) {
+    private void getItemsAtPath(String path) {
         if (!sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals(server)) {
             connectFtp(true);
             return;
         }
+
+        state = ProviderState.FETCHING;
+        notifyCallback.run();
 
         ArrayList<SideloadItem> items = new ArrayList<>();
         if(!path.equals("") && !path.equals("/")) {
@@ -184,19 +191,24 @@ public class FTPProvider extends AbstractProvider {
                         }
 
                         updating = false;
+                        state = ProviderState.IDLE;
                         mainActivityContext.runOnUiThread(() -> {
                             Log.i("FTP", "Updated files (" + items.size() + " total)");
                             itemList = items;
-                            completeCallback.run();
+                            notifyCallback.run();
                         });
                     } else {
                         updating = false;
+                        state = ProviderState.IDLE;
+                        mainActivityContext.runOnUiThread(notifyCallback);
                         Log.i("FTP", "Tried to update files but not connected, attempting to connect");
                         connectFtp(false);
                     }
                 } catch (Exception e) {
                     Log.e("FTP Error", e.toString());
                     updating = false;
+                    state = ProviderState.IDLE;
+                    mainActivityContext.runOnUiThread(notifyCallback);
                 }
             });
             thread.setPriority(8);

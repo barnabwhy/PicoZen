@@ -13,6 +13,7 @@ public class EmptyProvider extends AbstractProvider {
 
     public EmptyProvider(SharedPreferences sharedPreferences, MainActivity mainActivityContext, Runnable notifyCallback) {
         super(sharedPreferences, mainActivityContext, notifyCallback);
+        state = ProviderState.IDLE;
         updateList();
     }
 
@@ -23,7 +24,7 @@ public class EmptyProvider extends AbstractProvider {
 
     public void updateList() {
         // Do nothing
-        notifyCallback.run();
+        mainActivityContext.runOnUiThread(notifyCallback);
     }
 
     @Override

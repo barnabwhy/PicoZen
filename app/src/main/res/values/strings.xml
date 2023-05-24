@@ -37,6 +37,8 @@
     <string name="download_complete">Download complete</string>
     <string name="fetch_files_error">Couldn\'t fetch files</string>
     <string name="no_sideload_server">A sideload server has not been set in settings</string>
+    <string name="sideload_connecting">Connecting...</string>
+    <string name="sideload_fetching">Fetching...</string>
     <string name="install">Install</string>
     <string name="cancel">Cancel</string>
     <string name="saves_empty">No supported apps found</string>
@@ -74,7 +76,7 @@
 
     <string-array name="sideload_type_options">
         <item>None</item>
-        <item>FTP</item>
         <item>Proxied FTP</item>
+        <item>FTP (Slow)</item>
     </string-array>
 </resources>

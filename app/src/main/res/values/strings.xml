@@ -26,7 +26,7 @@
     <string name="check_for_updates">Check for updates</string>
     <string name="check">Check</string>
     <string name="change">Change</string>
-    <string name="sideload_ftp_server">Sideload FTP server</string>
+    <string name="sideload_server">Sideload server</string>
     <string name="start_on_boot">Start PicoZen on device boot</string>
     <string name="download">Download</string>
     <string name="dismiss">Dismiss</string>
@@ -36,7 +36,7 @@
     <string name="extracting_zip_progress">Extracting ZIP (%1$s)</string>
     <string name="download_complete">Download complete</string>
     <string name="fetch_files_error">Couldn\'t fetch files</string>
-    <string name="no_sideload_ftp_server">An FTP server has not been set in settings</string>
+    <string name="no_sideload_server">A sideload server has not been set in settings</string>
     <string name="install">Install</string>
     <string name="cancel">Cancel</string>
     <string name="saves_empty">No supported apps found</string>
@@ -54,6 +54,8 @@
     <string name="restore_fail">Restore (Failed)</string>
     <string name="delete_backup">Delete backup</string>
     <string name="backup_warning">WARNING: Restoring from a corrupt backup can cause data loss</string>
+    <string name="general">General</string>
+    <string name="server_type">Server type:</string>
 
     <string-array name="sort_options">
         <item>↓\t Name</item>
@@ -68,5 +70,11 @@
         <item>☰\t All</item>
         <item>★\t Favorites</item>
         <item>—\t Hidden</item>
+    </string-array>
+
+    <string-array name="sideload_type_options">
+        <item>None</item>
+        <item>FTP</item>
+        <item>Proxied FTP</item>
     </string-array>
 </resources>

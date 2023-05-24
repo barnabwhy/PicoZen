@@ -8,7 +8,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,24 +21,19 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.barnabwhy.picozen.Sideload.Providers.AbstractProvider;
+import com.barnabwhy.picozen.Sideload.Providers.EmptyProvider;
+import com.barnabwhy.picozen.Sideload.Providers.FTPProvider;
+import com.barnabwhy.picozen.Sideload.Providers.ProxyProvider;
+import com.barnabwhy.picozen.Sideload.SideloadItem;
+import com.barnabwhy.picozen.Sideload.SideloadItemType;
 
 import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,193 +45,93 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public class SideloadAdapter extends BaseAdapter {
-    private static final String FILES_PATH = "https://files-pico.doesnt-like.me";
     private final SharedPreferences sharedPreferences;
     private final MainActivity mainActivityContext;
 
-    private ArrayList<DirItem> dirList;
-    private ArrayList<DirItem> fileList;
-
-    private String currentPath = "/";
+    private AbstractProvider provider;
 
     private DownloadInfo currentDownload;
 
-    private static class ViewHolder {
-        RelativeLayout layout;
-        TextView name;
-        TextView modified;
-        TextView size;
-        ImageView downloadIcon;
-        ImageView openFolderIcon;
+    public AbstractProvider getProvider() {
+        return provider;
+    }
+
+    public static class ViewHolder {
+        public RelativeLayout layout;
+        public TextView name;
+        public TextView modified;
+        public TextView size;
+        public ImageView downloadIcon;
+        public ImageView openFolderIcon;
     }
     private static class DownloadInfo {
-        DirItem dirItem;
+        SideloadItem item;
         long downloadedBytes;
     }
-    private static class DirItem {
-        String path;
-        String name;
-        long size;
-        String modifiedAt;
-        ViewHolder holder;
-        public DirItem(String path, String name, long size, String modifiedAt) {
-            this.path = path;
-            this.name = name;
-            this.size = size;
-            this.modifiedAt = modifiedAt;
-        }
+
+    public enum SideloadProviderType {
+        NONE,
+        PROXY,
+        FTP,
     }
 
     public SideloadAdapter(MainActivity context) {
         mainActivityContext = context;
-
         sharedPreferences = mainActivityContext.getSharedPreferences(mainActivityContext.getPackageName() + "_preferences", Context.MODE_PRIVATE);
 
-        dirList = new ArrayList<>();
-        fileList = new ArrayList<>();
-
-        updateCurrentDirectory();
+        setProvider(SideloadProviderType.values()[sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0)]);
     }
 
-    public void updateCurrentDirectory() {
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                if (sharedPreferences.getString(SettingsProvider.KEY_FTP_HOST, "").equals("")) {
-                    dirList = new ArrayList<>();
-                    fileList = new ArrayList<>();
-                } else {
-                    dirList = getDirsAtPath(currentPath);
-                    fileList = getFilesAtPath(currentPath);
-                    mainActivityContext.ensureStoragePermissions();
-                }
-
-                mainActivityContext.runOnUiThread(() -> {
-                    if (dirList.size() == 0 && fileList.size() == 0) {
-                        mainActivityContext.findViewById(R.id.sideload_grid).setVisibility(View.GONE);
-                        mainActivityContext.findViewById(R.id.sideload_grid_empty).setVisibility(View.VISIBLE);
-
-                        if (sharedPreferences.getString(SettingsProvider.KEY_FTP_HOST, "").equals("")) {
-                            ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.no_sideload_ftp_server);
-                        } else {
-                            ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.fetch_files_error);
-                        }
-                    } else {
-                        mainActivityContext.findViewById(R.id.sideload_grid).setVisibility(View.VISIBLE);
-                        mainActivityContext.findViewById(R.id.sideload_grid_empty).setVisibility(View.GONE);
-                    }
-
-                    notifyDataSetChanged();
-                });
-            }
-        };
-        thread.start();
-    }
-
-    public void setCurrentPath(String newPath) {
-        currentPath = newPath;
-        Log.i("Path", newPath);
-        updateCurrentDirectory();
-    }
-
-    public ArrayList<DirItem> getDirsAtPath(String path) {
-        ArrayList<DirItem> dirs = new ArrayList<>();
-        if(!path.equals("") && !path.equals("/")) {
-            String[] pathSegments = path.split("/");
-            String backPath = String.join("/", Arrays.asList(pathSegments).subList(0, pathSegments.length-1));
-            dirs.add(new DirItem(backPath, "../", -1, ""));
+    public void setProvider(SideloadProviderType type) {
+        if(provider != null) {
+            provider.cleanup();
         }
-        try {
-            URL u = new URL(FILES_PATH + path + "?host=" + sharedPreferences.getString(SettingsProvider.KEY_FTP_HOST, ""));
-            InputStream stream = u.openStream();
-            int bufferSize = 1024;
-            char[] buffer = new char[bufferSize];
-            StringBuilder out = new StringBuilder();
-            Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
-            for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
-                out.append(buffer, 0, numRead);
-            }
-            JSONObject json = new JSONObject(out.toString());
-            JSONArray dirArray = json.getJSONArray("dirs");
-            for(int i = 0; i < dirArray.length(); i++) {
-                JSONObject dir = dirArray.getJSONObject(i);
-                String dirPath = dir.getString("path");
-                String name = dir.getString("name");
-                long size = dir.getLong("size");
-                String date = "";
-                if(dir.has("date"))
-                    date = dir.getString("date");
-                dirs.add(new DirItem(dirPath, name, size, date));
-            }
-        } catch (Exception e) {
-            Log.e("Error", e.toString());
+        if(type == SideloadProviderType.NONE) {
+            provider = new EmptyProvider(sharedPreferences, mainActivityContext, this::notifyDataSetChanged);
+        } else if(type == SideloadProviderType.FTP) {
+            provider = new FTPProvider(sharedPreferences, mainActivityContext, this::notifyDataSetChanged);
+        } else if(type == SideloadProviderType.PROXY) {
+            provider = new ProxyProvider(sharedPreferences, mainActivityContext, this::notifyDataSetChanged);
         }
-        return dirs;
     }
-    public ArrayList<DirItem> getFilesAtPath(String path) {
-        ArrayList<DirItem> files = new ArrayList<>();
-        try {
-            URL u = new URL(FILES_PATH + path + "?host=" + sharedPreferences.getString(SettingsProvider.KEY_FTP_HOST, ""));
-            InputStream stream = u.openStream();
-            int bufferSize = 1024;
-            char[] buffer = new char[bufferSize];
-            StringBuilder out = new StringBuilder();
-            Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
-            for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
-                out.append(buffer, 0, numRead);
+
+    @Override
+    public void notifyDataSetChanged() {
+        if (provider != null && provider.getState() != AbstractProvider.ProviderState.IDLE) {
+            mainActivityContext.findViewById(R.id.sideload_grid).setVisibility(View.GONE);
+            mainActivityContext.findViewById(R.id.sideload_grid_empty).setVisibility(View.VISIBLE);
+            if (provider.getState() == AbstractProvider.ProviderState.CONNECTING) {
+                ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.sideload_connecting);
+            } else {
+                ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.sideload_fetching);
             }
-            JSONObject json = new JSONObject(out.toString());
-            JSONArray dirArray = json.getJSONArray("files");
-            for(int i = 0; i < dirArray.length(); i++) {
-                JSONObject file = dirArray.getJSONObject(i);
-                String filePath = file.getString("path");
-                String name = file.getString("name");
-                long size = file.getLong("size");
-                String date = "";
-                if(file.has("date"))
-                    date = file.getString("date");
-                files.add(new DirItem(filePath, name, size, date));
+        } else if (getCount() == 0) {
+            mainActivityContext.findViewById(R.id.sideload_grid).setVisibility(View.GONE);
+            mainActivityContext.findViewById(R.id.sideload_grid_empty).setVisibility(View.VISIBLE);
+            if (sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0) == 0 || sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals("")) {
+                ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.no_sideload_server);
+            } else {
+                ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.fetch_files_error);
             }
-        } catch (Exception e) {
-            Log.e("Error", e.toString());
+        } else {
+            mainActivityContext.findViewById(R.id.sideload_grid).setVisibility(View.VISIBLE);
+            mainActivityContext.findViewById(R.id.sideload_grid_empty).setVisibility(View.GONE);
         }
-        return files;
+        super.notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return dirList.size() + fileList.size();
+        return provider != null ? getProvider().getCount() : 0;
     }
 
     @Override
-    public DirItem getItem(int position) {
-        if(position < dirList.size()) {
-            return dirList.get(position);
-        } else {
-            return fileList.get(position - dirList.size());
-        }
+    public SideloadItem getItem(int position) {
+        return getProvider().getItem(position);
     }
 
-    public String getType(int position) {
-        if(position < dirList.size()) {
-            return "dir";
-        } else {
-            return "file";
-        }
-    }
-
-    public DirItem getByPath(String path) {
-        for (DirItem item : dirList) {
-            if(item.path.equals(path)) {
-                return item;
-            }
-        }
-        for (DirItem item : fileList) {
-            if(item.path.equals(path)) {
-                return item;
-            }
-        }
-        return null;
+    public SideloadItemType getType(int position) {
+        return getItem(position).getType();
     }
 
     @Override
@@ -250,7 +144,7 @@ public class SideloadAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
 
-        final DirItem current = getItem(position);
+        final SideloadItem current = getItem(position);
         LayoutInflater inflater = (LayoutInflater) mainActivityContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
@@ -272,23 +166,9 @@ public class SideloadAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        current.holder = holder;
+        getProvider().setHolder(position, holder);
 
-        holder.name.setText(current.name);
-
-        if(getType(position).equals("dir")) {
-            holder.size.setVisibility(View.GONE);
-            holder.downloadIcon.setVisibility(View.GONE);
-            holder.openFolderIcon.setVisibility(View.VISIBLE);
-
-            holder.layout.setOnClickListener(view -> {
-                setCurrentPath(current.path);
-            });
-        } else {
-            holder.size.setVisibility(View.VISIBLE);
-            holder.downloadIcon.setVisibility(View.VISIBLE);
-            holder.openFolderIcon.setVisibility(View.GONE);
-
+        if(getType(position) != SideloadItemType.DIRECTORY) {
             holder.layout.setOnClickListener(view -> {
                 Thread thread = new Thread() {
                     @Override
@@ -299,7 +179,7 @@ public class SideloadAdapter extends BaseAdapter {
                             return;
 
                         currentDownload = new DownloadInfo();
-                        currentDownload.dirItem = current;
+                        currentDownload.item = current;
                         AtomicReference<AlertDialog> dialog = new AtomicReference<>();
                         mainActivityContext.runOnUiThread(() -> {
                             dialog.set(showDownloadDialog());
@@ -307,7 +187,7 @@ public class SideloadAdapter extends BaseAdapter {
 
                         AtomicBoolean cancelled = new AtomicBoolean(false);
                         AtomicLong lastProgressTime = new AtomicLong();
-                        downloadFile(current, (file) -> {
+                        getProvider().downloadFile(current, (file) -> {
                             mainActivityContext.runOnUiThread(() -> {
                                 ((TextView)dialog.get().findViewById(R.id.file_name)).setText(file.getName());
                                 dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.VISIBLE);
@@ -317,18 +197,18 @@ public class SideloadAdapter extends BaseAdapter {
                                 });
                             });
                         }, (progress) -> {
-                            if(progress != current.size && System.currentTimeMillis() - lastProgressTime.get() < 100)
+                            if(progress != current.getSize() && System.currentTimeMillis() - lastProgressTime.get() < 100)
                                 return;
 
                             lastProgressTime.set(System.currentTimeMillis());
 
                             mainActivityContext.runOnUiThread(() -> {
                                 currentDownload.downloadedBytes = progress;
-                                ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format("%s / %s (%01.2f%%)", bytesReadable(currentDownload.downloadedBytes), bytesReadable(current.size), ((double)progress / current.size) * 100.0));
+                                ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format("%s / %s (%01.2f%%)", bytesReadable(currentDownload.downloadedBytes), bytesReadable(current.getSize()), ((double)progress / current.getSize()) * 100.0));
 
                                 View progressBar = dialog.get().findViewById(R.id.progress_bar);
                                 ViewGroup.LayoutParams params = progressBar.getLayoutParams();
-                                params.width = (int) (((View)progressBar.getParent()).getWidth() * ((double)progress / current.size));
+                                params.width = (int) (((View)progressBar.getParent()).getWidth() * ((double)progress / current.getSize()));
                                 params.height = ((View)progressBar.getParent()).getHeight();
                                 progressBar.setLayoutParams(params);
                                 progressBar.setVisibility(View.VISIBLE);
@@ -490,85 +370,10 @@ public class SideloadAdapter extends BaseAdapter {
             });
         }
 
-        holder.size.setText(bytesReadable(current.size));
-        holder.modified.setText(current.modifiedAt);
+        holder.size.setText(bytesReadable(current.getSize()));
+        holder.modified.setText(current.getModifiedAt());
 
         return convertView;
-    }
-
-    private void downloadFile(DirItem item, Consumer<File> startCallback, Consumer<Long> progressCallback, Consumer<File> completeCallback, Consumer<Exception> errorCallback) {
-        File file = null;
-        try {
-            String fileUrl = FILES_PATH + item.path + "?download&host=" + sharedPreferences.getString(SettingsProvider.KEY_FTP_HOST, "");
-            final File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            Files.createDirectories(Paths.get(dir.getAbsolutePath() + "/PicoZen"));
-            file = new File(dir.getAbsolutePath() + "/PicoZen/" + item.name);
-            Log.i("File", file.getName());
-            int i = 1;
-            while(file.exists()) {
-                file = new File(dir.getAbsolutePath() + "/PicoZen/" + item.name.substring(0, item.name.lastIndexOf(".")) + " (" + i + ")." + item.name.substring(item.name.lastIndexOf(".") + 1));
-                i++;
-                Log.i("File", file.getName());
-            }
-            startCallback.accept(file);
-            Log.i("Download", "Started");
-            if(downloadFileFromUrl(fileUrl, file, progressCallback)) {
-                completeCallback.accept(file);
-            } else {
-                file.delete();
-                errorCallback.accept(null);
-            }
-        } catch(Exception e) {
-            Log.e("Error", e.toString());
-            if(file != null && file.exists()) {
-                file.delete();
-            }
-            errorCallback.accept(e);
-        }
-    }
-
-    protected static boolean downloadFileFromUrl(String url, File outputFile, Consumer<Long> progressCallback) {
-        try {
-            return saveStream(new URL(url).openStream(), outputFile, progressCallback);
-        } catch (Exception e) {
-            Log.e("Error", e.toString());
-            return false;
-        }
-    }
-
-    protected static boolean saveStream(InputStream is, File outputFile, Consumer<Long> progressCallback) {
-        try {
-            DataInputStream dis = new DataInputStream(is);
-
-            long processed = 0;
-            int length;
-            byte[] buffer = new byte[65536];
-            FileOutputStream fos = new FileOutputStream(outputFile);
-
-            while ((length = dis.read(buffer)) > 0) {
-                if(!outputFile.canWrite()) {
-                    fos.flush();
-                    fos.close();
-                    is.close();
-                    dis.close();
-                    return false;
-                }
-
-                fos.write(buffer, 0, length);
-                fos.flush();
-                processed += length;
-                progressCallback.accept(processed);
-            }
-            fos.flush();
-            fos.close();
-            is.close();
-            dis.close();
-
-            return true;
-        } catch (Exception e) {
-            Log.e("Error", e.toString());
-            return false;
-        }
     }
 
     private AlertDialog showDownloadDialog() {
@@ -591,8 +396,8 @@ public class SideloadAdapter extends BaseAdapter {
         dialog.getWindow().setAttributes(lp);
         dialog.findViewById(R.id.layout).requestLayout();
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_dialog);
-        ((TextView)dialog.findViewById(R.id.file_name)).setText(currentDownload.dirItem.name);
-        ((TextView)dialog.findViewById(R.id.progress_text)).setText(String.format("0 B / %s (0%%)", bytesReadable(currentDownload.dirItem.size)));
+        ((TextView)dialog.findViewById(R.id.file_name)).setText(currentDownload.item.getName());
+        ((TextView)dialog.findViewById(R.id.progress_text)).setText(String.format("0 B / %s (0%%)", bytesReadable(currentDownload.item.getSize())));
         ((View)dialog.findViewById(R.id.progress_bar).getParent()).setClipToOutline(true);
 
         dialog.setOnDismissListener(d -> {

@@ -1,8 +1,5 @@
 package com.barnabwhy.picozen;
 
-import static android.os.Build.VERSION.SDK_INT;
-import static androidx.core.content.FileProvider.getUriForFile;
-
 import static com.barnabwhy.picozen.SettingsProvider.KEY_CURRENT_TAB;
 import static com.barnabwhy.picozen.SettingsProvider.KEY_START_ON_BOOT;
 
@@ -25,11 +22,8 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -367,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(pages.get(page)).setVisibility(View.VISIBLE);
 
         if (page == PAGES.SIDELOAD) {
-            ((SideloadAdapter)sideloadGridView.getAdapter()).updateCurrentDirectory();
+            ((SideloadAdapter)sideloadGridView.getAdapter()).getProvider().updateList();
         } else if (page == PAGES.SAVES) {
             ((SavesAdapter)savesGridView.getAdapter()).updateAppList();
         }
@@ -488,12 +482,34 @@ public class MainActivity extends AppCompatActivity {
             dialog.dismiss();
         });
 
-        EditText ftpHostInput = dialog.findViewById(R.id.ftp_host_input);
-        View ftpHostBtn = dialog.findViewById(R.id.ftp_host_btn);
-        ftpHostInput.setText(sharedPreferences.getString(SettingsProvider.KEY_FTP_HOST, ""));
-        ftpHostBtn.setOnClickListener(view -> {
-            sharedPreferences.edit().putString(SettingsProvider.KEY_FTP_HOST, String.valueOf(ftpHostInput.getText())).apply();
-            ((SideloadAdapter)sideloadGridView.getAdapter()).updateCurrentDirectory();
+        Spinner sideloadTypeSpinner = dialog.findViewById(R.id.sideload_type);
+        ((View)sideloadTypeSpinner.getParent()).setClipToOutline(true);
+        ArrayAdapter<CharSequence> sideloadTypeApdater = ArrayAdapter.createFromResource(this, R.array.sideload_type_options, R.layout.spinner_item);
+        sideloadTypeApdater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sideloadTypeSpinner.setAdapter(sideloadTypeApdater);
+        sideloadTypeSpinner.setSelection(sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0));
+        sideloadTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                if(sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0) != pos) {
+                    sharedPreferences.edit().putInt(SettingsProvider.KEY_SIDELOAD_TYPE, pos).apply();
+                    ((SideloadAdapter) sideloadGridView.getAdapter()).setProvider(SideloadAdapter.SideloadProviderType.values()[pos]);
+                    ((SideloadAdapter)sideloadGridView.getAdapter()).notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        EditText sideloadHostInput = dialog.findViewById(R.id.sideload_host_input);
+        View sideloadHostBtn = dialog.findViewById(R.id.sideload_host_btn);
+        sideloadHostInput.setText(sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, ""));
+        sideloadHostBtn.setOnClickListener(view -> {
+            sharedPreferences.edit().putString(SettingsProvider.KEY_SIDELOAD_HOST, String.valueOf(sideloadHostInput.getText())).apply();
+            ((SideloadAdapter)sideloadGridView.getAdapter()).getProvider().updateList();
         });
 
         View toggleStartOnBoot = dialog.findViewById(R.id.toggle_start_on_boot);

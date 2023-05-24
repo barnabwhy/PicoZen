@@ -7,9 +7,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:paddingHorizontal="20dp"
-                android:showDividers="middle"
-                android:divider="@drawable/divider">
+                android:paddingHorizontal="20dp">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -33,6 +31,16 @@
                             android:orientation="vertical"
                             android:showDividers="middle"
                             android:divider="@drawable/divider">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:textStyle="bold"
+                                    android:gravity="center_vertical"
+                                    android:text="@string/general"
+                                    android:paddingTop="15dp"
+                                    android:paddingHorizontal="15dp"
+                                    android:paddingBottom="5dp" />
+
                                 <LinearLayout
                                     android:id="@+id/configure_accessibility"
                                     android:layout_width="match_parent"
@@ -119,36 +127,6 @@
                                 </LinearLayout>
 
                                 <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:padding="10dp"
-                                    android:background="@drawable/bg_list_item_s">
-                                        <EditText
-                                            android:id="@+id/ftp_host_input"
-                                            android:layout_width="0dp"
-                                            android:layout_weight="1"
-                                            android:layout_height="wrap_content"
-                                            android:gravity="center_vertical"
-                                            android:hint="@string/sideload_ftp_server"
-                                            android:singleLine="true"
-                                            android:textSize="14sp"
-                                            android:textCursorDrawable="@null"
-                                            android:padding="10dp"
-                                            android:layout_marginEnd="15dp"
-                                            android:background="@drawable/bg_list_item_hover_s" />
-                                        <TextView
-                                            android:id="@+id/ftp_host_btn"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="match_parent"
-                                            android:textStyle="bold"
-                                            android:gravity="center_vertical"
-                                            android:textColor="@color/link"
-                                            android:text="@string/change"
-                                            android:padding="5dp" />
-                                </LinearLayout>
-
-                                <LinearLayout
                                     android:id="@+id/toggle_start_on_boot"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
@@ -170,6 +148,72 @@
                                             android:text="@string/enable" />
                                 </LinearLayout>
 
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:textStyle="bold"
+                                    android:gravity="center_vertical"
+                                    android:text="@string/list_sideload"
+                                    android:paddingTop="15dp"
+                                    android:paddingHorizontal="15dp"
+                                    android:paddingBottom="5dp" />
+
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:background="@drawable/bg_list_item_s">
+                                        <TextView
+                                            android:padding="15dp"
+                                            android:layout_width="wrap_content"
+                                            android:textStyle="bold"
+                                            android:gravity="center_vertical"
+                                            android:layout_height="match_parent"
+                                            android:text="@string/server_type" />
+                                        <Spinner
+                                            android:id="@+id/sideload_type"
+                                            android:theme="@style/spinnerItemStyle"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:paddingHorizontal="5dp"
+                                            android:dropDownVerticalOffset="45dp"
+                                            android:popupBackground="@drawable/bg_list_item_hover_s"
+                                            android:background="@color/bg_dark"
+                                            android:spinnerMode="dropdown" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:padding="10dp"
+                                    android:background="@drawable/bg_list_item_s">
+                                        <EditText
+                                            android:id="@+id/sideload_host_input"
+                                            android:layout_width="0dp"
+                                            android:layout_weight="1"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:hint="@string/sideload_server"
+                                            android:singleLine="true"
+                                            android:textSize="14sp"
+                                            android:textCursorDrawable="@null"
+                                            android:paddingHorizontal="10dp"
+                                            android:paddingVertical="7.5dp"
+                                            android:layout_marginEnd="15dp"
+                                            android:background="@drawable/bg_list_item_hover_s" />
+                                        <TextView
+                                            android:id="@+id/sideload_host_btn"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="match_parent"
+                                            android:textStyle="bold"
+                                            android:gravity="center_vertical"
+                                            android:textColor="@color/link"
+                                            android:text="@string/change"
+                                            android:padding="5dp" />
+                                </LinearLayout>
                         </LinearLayout>
                 </ScrollView>
                 <TextView

@@ -27,7 +27,8 @@ public class SettingsProvider
     public static final String KEY_FAVORITE_APPS = "KEY_FAVORITE_APPS";
     public static final String KEY_HIDDEN_APPS = "KEY_HIDDEN_APPS";
     public static final String KEY_RECENTS = "KEY_RECENTS";
-    public static final String KEY_FTP_HOST = "KEY_FTP_HOST";
+    public static final String KEY_SIDELOAD_TYPE = "KEY_SIDELOAD_TYPE";
+    public static final String KEY_SIDELOAD_HOST = "KEY_SIDELOAD_HOST";
     public static final String KEY_START_ON_BOOT = "KEY_START_ON_BOOT";
 
     private static SettingsProvider instance;

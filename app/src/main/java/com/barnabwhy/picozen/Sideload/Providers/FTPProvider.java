@@ -1,6 +1,7 @@
 package com.barnabwhy.picozen.Sideload.Providers;
 
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
@@ -15,8 +16,13 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -218,6 +224,69 @@ public class FTPProvider extends AbstractProvider {
 
     @Override
     public void downloadFile(SideloadItem item, Consumer<File> startCallback, Consumer<Long> progressCallback, Consumer<File> completeCallback, Consumer<Exception> errorCallback) {
-        errorCallback.accept(new Exception("Provider doesn't support downloads"));
+        File file = null;
+        try {
+            final File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            Files.createDirectories(Paths.get(dir.getAbsolutePath() + "/PicoZen"));
+            file = new File(dir.getAbsolutePath() + "/PicoZen/" + item.getName());
+            Log.i("File", file.getName());
+            int i = 1;
+            while(file.exists()) {
+                file = new File(dir.getAbsolutePath() + "/PicoZen/" + item.getName().substring(0, item.getName().lastIndexOf(".")) + " (" + i + ")." + item.getName().substring(item.getName().lastIndexOf(".") + 1));
+                i++;
+                Log.i("File", file.getName());
+            }
+            startCallback.accept(file);
+            Log.i("Download", "Started");
+
+            InputStream is = ftp.retrieveFileStream(item.getPath());
+            if(saveStream(is, file, progressCallback)) {
+                completeCallback.accept(file);
+            } else {
+                file.delete();
+                errorCallback.accept(null);
+            }
+        } catch(Exception e) {
+            Log.e("Error", e.toString());
+            if(file != null && file.exists()) {
+                file.delete();
+            }
+            errorCallback.accept(e);
+        }
+    }
+
+    protected static boolean saveStream(InputStream is, File outputFile, Consumer<Long> progressCallback) {
+        try {
+            DataInputStream dis = new DataInputStream(is);
+
+            long processed = 0;
+            int length;
+            byte[] buffer = new byte[65536];
+            FileOutputStream fos = new FileOutputStream(outputFile);
+
+            while ((length = dis.read(buffer)) > 0) {
+                if(!outputFile.canWrite()) {
+                    fos.flush();
+                    fos.close();
+                    is.close();
+                    dis.close();
+                    return false;
+                }
+
+                fos.write(buffer, 0, length);
+                fos.flush();
+                processed += length;
+                progressCallback.accept(processed);
+            }
+            fos.flush();
+            fos.close();
+            is.close();
+            dis.close();
+
+            return true;
+        } catch (Exception e) {
+            Log.e("Error", e.toString());
+            return false;
+        }
     }
 }

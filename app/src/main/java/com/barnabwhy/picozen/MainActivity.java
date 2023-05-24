@@ -494,7 +494,6 @@ public class MainActivity extends AppCompatActivity {
                 if(sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0) != pos) {
                     sharedPreferences.edit().putInt(SettingsProvider.KEY_SIDELOAD_TYPE, pos).apply();
                     ((SideloadAdapter) sideloadGridView.getAdapter()).setProvider(SideloadAdapter.SideloadProviderType.values()[pos]);
-                    ((SideloadAdapter)sideloadGridView.getAdapter()).notifyDataSetChanged();
                 }
             }
 
@@ -508,8 +507,10 @@ public class MainActivity extends AppCompatActivity {
         View sideloadHostBtn = dialog.findViewById(R.id.sideload_host_btn);
         sideloadHostInput.setText(sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, ""));
         sideloadHostBtn.setOnClickListener(view -> {
-            sharedPreferences.edit().putString(SettingsProvider.KEY_SIDELOAD_HOST, String.valueOf(sideloadHostInput.getText())).apply();
-            ((SideloadAdapter)sideloadGridView.getAdapter()).getProvider().updateList();
+            if(!sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals(String.valueOf(sideloadHostInput.getText()))) {
+                sharedPreferences.edit().putString(SettingsProvider.KEY_SIDELOAD_HOST, String.valueOf(sideloadHostInput.getText())).apply();
+                ((SideloadAdapter) sideloadGridView.getAdapter()).setProvider(SideloadAdapter.SideloadProviderType.values()[sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0)]);
+            }
         });
 
         View toggleStartOnBoot = dialog.findViewById(R.id.toggle_start_on_boot);

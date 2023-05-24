@@ -25,6 +25,7 @@ import com.barnabwhy.picozen.Sideload.Providers.AbstractProvider;
 import com.barnabwhy.picozen.Sideload.Providers.EmptyProvider;
 import com.barnabwhy.picozen.Sideload.Providers.FTPProvider;
 import com.barnabwhy.picozen.Sideload.Providers.ProxyProvider;
+import com.barnabwhy.picozen.Sideload.Providers.SMBProvider;
 import com.barnabwhy.picozen.Sideload.SideloadItem;
 import com.barnabwhy.picozen.Sideload.SideloadItemType;
 
@@ -73,6 +74,7 @@ public class SideloadAdapter extends BaseAdapter {
         NONE,
         PROXY,
         FTP,
+        SMB,
     }
 
     public SideloadAdapter(MainActivity context) {
@@ -86,12 +88,14 @@ public class SideloadAdapter extends BaseAdapter {
         if(provider != null) {
             provider.cleanup();
         }
-        if(type == SideloadProviderType.NONE) {
-            provider = new EmptyProvider(sharedPreferences, mainActivityContext, this::notifyDataSetChanged);
-        } else if(type == SideloadProviderType.FTP) {
+        if(type == SideloadProviderType.FTP) {
             provider = new FTPProvider(sharedPreferences, mainActivityContext, this::notifyDataSetChanged);
         } else if(type == SideloadProviderType.PROXY) {
             provider = new ProxyProvider(sharedPreferences, mainActivityContext, this::notifyDataSetChanged);
+        } else if(type == SideloadProviderType.SMB) {
+            provider = new SMBProvider(sharedPreferences, mainActivityContext, this::notifyDataSetChanged);
+        } else {
+            provider = new EmptyProvider(sharedPreferences, mainActivityContext, this::notifyDataSetChanged);
         }
     }
 

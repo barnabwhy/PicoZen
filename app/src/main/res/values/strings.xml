@@ -78,5 +78,6 @@
         <item>None</item>
         <item>Proxied FTP</item>
         <item>FTP (Slow)</item>
+        <item>SMB</item>
     </string-array>
 </resources>

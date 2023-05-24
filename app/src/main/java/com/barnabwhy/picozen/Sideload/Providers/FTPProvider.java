@@ -218,6 +218,6 @@ public class FTPProvider extends AbstractProvider {
 
     @Override
     public void downloadFile(SideloadItem item, Consumer<File> startCallback, Consumer<Long> progressCallback, Consumer<File> completeCallback, Consumer<Exception> errorCallback) {
-        errorCallback.accept(new Exception("Provider doesn't support file downloads"));
+        errorCallback.accept(new Exception("Provider doesn't support downloads"));
     }
 }

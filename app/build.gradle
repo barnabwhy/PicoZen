@@ -57,6 +57,8 @@ dependencies {
     implementation 'androidx.palette:palette:1.0.0'
 
     implementation 'commons-net:commons-net:3.9.0'
+    implementation 'com.hierynomus:smbj:0.11.5'
+
     implementation  "io.noties.markwon:core:4.6.2"
     implementation  "io.noties.markwon:ext-tables:4.6.2"
     implementation  "io.noties.markwon:ext-tasklist:4.6.2"

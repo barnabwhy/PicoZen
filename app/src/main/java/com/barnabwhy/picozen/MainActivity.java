@@ -494,6 +494,7 @@ public class MainActivity extends AppCompatActivity {
                 if(sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0) != pos) {
                     sharedPreferences.edit().putInt(SettingsProvider.KEY_SIDELOAD_TYPE, pos).apply();
                     ((SideloadAdapter) sideloadGridView.getAdapter()).setProvider(SideloadAdapter.SideloadProviderType.values()[pos]);
+                    ((SideloadAdapter)sideloadGridView.getAdapter()).notifyDataSetChanged();
                 }
             }
 

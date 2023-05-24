@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 
 public class FTPProvider extends AbstractProvider {
     private final FTPClient ftp;
-    private String currentPath = "";
+    private String currentPath = "/";
     private String server = "";
     private boolean connecting = false;
     private boolean updating = false;
@@ -50,9 +50,9 @@ public class FTPProvider extends AbstractProvider {
                 try {
                     if(connecting || ftp.isConnected()) {
                         try {
+                            ftp.abort();
                             ftp.logout();
                             ftp.disconnect();
-                            ftp.abort();
                         } catch(Exception e) { }
                     }
 
@@ -106,9 +106,9 @@ public class FTPProvider extends AbstractProvider {
     protected void finalize() {
         new Thread(() -> {
             try {
+                ftp.abort();
                 ftp.logout();
                 ftp.disconnect();
-                ftp.abort();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -116,6 +116,9 @@ public class FTPProvider extends AbstractProvider {
     }
 
     public void setCurrentPath(String newPath) {
+        if(currentPath.equals(newPath))
+            return;
+
         currentPath = newPath;
         Log.i("Path", newPath);
         updating = false;
@@ -146,18 +149,25 @@ public class FTPProvider extends AbstractProvider {
     }
 
     private void getItemsAtPath(String path, Runnable completeCallback) {
+        if (!sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals(server)) {
+            connectFtp();
+            return;
+        }
+
         ArrayList<SideloadItem> items = new ArrayList<>();
         if(!path.equals("") && !path.equals("/")) {
             String[] pathSegments = path.split("/");
-            String backPath = String.join("/", Arrays.asList(pathSegments).subList(0, pathSegments.length-1));
+            String backPath = "/" + String.join("/", Arrays.asList(pathSegments).subList(0, pathSegments.length-1));
             items.add(new SideloadItem(SideloadItemType.DIRECTORY, "../", backPath, -1, ""));
         }
         if(!updating) {
             updating = true;
             new Thread(() -> {
                 try {
-                    if (ftp.isConnected() && ftp.isAvailable()) {
-                        Log.i("FTP", "Starting file update");
+                    if (ftp.isAvailable() && ftp.isConnected()) {
+                        if(!path.equals(currentPath))
+                            return;
+                        Log.i("FTP", "Starting file update ("+path+")");
                         FTPFile[] files = ftp.listFiles(currentPath);
                         if(!path.equals(currentPath))
                             return;
@@ -166,30 +176,32 @@ public class FTPProvider extends AbstractProvider {
                             if (file.isDirectory()) {
                                 DateFormat dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
                                 String modified = dateFormatter.format(file.getTimestamp().getTime());
-                                items.add(new SideloadItem(SideloadItemType.DIRECTORY, file.getName(), currentPath + "/" + file.getName(), file.getSize(), modified));
+                                items.add(new SideloadItem(SideloadItemType.DIRECTORY, file.getName(), currentPath + file.getName() + "/", file.getSize(), modified));
                             }
                         }
                         for (FTPFile file : files) {
                             if (!file.isDirectory()) {
                                 DateFormat dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
                                 String modified = dateFormatter.format(file.getTimestamp().getTime());
-                                items.add(new SideloadItem(SideloadItemType.FILE, file.getName(), currentPath + "/" + file.getName(), file.getSize(), modified));
+                                items.add(new SideloadItem(SideloadItemType.FILE, file.getName(), currentPath + file.getName(), file.getSize(), modified));
                             }
                         }
 
+                        updating = false;
                         mainActivityContext.runOnUiThread(() -> {
                             Log.i("FTP", "Updated files (" + items.size() + " total)");
                             itemList = items;
                             completeCallback.run();
                         });
                     } else {
+                        updating = false;
                         Log.i("FTP", "Tried to update files but not connected, attempting to connect");
                         connectFtp();
                     }
                 } catch (Exception e) {
                     Log.e("FTP Error", e.toString());
+                    updating = false;
                 }
-                updating = false;
             }).start();
         }
     }

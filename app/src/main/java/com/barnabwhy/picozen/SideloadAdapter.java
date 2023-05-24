@@ -201,7 +201,7 @@ public class SideloadAdapter extends BaseAdapter {
                                 });
                             });
                         }, (progress) -> {
-                            if(progress != current.getSize() && System.currentTimeMillis() - lastProgressTime.get() < 100)
+                            if(progress != current.getSize() && System.currentTimeMillis() - lastProgressTime.get() < 100 || currentDownload == null)
                                 return;
 
                             lastProgressTime.set(System.currentTimeMillis());

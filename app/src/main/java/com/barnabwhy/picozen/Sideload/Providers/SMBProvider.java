@@ -1,6 +1,7 @@
 package com.barnabwhy.picozen.Sideload.Providers;
 
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
@@ -9,18 +10,31 @@ import com.barnabwhy.picozen.SettingsProvider;
 import com.barnabwhy.picozen.Sideload.SideloadItem;
 import com.barnabwhy.picozen.Sideload.SideloadItemType;
 import com.barnabwhy.picozen.SideloadAdapter;
+import com.hierynomus.msdtyp.AccessMask;
+import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
+import com.hierynomus.mssmb2.SMB2CreateDisposition;
+import com.hierynomus.mssmb2.SMB2CreateOptions;
+import com.hierynomus.mssmb2.SMB2ShareAccess;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -161,6 +175,62 @@ public class SMBProvider extends AbstractProvider {
 
     @Override
     public void downloadFile(SideloadItem item, Consumer<File> startCallback, Consumer<Long> progressCallback, Consumer<File> completeCallback, Consumer<Exception> errorCallback) {
-        errorCallback.accept(new Exception("Provider doesn't support downloads"));
+        HashSet<AccessMask> accessMasks = new HashSet<>();
+        accessMasks.add(AccessMask.GENERIC_READ);
+        HashSet<FileAttributes> attributes = new HashSet<>();
+        attributes.add(FileAttributes.FILE_ATTRIBUTE_NORMAL);
+        HashSet<SMB2CreateOptions> createOptions = new HashSet<>();
+        createOptions.add(SMB2CreateOptions.FILE_SEQUENTIAL_ONLY);
+
+        File file = null;
+        try (com.hierynomus.smbj.share.File remoteFile = share.openFile(item.getPath(), accessMasks, attributes, Collections.singleton(SMB2ShareAccess.FILE_SHARE_READ), SMB2CreateDisposition.FILE_OPEN, createOptions)) {
+
+            final File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            Files.createDirectories(Paths.get(dir.getAbsolutePath() + "/PicoZen"));
+            file = new File(dir.getAbsolutePath() + "/PicoZen/" + item.getName());
+            Log.i("File", file.getName());
+            int i = 1;
+            while (file.exists()) {
+                file = new File(dir.getAbsolutePath() + "/PicoZen/" + item.getName().substring(0, item.getName().lastIndexOf(".")) + " (" + i + ")." + item.getName().substring(item.getName().lastIndexOf(".") + 1));
+                i++;
+                Log.i("File", file.getName());
+            }
+
+            startCallback.accept(file);
+            Log.i("Download", "Started");
+            OutputStream is = remoteFile.getOutputStream();
+            if (saveFile(remoteFile, file, progressCallback)) {
+                completeCallback.accept(file);
+            } else {
+                file.delete();
+                errorCallback.accept(null);
+            }
+        } catch (Exception e) {
+            if (file != null && file.exists()) {
+                file.delete();
+            }
+            errorCallback.accept(e);
+        }
+    }
+
+    protected static boolean saveFile(com.hierynomus.smbj.share.File file, File outputFile, Consumer<Long> progressCallback) {
+        try {
+            FileOutputStream fos = new FileOutputStream(outputFile);
+
+            file.read(fos, (numBytes, totalBytes) -> {
+                if(outputFile.canWrite())
+                    progressCallback.accept(totalBytes);
+                else
+                    file.close();
+            });
+
+            fos.flush();
+            fos.close();
+
+            return true;
+        } catch (Exception e) {
+            Log.e("Error", e.toString());
+            return false;
+        }
     }
 }

@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 
 public class FTPProvider extends AbstractProvider {
     private final FTPClient ftp;
-    private String currentPath = "/";
+    private String currentPath = "";
     private String server = "";
     private boolean connecting = false;
     private boolean updating = false;
@@ -118,6 +118,7 @@ public class FTPProvider extends AbstractProvider {
     public void setCurrentPath(String newPath) {
         currentPath = newPath;
         Log.i("Path", newPath);
+        updating = false;
         updateList();
     }
 
@@ -152,24 +153,27 @@ public class FTPProvider extends AbstractProvider {
             items.add(new SideloadItem(SideloadItemType.DIRECTORY, "../", backPath, -1, ""));
         }
         if(!updating) {
+            updating = true;
             new Thread(() -> {
-                updating = true;
                 try {
                     if (ftp.isConnected() && ftp.isAvailable()) {
                         Log.i("FTP", "Starting file update");
                         FTPFile[] files = ftp.listFiles(currentPath);
+                        if(!path.equals(currentPath))
+                            return;
+
                         for (FTPFile file : files) {
                             if (file.isDirectory()) {
                                 DateFormat dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
                                 String modified = dateFormatter.format(file.getTimestamp().getTime());
-                                items.add(new SideloadItem(SideloadItemType.DIRECTORY, file.getName(), file.getLink(), file.getSize(), modified));
+                                items.add(new SideloadItem(SideloadItemType.DIRECTORY, file.getName(), currentPath + "/" + file.getName(), file.getSize(), modified));
                             }
                         }
                         for (FTPFile file : files) {
                             if (!file.isDirectory()) {
                                 DateFormat dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
                                 String modified = dateFormatter.format(file.getTimestamp().getTime());
-                                items.add(new SideloadItem(SideloadItemType.FILE, file.getName(), file.getLink(), file.getSize(), modified));
+                                items.add(new SideloadItem(SideloadItemType.FILE, file.getName(), currentPath + "/" + file.getName(), file.getSize(), modified));
                             }
                         }
 

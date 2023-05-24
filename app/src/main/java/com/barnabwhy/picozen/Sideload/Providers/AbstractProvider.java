@@ -20,6 +20,7 @@ abstract public class AbstractProvider {
     protected final MainActivity mainActivityContext;
     protected List<SideloadItem> itemList;
     protected Runnable notifyCallback;
+    protected boolean disabled = false;
 
     public enum ProviderState {
         CONNECTING,
@@ -33,7 +34,10 @@ abstract public class AbstractProvider {
         itemList = new ArrayList<>();
         this.sharedPreferences = sharedPreferences;
         this.mainActivityContext = mainActivityContext;
-        this.notifyCallback = notifyCallback;
+        this.notifyCallback = () -> {
+            if(!disabled)
+                notifyCallback.run();
+        };
         state = ProviderState.CONNECTING;
     }
 
@@ -68,5 +72,6 @@ abstract public class AbstractProvider {
     public abstract void downloadFile(SideloadItem item, Consumer<File> startCallback, Consumer<Long> progressCallback, Consumer<File> completeCallback, Consumer<Exception> errorCallback);
     public void cleanup() {
         Log.i("Provider", "Cleaning up provider");
+        disabled = true;
     };
 }

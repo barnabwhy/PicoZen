@@ -86,7 +86,13 @@ public class AppsAdapter extends BaseAdapter
 
     public AppsAdapter(MainActivity context)
     {
-        hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.picovr.init.overlay", "com.picovr.provision", "com.pvr.appmanager", "com.pvr.seethrough.setting", "com.pvr.scenemanager");
+        if(isPicoHeadset()) {
+            hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.picovr.init.overlay", "com.picovr.provision", "com.pvr.appmanager", "com.pvr.seethrough.setting", "com.pvr.scenemanager");
+        } else if(isOculusHeadset()) {
+            hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.oculus.vrshell", "com.oculus.integrity", "com.oculus.gamingactivity", "com.oculus.assistant", "com.oculus.cvp", "com.oculus.os.chargecontrol", "com.oculus.os.clearactivity", "com.oculus.cvpservice", "com.oculus.shellenv", "com.oculus.vrshell.home", "com.oculus.guidebook", "com.android.providers.calendar", "com.oculus.systemsearch", "com.oculus.systemutilities", "com.oculus.systemactivities");
+        } else {
+            hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.android.providers.calendar");
+        }
 
         mainActivityContext = context;
 

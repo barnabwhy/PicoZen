@@ -15,10 +15,10 @@
     <string name="changelog_empty">The changelog could not be fetched. You are likely not connected to the internet or are using a pre-release build.</string>
     <string name="changelog_header">What\'s new:</string>
     <string name="made_with_love">Made by Barnaby</string>
-    <string name="gh_repo">barnabwhy/PicoZen</string>
+    <string name="gh_repo"translatable="false">barnabwhy/PicoZen</string>
     <string name="latest_version">Latest version installed (v%1$s)</string>
     <string name="new_version_available">New version available (v%1$s)</string>
-    <string name="version_text">v%1$s</string>
+    <string name="version_text"translatable="false">v%1$s</string>
     <string name="empty_group">Empty group</string>
     <string name="edit_mode">Edit mode</string>
     <string name="enable">Enable</string>

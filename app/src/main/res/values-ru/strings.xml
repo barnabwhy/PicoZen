@@ -25,6 +25,7 @@
     <string name="check_for_updates">Проверить наличие обновлений</string>
     <string name="check">Проверить</string>
     <string name="change">Изменить</string>
+    <string name="no_files">Файлы не обнаружены</string>
     <string name="sideload_server">Адрес файлового сервера</string>
     <string name="start_on_boot">Запускать PicoZen при включении</string>
     <string name="download">Скачать</string>
@@ -79,4 +80,5 @@
         <item>FTP (Медленно)</item>
         <item>SMB</item>
     </string-array>
+    <string name="address_format_template">(Формат: %1$s)</string>
 </resources>

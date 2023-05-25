@@ -44,6 +44,7 @@
     <string name="saves_empty">No supported apps found</string>
     <string name="saves_android_files_bad">Saves manager is currently unsupported on Android 11 and newer</string>
     <string name="name">Name</string>
+    <string name="no_files">No files found</string>
     <string name="save_manager">Save Manager</string>
     <string name="files_size">Files: %1$s</string>
     <string name="backup_none">Backup: None</string>
@@ -58,6 +59,14 @@
     <string name="backup_warning">WARNING: Restoring from a corrupt backup can cause data loss</string>
     <string name="general">General</string>
     <string name="server_type">Server type:</string>
+
+    <string name="address_format_template">(Format: %1$s)</string>
+    <string-array name="address_format">
+        <item />  <!-- EmptyProvider -->
+        <item>username:password@host</item>  <!-- ProxyProvider -->
+        <item>username:password@host</item>  <!-- FTPProvider -->
+        <item>username:password@host/share</item>  <!-- SMBProvider -->
+    </string-array>
 
     <string-array name="sort_options">
         <item>↓\t Name</item>

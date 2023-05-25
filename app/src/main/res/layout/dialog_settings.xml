@@ -26,11 +26,13 @@
                     android:scrollbars="none"
                     android:overScrollMode="never">
                         <LinearLayout
+                            android:id="@+id/settings_view"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:showDividers="middle"
-                            android:divider="@drawable/divider">
+                            android:divider="@drawable/divider"
+                            android:paddingBottom="20dp">
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="match_parent"
@@ -214,18 +216,26 @@
                                             android:text="@string/change"
                                             android:padding="5dp" />
                                 </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:paddingTop="10dp">
+                                        <View android:layout_height="0dp"
+                                            android:layout_width="0dp"
+                                            android:layout_weight="1" />
+                                        <TextView
+                                            android:id="@+id/version_number"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="@string/version_text"
+                                            android:textSize="11sp"
+                                            android:textStyle="bold"
+                                            android:padding="10dp"
+                                            android:background="@drawable/bg_list_item_hover_s" />
+                                </LinearLayout>
                         </LinearLayout>
                 </ScrollView>
-                <TextView
-                    android:id="@+id/version_number"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/version_text"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:layout_marginVertical="25dp"
-                    android:layout_marginHorizontal="10dp"
-                    android:gravity="right" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"

@@ -484,6 +484,7 @@ public class MainActivity extends AppCompatActivity {
 
         EditText sideloadHostInput = dialog.findViewById(R.id.sideload_host_input);
         View sideloadHostBtn = dialog.findViewById(R.id.sideload_host_btn);
+        TextView sideloadAddressInfo = dialog.findViewById(R.id.sideload_address_info);
         Spinner sideloadTypeSpinner = dialog.findViewById(R.id.sideload_type);
         ((View)sideloadTypeSpinner.getParent()).setClipToOutline(true);
         ArrayAdapter<CharSequence> sideloadTypeApdater = ArrayAdapter.createFromResource(this, R.array.sideload_type_options, R.layout.spinner_item);
@@ -499,8 +500,13 @@ public class MainActivity extends AppCompatActivity {
 
                     if(((SideloadAdapter) sideloadGridView.getAdapter()).getProvider().usesAddress()) {
                         ((LinearLayout)sideloadHostInput.getParent()).setVisibility(View.VISIBLE);
+                        sideloadAddressInfo.setVisibility(View.VISIBLE);
+
+                        String infoText = String.format(getResources().getString(R.string.address_format_template), getResources().getStringArray(R.array.address_format)[pos]);
+                        sideloadAddressInfo.setText(infoText);
                     } else {
                         ((LinearLayout)sideloadHostInput.getParent()).setVisibility(View.GONE);
+                        sideloadAddressInfo.setVisibility(View.GONE);
                     }
                 }
             }
@@ -513,8 +519,13 @@ public class MainActivity extends AppCompatActivity {
 
         if(((SideloadAdapter) sideloadGridView.getAdapter()).getProvider().usesAddress()) {
             ((LinearLayout)sideloadHostInput.getParent()).setVisibility(View.VISIBLE);
+            sideloadAddressInfo.setVisibility(View.VISIBLE);
+
+            String infoText = String.format(getResources().getString(R.string.address_format_template), getResources().getStringArray(R.array.address_format)[sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0)]);
+            sideloadAddressInfo.setText(infoText);
         } else {
             ((LinearLayout)sideloadHostInput.getParent()).setVisibility(View.GONE);
+            sideloadAddressInfo.setVisibility(View.GONE);
         }
 
         sideloadHostInput.setText(sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, ""));

@@ -60,6 +60,14 @@
     <string name="general">General</string>
     <string name="server_type">Server type:</string>
 
+    <string name="address_format_template">(Format: %1$s)</string>
+    <string-array name="address_format">
+        <item />  <!-- EmptyProvider -->
+        <item>username:password@host</item>  <!-- ProxyProvider -->
+        <item>username:password@host</item>  <!-- FTPProvider -->
+        <item>username:password@host/share</item>  <!-- SMBProvider -->
+    </string-array>
+
     <string-array name="sort_options">
         <item>↓\t Name</item>
         <item>↑\t Name</item>

@@ -216,6 +216,14 @@
                                             android:text="@string/change"
                                             android:padding="5dp" />
                                 </LinearLayout>
+                                <TextView
+                                    android:id="@+id/sideload_address_info"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="11sp"
+                                    android:paddingHorizontal="20dp"
+                                    android:paddingBottom="10dp"
+                                    android:visibility="gone" />
 
                                 <LinearLayout
                                     android:layout_width="match_parent"

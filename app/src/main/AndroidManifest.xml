@@ -28,7 +28,14 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape"
+            android:resizeableActivity="true">
+
+            <layout android:defaultHeight="720dp"
+                android:defaultWidth="1280dp"
+                android:gravity="top|end"
+                android:minHeight="360dp"
+                android:minWidth="480dp" />
 
             <meta-data
                 android:name="platform_logo1"

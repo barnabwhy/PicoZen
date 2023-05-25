@@ -35,6 +35,11 @@ public class ProxyProvider extends AbstractProvider {
     private static final String FILES_PATH = "https://files-pico.doesnt-like.me";
     private String currentPath = "/";
 
+    @Override
+    public boolean usesAddress() {
+        return true;
+    }
+
     public ProxyProvider(SharedPreferences sharedPreferences, MainActivity mainActivityContext, Runnable notifyCallback) {
         super(sharedPreferences, mainActivityContext, notifyCallback);
         state = ProviderState.IDLE;

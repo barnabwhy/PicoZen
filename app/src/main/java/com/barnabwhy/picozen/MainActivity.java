@@ -482,6 +482,8 @@ public class MainActivity extends AppCompatActivity {
             dialog.dismiss();
         });
 
+        EditText sideloadHostInput = dialog.findViewById(R.id.sideload_host_input);
+        View sideloadHostBtn = dialog.findViewById(R.id.sideload_host_btn);
         Spinner sideloadTypeSpinner = dialog.findViewById(R.id.sideload_type);
         ((View)sideloadTypeSpinner.getParent()).setClipToOutline(true);
         ArrayAdapter<CharSequence> sideloadTypeApdater = ArrayAdapter.createFromResource(this, R.array.sideload_type_options, R.layout.spinner_item);
@@ -494,6 +496,12 @@ public class MainActivity extends AppCompatActivity {
                 if(sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0) != pos) {
                     sharedPreferences.edit().putInt(SettingsProvider.KEY_SIDELOAD_TYPE, pos).apply();
                     ((SideloadAdapter) sideloadGridView.getAdapter()).setProvider(SideloadAdapter.SideloadProviderType.values()[pos]);
+
+                    if(((SideloadAdapter) sideloadGridView.getAdapter()).getProvider().usesAddress()) {
+                        ((LinearLayout)sideloadHostInput.getParent()).setVisibility(View.VISIBLE);
+                    } else {
+                        ((LinearLayout)sideloadHostInput.getParent()).setVisibility(View.GONE);
+                    }
                 }
             }
 
@@ -503,8 +511,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        EditText sideloadHostInput = dialog.findViewById(R.id.sideload_host_input);
-        View sideloadHostBtn = dialog.findViewById(R.id.sideload_host_btn);
+        if(((SideloadAdapter) sideloadGridView.getAdapter()).getProvider().usesAddress()) {
+            ((LinearLayout)sideloadHostInput.getParent()).setVisibility(View.VISIBLE);
+        } else {
+            ((LinearLayout)sideloadHostInput.getParent()).setVisibility(View.GONE);
+        }
+
         sideloadHostInput.setText(sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, ""));
         sideloadHostBtn.setOnClickListener(view -> {
             if(!sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals(String.valueOf(sideloadHostInput.getText()))) {

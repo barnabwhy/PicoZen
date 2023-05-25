@@ -10,6 +10,10 @@ import java.io.File;
 import java.util.function.Consumer;
 
 public class EmptyProvider extends AbstractProvider {
+    @Override
+    public boolean usesAddress() {
+        return false;
+    }
 
     public EmptyProvider(SharedPreferences sharedPreferences, MainActivity mainActivityContext, Runnable notifyCallback) {
         super(sharedPreferences, mainActivityContext, notifyCallback);

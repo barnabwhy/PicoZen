@@ -22,6 +22,8 @@ abstract public class AbstractProvider {
     protected Runnable notifyCallback;
     protected boolean disabled = false;
 
+    public abstract boolean usesAddress();
+
     public enum ProviderState {
         CONNECTING,
         IDLE,

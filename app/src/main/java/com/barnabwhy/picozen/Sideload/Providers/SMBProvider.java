@@ -46,6 +46,11 @@ public class SMBProvider extends AbstractProvider {
     private Session session;
     private DiskShare share;
 
+    @Override
+    public boolean usesAddress() {
+        return true;
+    }
+
     public SMBProvider(SharedPreferences sharedPreferences, MainActivity mainActivityContext, Runnable notifyCallback) {
         super(sharedPreferences, mainActivityContext, notifyCallback);
         connect();

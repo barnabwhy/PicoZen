@@ -34,7 +34,11 @@ public class FTPProvider extends AbstractProvider {
     private String server = "";
     private boolean ready = false;
     private boolean updating = false;
-    private Thread ftpThread;
+
+    @Override
+    public boolean usesAddress() {
+        return true;
+    }
 
     public FTPProvider(SharedPreferences sharedPreferences, MainActivity mainActivityContext, Runnable notifyCallback) {
         super(sharedPreferences, mainActivityContext, notifyCallback);
@@ -42,12 +46,12 @@ public class FTPProvider extends AbstractProvider {
     }
 
     private void connectFtp(boolean force) {
-        ftpThread = new Thread(() -> {
-            if(force || (ftp != null && ready && !ftp.isConnected())) {
+        Thread ftpThread = new Thread(() -> {
+            if (force || (ftp != null && ready && !ftp.isConnected())) {
                 try {
                     state = ProviderState.CONNECTING;
                     mainActivityContext.runOnUiThread(notifyCallback);
-                    if(ready) {
+                    if (ready) {
                         ftp = null;
                     }
                     ready = false;

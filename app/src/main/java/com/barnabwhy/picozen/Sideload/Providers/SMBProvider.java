@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class SMBProvider extends AbstractProvider {
-    private String currentPath = "/";
+    private String currentPath = "";
     private String server = "";
     private boolean ready = false;
     private SMBClient client;
@@ -146,7 +146,7 @@ public class SMBProvider extends AbstractProvider {
                 }
                 if(!currentPath.equals("") && !currentPath.equals("/")) {
                     String[] pathSegments = currentPath.split("/");
-                    String backPath = "/" + String.join("/", Arrays.asList(pathSegments).subList(0, pathSegments.length-1)) + "/";
+                    String backPath = String.join("/", Arrays.asList(pathSegments).subList(0, pathSegments.length-1));
                     items.add(new SideloadItem(SideloadItemType.DIRECTORY, "../", backPath, -1, ""));
                 }
                 try {
@@ -158,14 +158,14 @@ public class SMBProvider extends AbstractProvider {
 
                             DateFormat dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
                             String modified = dateFormatter.format(f.getChangeTime().toDate());
-                            items.add(new SideloadItem(SideloadItemType.DIRECTORY, f.getFileName(), currentPath + f.getFileName() + "/", f.getAllocationSize(), modified));
+                            items.add(new SideloadItem(SideloadItemType.DIRECTORY, f.getFileName(), currentPath + "/" + f.getFileName(), f.getAllocationSize(), modified));
                         }
                     }
                     for (FileIdBothDirectoryInformation f : files) {
                         if((f.getFileAttributes() & 0x10) < 1) { // if is file
                             DateFormat dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
                             String modified = dateFormatter.format(f.getChangeTime().toDate());
-                            items.add(new SideloadItem(SideloadItemType.FILE, f.getFileName(), currentPath + f.getFileName(), f.getAllocationSize(), modified));
+                            items.add(new SideloadItem(SideloadItemType.FILE, f.getFileName(), currentPath + "/" + f.getFileName(), f.getAllocationSize(), modified));
                         }
                     }
                     state = ProviderState.IDLE;

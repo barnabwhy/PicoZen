@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 
 public class FTPProvider extends AbstractProvider {
     private FTPClient ftp;
-    private String currentPath = "/";
+    private String currentPath = "";
     private String server = "";
     private boolean ready = false;
     private boolean updating = false;
@@ -172,7 +172,7 @@ public class FTPProvider extends AbstractProvider {
         ArrayList<SideloadItem> items = new ArrayList<>();
         if(!path.equals("") && !path.equals("/")) {
             String[] pathSegments = path.split("/");
-            String backPath = "/" + String.join("/", Arrays.asList(pathSegments).subList(0, pathSegments.length-1)) + "/";
+            String backPath = String.join("/", Arrays.asList(pathSegments).subList(0, pathSegments.length-1));
             items.add(new SideloadItem(SideloadItemType.DIRECTORY, "../", backPath, -1, ""));
         }
         if(ready && !updating) {
@@ -194,14 +194,14 @@ public class FTPProvider extends AbstractProvider {
                             if (file.isDirectory()) {
                                 DateFormat dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
                                 String modified = dateFormatter.format(file.getTimestamp().getTime());
-                                items.add(new SideloadItem(SideloadItemType.DIRECTORY, file.getName(), currentPath + file.getName() + "/", file.getSize(), modified));
+                                items.add(new SideloadItem(SideloadItemType.DIRECTORY, file.getName(), currentPath + "/" + file.getName(), file.getSize(), modified));
                             }
                         }
                         for (FTPFile file : files) {
                             if (!file.isDirectory()) {
                                 DateFormat dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
                                 String modified = dateFormatter.format(file.getTimestamp().getTime());
-                                items.add(new SideloadItem(SideloadItemType.FILE, file.getName(), currentPath + file.getName(), file.getSize(), modified));
+                                items.add(new SideloadItem(SideloadItemType.FILE, file.getName(), currentPath + "/" + file.getName(), file.getSize(), modified));
                             }
                         }
 

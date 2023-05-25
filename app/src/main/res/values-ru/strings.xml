@@ -25,7 +25,6 @@
     <string name="check_for_updates">Проверить наличие обновлений</string>
     <string name="check">Проверить</string>
     <string name="change">Изменить</string>
-    <string name="no_files">Файлы не обнаружены</string>
     <string name="sideload_server">Адрес файлового сервера</string>
     <string name="start_on_boot">Запускать PicoZen при включении</string>
     <string name="download">Скачать</string>
@@ -36,6 +35,7 @@
     <string name="extracting_zip_progress">Распаковка ZIP (%1$s)</string>
     <string name="download_complete">Скачивание завершено</string>
     <string name="fetch_files_error">Не удалось загрузить файлы</string>
+    <string name="no_files">Файлы не обнаружены</string>
     <string name="no_sideload_server">Сервер передачи данных не был настроен\\включен в настройках</string>
     <string name="sideload_connecting">Подключение...</string>
     <string name="sideload_fetching">Загрузка...</string>

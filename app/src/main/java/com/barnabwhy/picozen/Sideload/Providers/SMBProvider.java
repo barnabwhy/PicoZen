@@ -158,7 +158,7 @@ public class SMBProvider extends AbstractProvider {
 
                             DateFormat dateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
                             String modified = dateFormatter.format(f.getChangeTime().toDate());
-                            items.add(new SideloadItem(SideloadItemType.DIRECTORY, f.getFileName(), currentPath + f.getFileName(), f.getAllocationSize(), modified));
+                            items.add(new SideloadItem(SideloadItemType.DIRECTORY, f.getFileName(), currentPath + f.getFileName() + "/", f.getAllocationSize(), modified));
                         }
                     }
                     for (FileIdBothDirectoryInformation f : files) {

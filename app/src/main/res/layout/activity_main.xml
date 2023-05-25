@@ -109,7 +109,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:padding="15dp"
+            android:paddingTop="15dp"
+            android:paddingHorizontal="15dp"
             android:background="@drawable/bg_content"
             android:visibility="gone">
 
@@ -166,7 +167,9 @@
                 android:verticalSpacing="10dp"
                 android:baselineAligned="false"
                 android:scrollbars="none"
-                android:overScrollMode="never">
+                android:overScrollMode="never"
+                android:paddingBottom="15dp"
+                android:clipToPadding="false">
             </GridView>
             <TextView
                 android:id="@+id/app_grid_empty"

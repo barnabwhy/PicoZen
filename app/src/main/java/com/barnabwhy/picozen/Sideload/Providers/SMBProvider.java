@@ -22,10 +22,8 @@ import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
 
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,9 +31,9 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class SMBProvider extends AbstractProvider {
@@ -223,17 +221,20 @@ public class SMBProvider extends AbstractProvider {
         try {
             FileOutputStream fos = new FileOutputStream(outputFile);
 
+            AtomicBoolean didError = new AtomicBoolean(false);
             file.read(fos, (numBytes, totalBytes) -> {
                 if(outputFile.canWrite())
                     progressCallback.accept(totalBytes);
-                else
+                else {
                     file.close();
+                    didError.set(true);
+                }
             });
 
             fos.flush();
             fos.close();
 
-            return true;
+            return !didError.get();
         } catch (Exception e) {
             Log.e("Error", e.toString());
             return false;

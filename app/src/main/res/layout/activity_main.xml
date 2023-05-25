@@ -221,7 +221,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:padding="15dp"
+            android:paddingTop="15dp"
+            android:paddingHorizontal="15dp"
             android:background="@drawable/bg_content"
             android:visibility="gone">
             <TextView
@@ -239,7 +240,9 @@
                 android:numColumns="1"
                 android:verticalSpacing="5dp"
                 android:overScrollMode="never"
-                android:scrollbars="none" />
+                android:scrollbars="none"
+                android:paddingBottom="15dp"
+                android:clipToPadding="false" />
             <TextView
                 android:id="@+id/sideload_grid_empty"
                 android:layout_width="match_parent"
@@ -258,7 +261,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:padding="15dp"
+            android:paddingTop="15dp"
+            android:paddingHorizontal="15dp"
             android:background="@drawable/bg_content"
             android:visibility="gone">
             <TextView
@@ -276,7 +280,9 @@
                 android:numColumns="1"
                 android:verticalSpacing="5dp"
                 android:overScrollMode="never"
-                android:scrollbars="none" />
+                android:scrollbars="none"
+                android:paddingBottom="15dp"
+                android:clipToPadding="false" />
             <TextView
                 android:id="@+id/save_grid_empty"
                 android:layout_width="match_parent"

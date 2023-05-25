@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PicoZen</string>
+    <string name="list_apps">Приложения</string>
+    <string name="list_tweaks">Твики</string>
+    <string name="list_sideload">Сеть</string>
+    <string name="list_saves">Сохранения</string>
+    <string name="list_about">Подробнее</string>
+    <string name="settings">Настройки</string>
+    <string name="currently_in_development">В настоящее время в разработке</string>
+    <string name="start_shortcut">Откройте PicoZen с помощью иконки \"Библиотека\" на панели инструментов системы</string>
+    <string name="shortcut_prompt">Открывать PicoZen с помощью ярлыка \"Библиотека\" (экспериментально)</string>
+    <string name="configure">Настроить</string>
+    <string name="refresh">Обновить</string>
+    <string name="refresh_icon_cache">Обновить кэш иконок</string>
+    <string name="changelog_empty">Не удалось получить журнал изменений. Вероятно, вы не подключены к интернету или используете предварительную сборку.</string>
+    <string name="changelog_header">Изменения:</string>
+    <string name="made_with_love">Разработчик: Barnaby</string>
+    <string name="latest_version">Установлена последняя версия (v%1$s)</string>
+    <string name="new_version_available">Доступна новая версия (v%1$s)</string>
+    <string name="empty_group">Пустая группа</string>
+    <string name="edit_mode">Режим редактирования</string>
+    <string name="enable">Активировать</string>
+    <string name="disable">Отключить</string>
+    <string name="check_for_updates">Проверить наличие обновлений</string>
+    <string name="check">Проверить</string>
+    <string name="change">Изменить</string>
+    <string name="sideload_server">Адрес файлового сервера</string>
+    <string name="start_on_boot">Запускать PicoZen при включении</string>
+    <string name="download">Скачать</string>
+    <string name="dismiss">Отклонить</string>
+    <string name="an_error_occurred">Произошла ошибка (%1$s)</string>
+    <string name="download_cancelled">Скачивание отменено</string>
+    <string name="extracting_zip">Распаковка ZIP</string>
+    <string name="extracting_zip_progress">Распаковка ZIP (%1$s)</string>
+    <string name="download_complete">Скачивание завершено</string>
+    <string name="fetch_files_error">Не удалось загрузить файлы</string>
+    <string name="no_files">Файлы не обнаружены</string>
+    <string name="no_sideload_server">Сервер передачи данных не был настроен\\включен в настройках</string>
+    <string name="sideload_connecting">Подключение...</string>
+    <string name="sideload_fetching">Загрузка...</string>
+    <string name="install">Установить</string>
+    <string name="cancel">Отмена</string>
+    <string name="saves_empty">Поддерживаемые приложения не найдены</string>
+    <string name="saves_android_files_bad">Менеджер сохранений в настоящее время не поддерживается на Android 11 и новее</string>
+    <string name="name">Имя</string>
+    <string name="save_manager">Менеджер сохранений</string>
+    <string name="files_size">Файлы: %1$s</string>
+    <string name="backup_none">Резервная копия: отсутствует</string>
+    <string name="backup_size">Резервная копия: %1$s</string>
+    <string name="backup">Резервирование</string>
+    <string name="restore">Восстановление</string>
+    <string name="backup_success">Резервирование (Завершено)</string>
+    <string name="restore_success">Восстановление (Завершено)</string>
+    <string name="backup_fail">Резервирование (Провалено)</string>
+    <string name="restore_fail">Восстановление (Провалено)</string>
+    <string name="delete_backup">Удалить резервную копию</string>
+    <string name="backup_warning">ПРЕДУПРЕЖДЕНИЕ: Восстановление из поврежденной резервной копии может привести к потере данных</string>
+    <string name="general">Основное</string>
+    <string name="server_type">Протокол передачи:</string>
+
+    <string-array name="sort_options">
+        <item>↓\t Имя</item>
+        <item>↑\t Имя</item>
+        <item>↓\t Недавнее</item>
+        <item>↑\t Недавнее</item>
+        <item>↓\t Дата установки</item>
+        <item>↑\t Дата установки</item>
+    </string-array>
+
+    <string-array name="group_options">
+        <item>☰\t Все</item>
+        <item>★\t Избранное</item>
+        <item>—\t Скрытое</item>
+    </string-array>
+
+    <string-array name="sideload_type_options">
+        <item>Никакой</item>
+        <item>Проксированный FTP</item>
+        <item>FTP (Медленно)</item>
+        <item>SMB</item>
+    </string-array>
+    <string name="address_format_template">(Формат: %1$s)</string>
+</resources>

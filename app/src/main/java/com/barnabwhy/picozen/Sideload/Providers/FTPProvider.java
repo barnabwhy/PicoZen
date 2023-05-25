@@ -172,7 +172,7 @@ public class FTPProvider extends AbstractProvider {
         ArrayList<SideloadItem> items = new ArrayList<>();
         if(!path.equals("") && !path.equals("/")) {
             String[] pathSegments = path.split("/");
-            String backPath = "/" + String.join("/", Arrays.asList(pathSegments).subList(0, pathSegments.length-1));
+            String backPath = "/" + String.join("/", Arrays.asList(pathSegments).subList(0, pathSegments.length-1)) + "/";
             items.add(new SideloadItem(SideloadItemType.DIRECTORY, "../", backPath, -1, ""));
         }
         if(ready && !updating) {

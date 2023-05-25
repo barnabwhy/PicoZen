@@ -104,7 +104,9 @@ public class SideloadAdapter extends BaseAdapter {
         if (provider != null && provider.getState() != AbstractProvider.ProviderState.IDLE) {
             mainActivityContext.findViewById(R.id.sideload_grid).setVisibility(View.GONE);
             mainActivityContext.findViewById(R.id.sideload_grid_empty).setVisibility(View.VISIBLE);
-            if (provider.getState() == AbstractProvider.ProviderState.CONNECTING) {
+            if(provider.getState() == AbstractProvider.ProviderState.ERROR) {
+                ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.fetch_files_error);
+            } else if (provider.getState() == AbstractProvider.ProviderState.CONNECTING) {
                 ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.sideload_connecting);
             } else {
                 ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.sideload_fetching);
@@ -115,7 +117,7 @@ public class SideloadAdapter extends BaseAdapter {
             if (sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0) == 0 || sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals("")) {
                 ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.no_sideload_server);
             } else {
-                ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.fetch_files_error);
+                ((TextView)mainActivityContext.findViewById(R.id.sideload_grid_empty)).setText(R.string.no_files);
             }
         } else {
             mainActivityContext.findViewById(R.id.sideload_grid).setVisibility(View.VISIBLE);

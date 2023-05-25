@@ -79,6 +79,9 @@ public class FTPProvider extends AbstractProvider {
                         ftp.disconnect();
                         ready = false;
                         Log.e("FTP", "Server refused connection.");
+
+                        state = ProviderState.ERROR;
+                        mainActivityContext.runOnUiThread(notifyCallback);
                     } else {
                         Log.i("FTP", "Server connected.");
                         ftp.login(user, pass);
@@ -91,13 +94,15 @@ public class FTPProvider extends AbstractProvider {
                         ready = true;
                         state = ProviderState.IDLE;
                         mainActivityContext.runOnUiThread(notifyCallback);
+
+                        mainActivityContext.runOnUiThread(this::updateList);
                     }
                 } catch (IOException e) {
+                    state = ProviderState.ERROR;
+                    mainActivityContext.runOnUiThread(notifyCallback);
                     Log.e("FTP Error", e.getLocalizedMessage());
                     e.printStackTrace();
                 }
-
-                mainActivityContext.runOnUiThread(this::updateList);
             }
         });
         ftpThread.setPriority(8);
@@ -160,9 +165,6 @@ public class FTPProvider extends AbstractProvider {
             return;
         }
 
-        state = ProviderState.FETCHING;
-        notifyCallback.run();
-
         ArrayList<SideloadItem> items = new ArrayList<>();
         if(!path.equals("") && !path.equals("/")) {
             String[] pathSegments = path.split("/");
@@ -170,6 +172,9 @@ public class FTPProvider extends AbstractProvider {
             items.add(new SideloadItem(SideloadItemType.DIRECTORY, "../", backPath, -1, ""));
         }
         if(ready && !updating) {
+            state = ProviderState.FETCHING;
+            notifyCallback.run();
+
             updating = true;
             Thread thread = new Thread(() -> {
                 try {
@@ -213,7 +218,7 @@ public class FTPProvider extends AbstractProvider {
                 } catch (Exception e) {
                     Log.e("FTP Error", e.toString());
                     updating = false;
-                    state = ProviderState.IDLE;
+                    state = ProviderState.ERROR;
                     mainActivityContext.runOnUiThread(notifyCallback);
                 }
             });

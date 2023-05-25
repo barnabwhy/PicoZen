@@ -89,13 +89,13 @@ public class SMBProvider extends AbstractProvider {
                 ready = true;
                 state = ProviderState.IDLE;
                 mainActivityContext.runOnUiThread(notifyCallback);
+
+                updateList();
             } catch (Exception e) {
-                state = ProviderState.IDLE;
+                state = ProviderState.ERROR;
                 mainActivityContext.runOnUiThread(notifyCallback);
                 e.printStackTrace();
             }
-
-            updateList();
         }).start();
     }
 
@@ -163,12 +163,13 @@ public class SMBProvider extends AbstractProvider {
                             items.add(new SideloadItem(SideloadItemType.FILE, f.getFileName(), currentPath + f.getFileName(), f.getAllocationSize(), modified));
                         }
                     }
+                    state = ProviderState.IDLE;
                 } catch(Exception e) {
+                    state = ProviderState.ERROR;
                     e.printStackTrace();
                 }
             }
             itemList = items;
-            state = ProviderState.IDLE;
             mainActivityContext.runOnUiThread(notifyCallback);
         }).start();
     }

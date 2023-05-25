@@ -26,6 +26,7 @@ abstract public class AbstractProvider {
         CONNECTING,
         IDLE,
         FETCHING,
+        ERROR,
     }
 
     ProviderState state;

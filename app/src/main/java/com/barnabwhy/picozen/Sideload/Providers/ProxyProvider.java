@@ -47,11 +47,9 @@ public class ProxyProvider extends AbstractProvider {
             public void run() {
                 if (sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals("")) {
                     itemList = new ArrayList<>();
-                } else {
-                    state = ProviderState.FETCHING;
-                    mainActivityContext.runOnUiThread(notifyCallback);
-                    itemList = getItemsAtPath(currentPath);
                     state = ProviderState.IDLE;
+                } else {
+                    itemList = getItemsAtPath(currentPath);
                     Log.i("Items", "Size: "+itemList.size());
                     mainActivityContext.ensureStoragePermissions();
                 }
@@ -95,6 +93,9 @@ public class ProxyProvider extends AbstractProvider {
             items.add(new SideloadItem(SideloadItemType.DIRECTORY, "../", backPath, -1, ""));
         }
         try {
+            state = ProviderState.FETCHING;
+            mainActivityContext.runOnUiThread(notifyCallback);
+
             URL u = new URL(FILES_PATH + path + "?host=" + sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, ""));
             InputStream stream = u.openStream();
             int bufferSize = 1024;
@@ -130,9 +131,13 @@ public class ProxyProvider extends AbstractProvider {
 
                 items.add(new SideloadItem(SideloadItemType.FILE, name, filePath, size, date));
             }
+
+            state = ProviderState.IDLE;
         } catch (Exception e) {
+            state = ProviderState.ERROR;
             Log.e("Error", e.toString());
         }
+        mainActivityContext.runOnUiThread(notifyCallback);
         return items;
     }
 

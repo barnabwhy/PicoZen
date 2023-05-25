@@ -15,10 +15,10 @@
     <string name="changelog_empty">The changelog could not be fetched. You are likely not connected to the internet or are using a pre-release build.</string>
     <string name="changelog_header">What\'s new:</string>
     <string name="made_with_love">Made by Barnaby</string>
-    <string name="gh_repo">barnabwhy/PicoZen</string>
+    <string name="gh_repo" translatable="false">barnabwhy/PicoZen</string>
     <string name="latest_version">Latest version installed (v%1$s)</string>
     <string name="new_version_available">New version available (v%1$s)</string>
-    <string name="version_text">v%1$s</string>
+    <string name="version_text" translatable="false">v%1$s</string>
     <string name="empty_group">Empty group</string>
     <string name="edit_mode">Edit mode</string>
     <string name="enable">Enable</string>
@@ -36,7 +36,6 @@
     <string name="extracting_zip_progress">Extracting ZIP (%1$s)</string>
     <string name="download_complete">Download complete</string>
     <string name="fetch_files_error">Couldn\'t fetch files</string>
-    <string name="no_files">No files found</string>
     <string name="no_sideload_server">A sideload server has not been set in settings</string>
     <string name="sideload_connecting">Connecting...</string>
     <string name="sideload_fetching">Fetching...</string>
@@ -59,14 +58,6 @@
     <string name="backup_warning">WARNING: Restoring from a corrupt backup can cause data loss</string>
     <string name="general">General</string>
     <string name="server_type">Server type:</string>
-
-    <string name="address_format_template">(Format: %1$s)</string>
-    <string-array name="address_format">
-        <item />  <!-- EmptyProvider -->
-        <item>username:password@host</item>  <!-- ProxyProvider -->
-        <item>username:password@host</item>  <!-- FTPProvider -->
-        <item>username:password@host/share</item>  <!-- SMBProvider -->
-    </string-array>
 
     <string-array name="sort_options">
         <item>↓\t Name</item>

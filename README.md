@@ -1,5 +1,5 @@
 #   PicoZen
-An alternate library and utility app for PICO XR. Designed to look and feel like it came stock.
+An alternate library and utility app for PICO XR (and Quest). Designed to look and feel like it came stock.
 
 <img src="https://github.com/barnabwhy/PicoZen/assets/22575741/d6560d17-e00f-456a-911f-548c177f4c04" width="100%" />
 <br><br>

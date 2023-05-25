@@ -531,7 +531,7 @@ public class AppsAdapter extends BaseAdapter
         return new File(context.getCacheDir(), pkg + ".webp");
     }
 
-    private final String ICONS_URL = "https://pico.doesnt-like.me/assets/";
+    private final String ICONS_URL = "https://api.picozen.app/assets/";
     private final String ICONS1_URL = "https://raw.githubusercontent.com/Veticia/binaries/main/banners/";
     private static final String ICONS_FALLBACK_URL = "https://pilauncher.lwiczka.pl/get_icon.php?id=";
     protected static final HashMap<String, Drawable> iconCache = new HashMap<>();

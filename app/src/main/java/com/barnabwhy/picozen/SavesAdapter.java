@@ -40,7 +40,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class SavesAdapter extends BaseAdapter {
-    private static final String APP_ICON_PATH = "https://pico.doesnt-like.me/assets/";
+    private static final String APP_ICON_PATH = "https://api.picozen.app/assets/";
     private final SharedPreferences sharedPreferences;
     private final MainActivity mainActivityContext;
     private List<ApplicationInfo> appList;

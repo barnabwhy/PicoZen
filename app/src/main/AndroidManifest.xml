@@ -31,11 +31,9 @@
             android:screenOrientation="landscape"
             android:resizeableActivity="true">
 
-            <layout android:defaultHeight="720dp"
-                android:defaultWidth="1280dp"
-                android:gravity="top|end"
-                android:minHeight="360dp"
-                android:minWidth="480dp" />
+            <layout android:defaultHeight="410dp"
+                android:defaultWidth="620dp"
+                android:gravity="top|end" />
 
             <meta-data
                 android:name="platform_logo1"

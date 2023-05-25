@@ -78,18 +78,36 @@ public class MainActivity extends AppCompatActivity {
 
     BroadcastReceiver updateAppsReciver;
 
-    public static boolean foregrounded() {
-        ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
-        ActivityManager.getMyMemoryState(appProcessInfo);
-        return (appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
-                || appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE);
+    private static boolean focused = false;
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        focused = hasFocus;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(updateAppsReciver);
+        focused = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerAppUpdateReciever();
+        ((AppsAdapter)appGridView.getAdapter()).updateAppList();
+        checkForUpdates();
+        focused = true;
     }
 
     public static void reset(Context context) {
         try {
             Intent intent = new Intent(context, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-            intent.putExtra("wasActive", foregrounded());
+            intent.putExtra("wasActive", focused);
+            intent.putExtra("fromAccessibilityShortcut", true);
             context.startActivity(intent);
             ((Activity) context).finish();
         } catch (Exception e) {
@@ -97,20 +115,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    protected void onNewIntent(Intent intent)
-//    {
-//        super.onNewIntent(intent);
-//        if(!intent.getBooleanExtra("wasActive", false)) {
-//            this.moveTaskToBack(true);
-//        }
-//    }
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+        if(intent.getBooleanExtra("fromAccessibilityShortcut", false) && !intent.getBooleanExtra("wasActive", false)) {
+            this.moveTaskToBack(true);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        focused = true;
         checkForUpdates();
 
         ensureStoragePermissions();
@@ -324,20 +343,6 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         registerReceiver(updateAppsReciver, filter);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(updateAppsReciver);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        registerAppUpdateReciever();
-        ((AppsAdapter)appGridView.getAdapter()).updateAppList();
-        checkForUpdates();
     }
 
     private void selectPage(int i) {

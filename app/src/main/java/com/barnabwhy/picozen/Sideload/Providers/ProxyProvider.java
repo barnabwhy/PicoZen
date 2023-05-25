@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class ProxyProvider extends AbstractProvider {
-    private static final String FILES_PATH = "https://files-pico.doesnt-like.me";
+    private static final String FILES_PATH = "https://files.picozen.app";
     private String currentPath = "/";
 
     @Override

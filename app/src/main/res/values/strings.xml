@@ -36,6 +36,7 @@
     <string name="extracting_zip_progress">Extracting ZIP (%1$s)</string>
     <string name="download_complete">Download complete</string>
     <string name="fetch_files_error">Couldn\'t fetch files</string>
+    <string name="no_files">No files found</string>
     <string name="no_sideload_server">A sideload server has not been set in settings</string>
     <string name="sideload_connecting">Connecting...</string>
     <string name="sideload_fetching">Fetching...</string>
@@ -44,7 +45,6 @@
     <string name="saves_empty">No supported apps found</string>
     <string name="saves_android_files_bad">Saves manager is currently unsupported on Android 11 and newer</string>
     <string name="name">Name</string>
-    <string name="no_files">No files found</string>
     <string name="save_manager">Save Manager</string>
     <string name="files_size">Files: %1$s</string>
     <string name="backup_none">Backup: None</string>

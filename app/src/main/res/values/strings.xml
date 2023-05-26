@@ -34,6 +34,8 @@
     <string name="download_cancelled">Download cancelled</string>
     <string name="extracting_zip">Extracting ZIP</string>
     <string name="extracting_zip_progress">Extracting ZIP (%1$s)</string>
+    <string name="extracting_archive">Extracting archive</string>
+    <string name="extracting_archive_progress">Extracting archive (%1$s)</string>
     <string name="download_complete">Download complete</string>
     <string name="fetch_files_error">Couldn\'t fetch files</string>
     <string name="no_files">No files found</string>

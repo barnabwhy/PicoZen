@@ -29,6 +29,12 @@ import com.barnabwhy.picozen.Sideload.Providers.SMBProvider;
 import com.barnabwhy.picozen.Sideload.SideloadItem;
 import com.barnabwhy.picozen.Sideload.SideloadItemType;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
+import org.apache.commons.compress.archivers.sevenz.SevenZFile;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -264,8 +270,9 @@ public class SideloadAdapter extends BaseAdapter {
                                     currentDownload = null;
                                 };
 
-                                if (getFileExtension(outFile).equals(".zip")) {
-                                    ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(R.string.extracting_zip);
+                                if (getFileExtension(outFile).equals(".zip") || getFileExtension(outFile).equals(".7z")
+                                        || getFileExtension(outFile).equals(".tar")) {
+                                    ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(R.string.extracting_archive);
 
                                     Thread zipThread = new Thread(() -> {
                                         Exception error = null;
@@ -290,18 +297,11 @@ public class SideloadAdapter extends BaseAdapter {
                                                 });
                                             });
 
-                                            long uncompressedSize = 0;
-                                            ZipFile f = new ZipFile(outFile);
-                                            Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) f.entries();
-                                            while(entries.hasMoreElements()) {
-                                                ZipEntry entry = entries.nextElement();
-                                                uncompressedSize += entry.getSize();
-                                            }
+                                            long uncompressedSize = getUncompressedArchiveSize(outFile);
 
-                                            long finalUncompressedSize = uncompressedSize;
-                                            unzip(outFile, dir, processedBytes -> {
+                                            extractArchive(outFile, dir, processedBytes -> {
                                                 mainActivityContext.runOnUiThread(() -> {
-                                                    ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.extracting_zip_progress), bytesReadable(processedBytes) + "/" + bytesReadable(finalUncompressedSize)));
+                                                    ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.extracting_archive_progress), bytesReadable(processedBytes) + "/" + bytesReadable(uncompressedSize)));
                                                 });
                                             });
 
@@ -430,42 +430,110 @@ public class SideloadAdapter extends BaseAdapter {
         return String.format("%01.2f %s", size, currentByteType);
     }
 
-    public static void unzip(File zipFile, File targetDirectory, Consumer<Long> progressCallback) throws IOException {
-        try (ZipInputStream zis = new ZipInputStream(
-                new BufferedInputStream(Files.newInputStream(zipFile.toPath())))) {
-            ZipEntry ze;
-            int count;
-            byte[] buffer = new byte[8192];
-            long processedBytes = 0;
-            while ((ze = zis.getNextEntry()) != null) {
-                if(!zipFile.exists()) {
-                    throw new IOException();
-                }
-                File file = new File(targetDirectory, ze.getName());
-                File dir = ze.isDirectory() ? file : file.getParentFile();
-                if (!dir.isDirectory() && !dir.mkdirs())
-                    throw new FileNotFoundException("Failed to ensure directory: " +
-                            dir.getAbsolutePath());
-                if (ze.isDirectory())
-                    continue;
-                try (FileOutputStream fout = new FileOutputStream(file)) {
-                    while ((count = zis.read(buffer)) != -1) {
-                        fout.write(buffer, 0, count);
-                        processedBytes += count;
-                        progressCallback.accept(processedBytes);
-                        if(!zipFile.exists()) {
-                            throw new IOException();
-                        }
+    public static long getUncompressedArchiveSize(File archiveFile) throws Exception {
+        if(getFileExtension(archiveFile).equals(".7z")) {
+            try (SevenZFile is = new SevenZFile(archiveFile)) {
+                SevenZArchiveEntry ze;
+                long totalBytes = 0;
+                while ((ze = is.getNextEntry()) != null) {
+                    if(!archiveFile.exists()) {
+                        throw new IOException();
                     }
+
+                    if (ze.isDirectory())
+                        continue;
+
+                    long size = ze.getSize();
+                    if(size > 0)
+                        totalBytes += size;
                 }
-            /* if time should be restored as well
-            long time = ze.getTime();
-            if (time > 0)
-                file.setLastModified(time);
-            */
+                return totalBytes;
+            }
+        } else {
+            try (ArchiveInputStream is = new ArchiveStreamFactory()
+                    .createArchiveInputStream(new BufferedInputStream(Files.newInputStream(archiveFile.toPath())))) {
+                ArchiveEntry ze;
+                long totalBytes = 0;
+                while ((ze = is.getNextEntry()) != null) {
+                    if (!archiveFile.exists()) {
+                        throw new IOException();
+                    }
+
+                    if (ze.isDirectory())
+                        continue;
+
+                    long size = ze.getSize();
+                    if (size > 0)
+                        totalBytes += size;
+                }
+                return totalBytes;
             }
         }
     }
+
+    public static void extractArchive(File archiveFile, File targetDirectory, Consumer<Long> progressCallback) throws Exception {
+        if(getFileExtension(archiveFile).equals(".7z")) {
+            try (SevenZFile is = new SevenZFile(archiveFile)) {
+                SevenZArchiveEntry ze;
+                int count;
+                byte[] buffer = new byte[8192];
+                long processedBytes = 0;
+                while ((ze = is.getNextEntry()) != null) {
+                    if (!archiveFile.exists()) {
+                        throw new IOException();
+                    }
+                    File file = new File(targetDirectory, ze.getName());
+                    File dir = ze.isDirectory() ? file : file.getParentFile();
+                    if (!dir.isDirectory() && !dir.mkdirs())
+                        throw new FileNotFoundException("Failed to ensure directory: " +
+                                dir.getAbsolutePath());
+                    if (ze.isDirectory())
+                        continue;
+                    try (FileOutputStream fout = new FileOutputStream(file)) {
+                        while ((count = is.read(buffer)) != -1) {
+                            fout.write(buffer, 0, count);
+                            processedBytes += count;
+                            progressCallback.accept(processedBytes);
+                            if (!archiveFile.exists()) {
+                                throw new IOException();
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            try (ArchiveInputStream is = new ArchiveStreamFactory()
+                    .createArchiveInputStream(new BufferedInputStream(Files.newInputStream(archiveFile.toPath())))) {
+                ArchiveEntry ze;
+                int count;
+                byte[] buffer = new byte[8192];
+                long processedBytes = 0;
+                while ((ze = is.getNextEntry()) != null) {
+                    if (!archiveFile.exists()) {
+                        throw new IOException();
+                    }
+                    File file = new File(targetDirectory, ze.getName());
+                    File dir = ze.isDirectory() ? file : file.getParentFile();
+                    if (!dir.isDirectory() && !dir.mkdirs())
+                        throw new FileNotFoundException("Failed to ensure directory: " +
+                                dir.getAbsolutePath());
+                    if (ze.isDirectory())
+                        continue;
+                    try (FileOutputStream fout = new FileOutputStream(file)) {
+                        while ((count = is.read(buffer)) != -1) {
+                            fout.write(buffer, 0, count);
+                            processedBytes += count;
+                            progressCallback.accept(processedBytes);
+                            if (!archiveFile.exists()) {
+                                throw new IOException();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     private static String getFileExtension(File file) {
         String name = file.getName();

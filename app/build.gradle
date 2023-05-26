@@ -56,6 +56,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.palette:palette:1.0.0'
 
+    implementation 'org.tukaani:xz:1.9'
+    implementation 'org.apache.commons:commons-compress:1.23.0'
+
     implementation 'commons-net:commons-net:3.9.0'
     implementation 'com.hierynomus:smbj:0.11.5'
 

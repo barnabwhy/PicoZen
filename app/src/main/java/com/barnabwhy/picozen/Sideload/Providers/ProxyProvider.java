@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.function.Consumer;
 
 public class ProxyProvider extends AbstractProvider {
@@ -119,7 +120,7 @@ public class ProxyProvider extends AbstractProvider {
                 long size = dir.getLong("size");
                 String date = "";
                 if(dir.has("date"))
-                    date = dir.getString("date");
+                    date = new Date(dir.getLong("date")).toLocaleString();
 
                 items.add(new SideloadItem(SideloadItemType.DIRECTORY, name, dirPath, size, date));
             }
@@ -132,7 +133,7 @@ public class ProxyProvider extends AbstractProvider {
                 long size = file.getLong("size");
                 String date = "";
                 if(file.has("date"))
-                    date = file.getString("date");
+                    date = new Date(file.getLong("date")).toLocaleString();
 
                 items.add(new SideloadItem(SideloadItemType.FILE, name, filePath, size, date));
             }

@@ -650,11 +650,12 @@ public class AppsAdapter extends BaseAdapter
     }
 
     private void downloadIcon(final Activity activity, String pkg, @SuppressWarnings("unused") String name, final Runnable callback) {
+        final String device = isOculusHeadset() ? "oculus" : (isMagicLeapHeadset() ? "leap" : "pico");
         final File file = pkg2path(activity, "banners." + pkg);
         new Thread(() -> {
             try {
                 synchronized (pkg) {
-                    if (downloadIconFromUrl(ICONS_URL + pkg + "/banner.png?useBackup=1", file)) {
+                    if (downloadIconFromUrl(ICONS_URL + pkg + "/banner.png?useBackup=1&device="+device, file)) {
                         activity.runOnUiThread(callback);
                     }
                     //if (ignoredIcons.contains(STYLES[style] + "." + file.getName())) {

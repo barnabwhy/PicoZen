@@ -62,6 +62,24 @@
     <string name="general">General</string>
     <string name="server_type">Server type:</string>
 
+    <string name="detail_category">Category:</string>
+    <string name="detail_control">Control:</string>
+    <string name="detail_developer">Developer:</string>
+    <string name="detail_genres">Genres:</string>
+    <string name="detail_languages">Languages:</string>
+    <string name="detail_permissions">Permissions:</string>
+    <string name="detail_play_modes">Play modes:</string>
+    <string name="detail_private_policy">Private policy:</string>
+    <string name="detail_publisher">Publisher:</string>
+    <string name="detail_release_note">Release note:</string>
+    <string name="detail_size">Size:</string>
+    <string name="detail_supported_platforms">Supported platforms:</string>
+    <string name="detail_supported_player_mode">Supported player mode:</string>
+    <string name="detail_term_of_service">Term of service:</string>
+    <string name="detail_update_time">Permissions:</string>
+    <string name="detail_version">Version:</string>
+    <string name="detail_web_site">Web site:</string>
+
     <string name="address_format_template">(Format: %1$s)</string>
     <string-array name="address_format">
         <item />  <!-- EmptyProvider -->

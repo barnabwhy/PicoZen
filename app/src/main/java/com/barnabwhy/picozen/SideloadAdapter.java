@@ -239,7 +239,7 @@ public class SideloadAdapter extends BaseAdapter {
                                     holder.info.setText(versionName);
                                     holder.info.setVisibility(View.VISIBLE);
                                     holder.sideloadIcon.setImageBitmap(icon);
-                                    holder.layout.setOnClickListener(view -> openAppDetailDialog(packageName));
+                                    holder.layout.setOnClickListener(view -> openAppDetailDialog(current, packageName));
                                 }
                             } catch (Exception e) {
                                 Log.e("Error", e.toString());
@@ -252,177 +252,7 @@ public class SideloadAdapter extends BaseAdapter {
             });
 
             holder.downloadIcon.setOnClickListener(view -> {
-                Thread thread = new Thread(() -> {
-
-                    mainActivityContext.ensureStoragePermissions();
-
-                    if(currentDownload != null)
-                        return;
-
-                    currentDownload = new DownloadInfo();
-                    currentDownload.item = current;
-                    AtomicReference<AlertDialog> dialog = new AtomicReference<>();
-                    mainActivityContext.runOnUiThread(() -> dialog.set(showDownloadDialog()));
-
-                    AtomicBoolean cancelled = new AtomicBoolean(false);
-                    AtomicLong lastProgressTime = new AtomicLong();
-                    getProvider().downloadFile(current, (file) -> mainActivityContext.runOnUiThread(() -> {
-                        ((TextView)dialog.get().findViewById(R.id.file_name)).setText(file.getName());
-                        dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.VISIBLE);
-                        dialog.get().findViewById(R.id.cancel_btn).setOnClickListener(view1 -> {
-                            cancelled.set(true);
-                            file.delete();
-                        });
-                    }), (progress) -> {
-                        if(progress != current.getSize() && System.currentTimeMillis() - lastProgressTime.get() < 100 || currentDownload == null)
-                            return;
-
-                        lastProgressTime.set(System.currentTimeMillis());
-
-                        mainActivityContext.runOnUiThread(() -> {
-                            currentDownload.downloadedBytes = progress;
-                            ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format("%s / %s (%01.2f%%)", bytesReadable(currentDownload.downloadedBytes), bytesReadable(current.getSize()), ((double)progress / current.getSize()) * 100.0));
-
-                            View progressBar = dialog.get().findViewById(R.id.progress_bar);
-                            ViewGroup.LayoutParams params = progressBar.getLayoutParams();
-                            params.width = (int) (((View)progressBar.getParent()).getWidth() * ((double)progress / current.getSize()));
-                            params.height = ((View)progressBar.getParent()).getHeight();
-                            progressBar.setLayoutParams(params);
-                            progressBar.setVisibility(View.VISIBLE);
-                        });
-                    }, outFile -> mainActivityContext.runOnUiThread(() -> {
-                        class CompleteData {
-                            Exception error;
-                            File installableFile;
-                            File obbDir;
-                            boolean cancelled;
-                        };
-
-                        Consumer<CompleteData> onComplete = (data) -> {
-                            if (data.error != null) {
-                                if(data.cancelled) {
-                                    ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(R.string.download_cancelled);
-                                } else {
-                                    ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.an_error_occurred), data.error.getLocalizedMessage()));
-                                }
-                                dialog.get().findViewById(R.id.progress_bar).setVisibility(View.GONE);
-                            } else {
-                                ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(R.string.download_complete);
-                                if (data.installableFile != null) {
-                                    dialog.get().findViewById(R.id.install_btn).setVisibility(View.VISIBLE);
-                                    File finalInstallableFile = data.installableFile;
-                                    File finalObbDir = data.obbDir;
-                                    dialog.get().findViewById(R.id.install_btn).setOnClickListener(view1 -> {
-                                        if (finalObbDir != null) {
-                                            File obbDest = new File(Environment.getExternalStorageDirectory().getPath() + "/Android/obb/" + finalObbDir.getName());
-                                            finalObbDir.renameTo(obbDest);
-                                        }
-                                        Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-                                        intent.setData(FileProvider.getUriForFile(mainActivityContext, BuildConfig.APPLICATION_ID + ".provider", finalInstallableFile));
-                                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        mainActivityContext.startActivity(intent);
-                                    });
-                                }
-                            }
-
-                            dialog.get().setCancelable(true);
-                            dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.GONE);
-                            dialog.get().findViewById(R.id.dismiss_btn).setVisibility(View.VISIBLE);
-                            dialog.get().findViewById(R.id.dismiss_btn).setOnClickListener(view1 -> dialog.get().dismiss());
-                            currentDownload = null;
-                        };
-
-                        if (getFileExtension(outFile).equals(".zip") || getFileExtension(outFile).equals(".7z")
-                                || getFileExtension(outFile).equals(".tar")) {
-                            ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(R.string.extracting_archive);
-
-                            Thread zipThread = new Thread(() -> {
-                                Exception error = null;
-                                File installableFile = null;
-                                File obbDir = null;
-
-                                try {
-                                    File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/PicoZen/" + outFile.getName().substring(0, outFile.getName().lastIndexOf(".")));
-
-                                    mainActivityContext.runOnUiThread(() -> {
-                                        dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.VISIBLE);
-                                        dialog.get().findViewById(R.id.cancel_btn).setOnClickListener(view1 -> {
-                                            cancelled.set(true);
-                                            outFile.delete();
-                                            if (dir.exists()) {
-                                                String deleteCmd = "rm -r " + dir.getAbsolutePath();
-                                                Runtime runtime = Runtime.getRuntime();
-                                                try {
-                                                    runtime.exec(deleteCmd);
-                                                } catch (IOException e) { }
-                                            }
-                                        });
-                                    });
-
-                                    long uncompressedSize = getUncompressedArchiveSize(outFile);
-
-                                    extractArchive(outFile, dir, processedBytes -> mainActivityContext.runOnUiThread(() -> ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.extracting_archive_progress), bytesReadable(processedBytes) + "/" + bytesReadable(uncompressedSize)))));
-
-                                    File[] files = dir.listFiles();
-                                    for (File file : Objects.requireNonNull(files)) {
-                                        if (getFileExtension(file).equals(".apk")) {
-                                            installableFile = file;
-                                            break;
-                                        }
-                                    }
-                                    if (installableFile != null) {
-                                        for (File file : Objects.requireNonNull(files)) {
-                                            if (file.getName().equals(getPackageName(mainActivityContext, installableFile))) {
-                                                obbDir = file;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    error = e;
-                                }
-
-                                outFile.delete();
-
-                                CompleteData completeData = new CompleteData();
-                                completeData.error = error;
-                                completeData.installableFile = installableFile;
-                                completeData.obbDir = obbDir;
-                                completeData.cancelled = cancelled.get();
-
-                                mainActivityContext.runOnUiThread(() -> onComplete.accept(completeData));
-                            });
-                            zipThread.start();
-                        } else {
-                            File installableFile = null;
-                            if (getFileExtension(outFile).equals(".apk")) {
-                                installableFile = outFile;
-                            }
-
-                            CompleteData completeData = new CompleteData();
-                            completeData.error = null;
-                            completeData.installableFile = installableFile;
-                            completeData.obbDir = null;
-                            completeData.cancelled = false;
-                            onComplete.accept(completeData);
-                        }
-                    }), e -> mainActivityContext.runOnUiThread(() -> {
-                        if(cancelled.get()) {
-                            ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(R.string.download_cancelled);
-                        } else {
-                            ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.an_error_occurred), e.getLocalizedMessage()));
-                        }
-                        dialog.get().findViewById(R.id.progress_bar).setVisibility(View.GONE);
-
-                        dialog.get().setCancelable(true);
-                        dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.GONE);
-                        dialog.get().findViewById(R.id.dismiss_btn).setVisibility(View.VISIBLE);
-                        dialog.get().findViewById(R.id.dismiss_btn).setOnClickListener(view1 -> dialog.get().dismiss());
-                        currentDownload = null;
-                    }));
-                });
-                thread.start();
+                downloadApp(current);
             });
         } else {
             holder.openFolderIcon.setVisibility(View.VISIBLE);
@@ -435,6 +265,197 @@ public class SideloadAdapter extends BaseAdapter {
         holder.modified.setText(current.getModifiedAt());
 
         return convertView;
+    }
+
+    private void downloadApp(SideloadItem current) {
+        Thread thread = new Thread(() -> {
+            mainActivityContext.ensureStoragePermissions();
+
+            if(currentDownload != null)
+                return;
+
+            currentDownload = new DownloadInfo();
+            currentDownload.item = current;
+            AtomicReference<AlertDialog> dialog = new AtomicReference<>();
+            mainActivityContext.runOnUiThread(() -> {
+                dialog.set(showDownloadDialog());
+            });
+
+            AtomicBoolean cancelled = new AtomicBoolean(false);
+            AtomicLong lastProgressTime = new AtomicLong();
+            getProvider().downloadFile(current, (file) -> {
+                mainActivityContext.runOnUiThread(() -> {
+                    ((TextView)dialog.get().findViewById(R.id.file_name)).setText(file.getName());
+                    dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.VISIBLE);
+                    dialog.get().findViewById(R.id.cancel_btn).setOnClickListener(view -> {
+                        cancelled.set(true);
+                        file.delete();
+                    });
+                });
+            }, (progress) -> {
+                if(progress != current.getSize() && System.currentTimeMillis() - lastProgressTime.get() < 100 || currentDownload == null)
+                    return;
+
+                lastProgressTime.set(System.currentTimeMillis());
+
+                mainActivityContext.runOnUiThread(() -> {
+                    currentDownload.downloadedBytes = progress;
+                    ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format("%s / %s (%01.2f%%)", bytesReadable(currentDownload.downloadedBytes), bytesReadable(current.getSize()), ((double)progress / current.getSize()) * 100.0));
+
+                    View progressBar = dialog.get().findViewById(R.id.progress_bar);
+                    ViewGroup.LayoutParams params = progressBar.getLayoutParams();
+                    params.width = (int) (((View)progressBar.getParent()).getWidth() * ((double)progress / current.getSize()));
+                    params.height = ((View)progressBar.getParent()).getHeight();
+                    progressBar.setLayoutParams(params);
+                    progressBar.setVisibility(View.VISIBLE);
+                });
+            }, outFile -> {
+                mainActivityContext.runOnUiThread(() -> {
+                    class CompleteData {
+                        Exception error;
+                        File installableFile;
+                        File obbDir;
+                        boolean cancelled;
+                    };
+
+                    Consumer<CompleteData> onComplete = (data) -> {
+                        if (data.error != null) {
+                            if(data.cancelled) {
+                                ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(R.string.download_cancelled);
+                            } else {
+                                ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.an_error_occurred), data.error.getLocalizedMessage()));
+                            }
+                            dialog.get().findViewById(R.id.progress_bar).setVisibility(View.GONE);
+                        } else {
+                            ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(R.string.download_complete);
+                            if (data.installableFile != null) {
+                                dialog.get().findViewById(R.id.install_btn).setVisibility(View.VISIBLE);
+                                File finalInstallableFile = data.installableFile;
+                                File finalObbDir = data.obbDir;
+                                dialog.get().findViewById(R.id.install_btn).setOnClickListener(view -> {
+                                    if (finalObbDir != null) {
+                                        File obbDest = new File(Environment.getExternalStorageDirectory().getPath() + "/Android/obb/" + finalObbDir.getName());
+                                        finalObbDir.renameTo(obbDest);
+                                    }
+                                    Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+                                    intent.setData(FileProvider.getUriForFile(mainActivityContext, BuildConfig.APPLICATION_ID + ".provider", finalInstallableFile));
+                                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    mainActivityContext.startActivity(intent);
+                                });
+                            }
+                        }
+
+                        dialog.get().setCancelable(true);
+                        dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.GONE);
+                        dialog.get().findViewById(R.id.dismiss_btn).setVisibility(View.VISIBLE);
+                        dialog.get().findViewById(R.id.dismiss_btn).setOnClickListener(view -> {
+                            dialog.get().dismiss();
+                        });
+                        currentDownload = null;
+                    };
+
+                    if (getFileExtension(outFile).equals(".zip") || getFileExtension(outFile).equals(".7z")
+                            || getFileExtension(outFile).equals(".tar")) {
+                        ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(R.string.extracting_archive);
+
+                        Thread zipThread = new Thread(() -> {
+                            Exception error = null;
+                            File installableFile = null;
+                            File obbDir = null;
+
+                            try {
+                                File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/PicoZen/" + outFile.getName().substring(0, outFile.getName().lastIndexOf(".")));
+
+                                mainActivityContext.runOnUiThread(() -> {
+                                    dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.VISIBLE);
+                                    dialog.get().findViewById(R.id.cancel_btn).setOnClickListener(view -> {
+                                        cancelled.set(true);
+                                        outFile.delete();
+                                        if (dir.exists()) {
+                                            String deleteCmd = "rm -r " + dir.getAbsolutePath();
+                                            Runtime runtime = Runtime.getRuntime();
+                                            try {
+                                                runtime.exec(deleteCmd);
+                                            } catch (IOException e) { }
+                                        }
+                                    });
+                                });
+
+                                long uncompressedSize = getUncompressedArchiveSize(outFile);
+
+                                extractArchive(outFile, dir, processedBytes -> {
+                                    mainActivityContext.runOnUiThread(() -> {
+                                        ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.extracting_archive_progress), bytesReadable(processedBytes) + "/" + bytesReadable(uncompressedSize)));
+                                    });
+                                });
+
+                                File[] files = dir.listFiles();
+                                for (File file : Objects.requireNonNull(files)) {
+                                    if (getFileExtension(file).equals(".apk")) {
+                                        installableFile = file;
+                                        break;
+                                    }
+                                }
+                                if (installableFile != null) {
+                                    for (File file : Objects.requireNonNull(files)) {
+                                        if (file.getName().equals(getPackageName(mainActivityContext, installableFile))) {
+                                            obbDir = file;
+                                            break;
+                                        }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                error = e;
+                            }
+
+                            outFile.delete();
+
+                            CompleteData completeData = new CompleteData();
+                            completeData.error = error;
+                            completeData.installableFile = installableFile;
+                            completeData.obbDir = obbDir;
+                            completeData.cancelled = cancelled.get();
+
+                            mainActivityContext.runOnUiThread(() -> {
+                                onComplete.accept(completeData);
+                            });
+                        });
+                        zipThread.start();
+                    } else {
+                        File installableFile = null;
+                        if (getFileExtension(outFile).equals(".apk")) {
+                            installableFile = outFile;
+                        }
+
+                        CompleteData completeData = new CompleteData();
+                        completeData.error = null;
+                        completeData.installableFile = installableFile;
+                        completeData.obbDir = null;
+                        completeData.cancelled = false;
+                        onComplete.accept(completeData);
+                    }
+                });
+            }, e -> {
+                mainActivityContext.runOnUiThread(() -> {
+                    if(cancelled.get()) {
+                        ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(R.string.download_cancelled);
+                    } else {
+                        ((TextView)dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.an_error_occurred), e.getLocalizedMessage()));
+                    }
+                    dialog.get().findViewById(R.id.progress_bar).setVisibility(View.GONE);
+
+                    dialog.get().setCancelable(true);
+                    dialog.get().findViewById(R.id.cancel_btn).setVisibility(View.GONE);
+                    dialog.get().findViewById(R.id.dismiss_btn).setVisibility(View.VISIBLE);
+                    dialog.get().findViewById(R.id.dismiss_btn).setOnClickListener(view -> {
+                        dialog.get().dismiss();
+                    });
+                    currentDownload = null;
+                });
+            });
+        });
+        thread.start();
     }
 
     private AlertDialog showDownloadDialog() {
@@ -666,7 +687,7 @@ public class SideloadAdapter extends BaseAdapter {
         return icon;
     }
 
-    private void openAppDetailDialog(String appPackage) {
+    private void openAppDetailDialog(SideloadItem current, String appPackage) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -705,7 +726,7 @@ public class SideloadAdapter extends BaseAdapter {
                                 dialogOverlay.setVisibility(View.GONE);
                             });
 
-                            updateAppDetailDialog(dialog, item, cover);
+                            updateAppDetailDialog(dialog, item, cover, current);
 
                             dialog.findViewById(R.id.cancel_btn).setOnClickListener(view -> {
                                 dialog.dismiss();
@@ -724,10 +745,11 @@ public class SideloadAdapter extends BaseAdapter {
 
     }
 
-    private void updateAppDetailDialog(AlertDialog dialog, JSONObject storeItem, Bitmap cover) {
+    private void updateAppDetailDialog(AlertDialog dialog, JSONObject storeItem, Bitmap cover, SideloadItem current) {
         try {
             ((ImageView) dialog.findViewById(R.id.app_cover)).setImageBitmap(cover);
             ((TextView) dialog.findViewById(R.id.app_name)).setText(storeItem.getString("name"));
+            ((TextView) dialog.findViewById(R.id.app_abstract)).setText(storeItem.getString("abstract"));
             ((TextView) dialog.findViewById(R.id.package_name)).setText(storeItem.getString("package_name"));
 
             String description = storeItem.getJSONObject("description").getString("app_description");
@@ -735,10 +757,26 @@ public class SideloadAdapter extends BaseAdapter {
 
 
             JSONObject detail = storeItem.getJSONObject("detail");
-            ((TextView) dialog.findViewById(R.id.files_size)).setText(String.format(mainActivityContext.getResources().getString(R.string.files_size), bytesReadable(detail.getLong("app_size"))));
-            ((TextView) dialog.findViewById(R.id.play_modes)).setText(detail.getString("app_play_modes"));
+            ((TextView) dialog.findViewById(R.id.files_size)).setText(mainActivityContext.getResources().getString(R.string.detail_size) + " " + String.format(mainActivityContext.getResources().getString(R.string.files_size), bytesReadable(detail.getLong("app_size"))));
+            ((TextView) dialog.findViewById(R.id.play_modes)).setText(mainActivityContext.getResources().getString(R.string.detail_play_modes) + " " + detail.getString("app_play_modes"));
+            ((TextView) dialog.findViewById(R.id.version)).setText(mainActivityContext.getResources().getString(R.string.detail_version) + " " + detail.getString("app_version"));
+            ((TextView) dialog.findViewById(R.id.category)).setText(mainActivityContext.getResources().getString(R.string.detail_category) + " " + detail.getString("app_category"));
+            ((TextView) dialog.findViewById(R.id.control)).setText(mainActivityContext.getResources().getString(R.string.detail_control) + " " + detail.getString("app_control"));
+            ((TextView) dialog.findViewById(R.id.developer)).setText(mainActivityContext.getResources().getString(R.string.detail_developer) + " " + detail.getString("app_developer"));
+            ((TextView) dialog.findViewById(R.id.genres)).setText(mainActivityContext.getResources().getString(R.string.detail_genres) + " " + detail.getString("app_genres"));
+            ((TextView) dialog.findViewById(R.id.languages)).setText(mainActivityContext.getResources().getString(R.string.detail_languages) + " " + detail.getString("app_languages"));
+            ((TextView) dialog.findViewById(R.id.permissions)).setText(mainActivityContext.getResources().getString(R.string.detail_permissions) + " " + detail.getString("app_permissions"));
+            ((TextView) dialog.findViewById(R.id.publisher)).setText(mainActivityContext.getResources().getString(R.string.detail_publisher) + " " + detail.getString("app_publisher"));
+            ((TextView) dialog.findViewById(R.id.web_site)).setText(mainActivityContext.getResources().getString(R.string.detail_web_site) + " " + detail.getString("app_web_site"));
+            ((TextView) dialog.findViewById(R.id.supported_platforms)).setText(mainActivityContext.getResources().getString(R.string.detail_supported_platforms) + " " + detail.getString("app_supported_platforms"));
+            ((TextView) dialog.findViewById(R.id.supported_player_mode)).setText(mainActivityContext.getResources().getString(R.string.detail_supported_player_mode) + " " + detail.getString("app_supported_player_mode"));
 
-            //TODO show all detail from store
+            //TODO add image gallery
+
+            ((TextView) dialog.findViewById(R.id.download_btn)).setOnClickListener(view -> {
+                downloadApp(current);
+                dialog.dismiss();
+            });
 
         } catch (Exception e) {
             Log.e("Error", e.toString());

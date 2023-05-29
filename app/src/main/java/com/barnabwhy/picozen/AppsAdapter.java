@@ -2,13 +2,10 @@ package com.barnabwhy.picozen;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -17,12 +14,10 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,15 +35,10 @@ import android.widget.TextView;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.palette.graphics.Palette;
 
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,10 +54,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class AppsAdapter extends BaseAdapter
 {
-    private static Drawable iconDrawable;
-    private static File iconFile;
-    private static String packageName;
-    private static long lastClickTime;
     private final MainActivity mainActivityContext;
     private List<ApplicationInfo> appList;
     private final Set<String> favoriteList;
@@ -102,8 +88,8 @@ public class AppsAdapter extends BaseAdapter
         sharedPreferences = context.getSharedPreferences(context.getPackageName() + "_preferences", Context.MODE_PRIVATE);
         settingsProvider = SettingsProvider.getInstance(mainActivityContext);
 
-        favoriteList = sharedPreferences.getStringSet(SettingsProvider.KEY_FAVORITE_APPS, new HashSet<String> ());
-        hiddenList = sharedPreferences.getStringSet(SettingsProvider.KEY_HIDDEN_APPS, new HashSet<String> ());
+        favoriteList = sharedPreferences.getStringSet(SettingsProvider.KEY_FAVORITE_APPS, new HashSet<>());
+        hiddenList = sharedPreferences.getStringSet(SettingsProvider.KEY_HIDDEN_APPS, new HashSet<>());
 
         isEditMode = false;
         updateAppList();
@@ -114,13 +100,11 @@ public class AppsAdapter extends BaseAdapter
         TimerTask updateAppListTask = new TimerTask() {
             @Override
             public void run() {
-                handler.post(new Runnable() {
-                    public void run() {
-                        try {
-                            updateAppList();
-                        } catch (Exception e) {
-                            Log.e("updateAppListTask", e.toString());
-                        }
+                handler.post(() -> {
+                    try {
+                        updateAppList();
+                    } catch (Exception e) {
+                        Log.e("updateAppListTask", e.toString());
                     }
                 });
             }
@@ -255,7 +239,7 @@ public class AppsAdapter extends BaseAdapter
 
             //Calculate text height
             holder.textView.measure(0, 0);
-            int textHeight = (int) holder.textView.getMeasuredHeight() + (int) ((ViewGroup.MarginLayoutParams) holder.textView.getLayoutParams()).topMargin + (int) ((ViewGroup.MarginLayoutParams) holder.textView.getLayoutParams()).bottomMargin;
+            int textHeight = holder.textView.getMeasuredHeight() + ((ViewGroup.MarginLayoutParams) holder.textView.getLayoutParams()).topMargin + ((ViewGroup.MarginLayoutParams) holder.textView.getLayoutParams()).bottomMargin;
 
             params.width = itemScale;
 //            if (style == 0) {
@@ -288,9 +272,7 @@ public class AppsAdapter extends BaseAdapter
                 favoriteList.remove(app.packageName);
             } else {
                 favoriteList.add(app.packageName);
-                if (hiddenList.contains(app.packageName)) {
-                    hiddenList.remove(app.packageName);
-                }
+                hiddenList.remove(app.packageName);
             }
             sharedPreferences.edit().putStringSet(SettingsProvider.KEY_FAVORITE_APPS, favoriteList).apply();
             sharedPreferences.edit().putStringSet(SettingsProvider.KEY_HIDDEN_APPS, hiddenList).apply();
@@ -311,9 +293,7 @@ public class AppsAdapter extends BaseAdapter
                 hiddenList.remove(app.packageName);
             } else {
                 hiddenList.add(app.packageName);
-                if (favoriteList.contains(app.packageName)) {
-                    favoriteList.remove(app.packageName);
-                }
+                favoriteList.remove(app.packageName);
             }
             sharedPreferences.edit().putStringSet(SettingsProvider.KEY_FAVORITE_APPS, favoriteList).apply();
             sharedPreferences.edit().putStringSet(SettingsProvider.KEY_HIDDEN_APPS, hiddenList).apply();
@@ -409,33 +389,15 @@ public class AppsAdapter extends BaseAdapter
         return convertView;
     }
 
-//    public void onImageSelected(String path, ImageView selectedImageView) {
-//        clearIconCache();
-//        if (path != null) {
-//            Bitmap bitmap = ImageUtils.getResizedBitmap(BitmapFactory.decodeFile(path), 512);
-//            ImageUtils.saveBitmap(bitmap, iconFile);
-//            selectedImageView.setImageBitmap(bitmap);
-//        } else {
-//            selectedImageView.setImageDrawable(iconDrawable);
-//            updateIcon(selectedImageView, iconFile, "banners."+ packageName);
-//        }
-//        mainActivityContext.reloadUI();
-//        this.notifyDataSetChanged(); // for real time updates
-//    }
-
     private Long getInstallDate(ApplicationInfo applicationInfo) {
-        if(SettingsProvider.installDates.containsKey(applicationInfo.packageName)) {
-            return SettingsProvider.installDates.get(applicationInfo.packageName);
-        }else{
-            return 0L;
-        }
+        return SettingsProvider.installDates.getOrDefault(applicationInfo.packageName, 0L);
     }
 
     public void sort(SORT_FIELD field, SORT_ORDER order) {
         final PackageManager pm = mainActivityContext.getPackageManager();
         final Map<String, Long> recents = settingsProvider.getRecents();
 
-        Collections.sort(appList, (a, b) -> {
+        appList.sort((a, b) -> {
             String na;
             String nb;
             long naL;
@@ -474,66 +436,11 @@ public class AppsAdapter extends BaseAdapter
         this.notifyDataSetChanged();
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-//    private void showAppDetails(ApplicationInfo actApp) {
-//
-//        //set layout
-//        Context context = mainActivityContext;
-//        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomDialog);
-//        builder.setView(R.layout.dialog_app_details);
-//        AlertDialog dialog = builder.create();
-//        dialog.getWindow().setBackgroundDrawableResource(R.drawable.bkg_dialog);
-//        dialog.show();
-//
-//        mainActivityContext.findViewById(R.id.dialogDim).setVisibility(View.VISIBLE);
-//        dialog.setOnDismissListener((DialogInterface dialogInterface) -> {
-//            mainActivityContext.findViewById(R.id.dialogDim).setVisibility(View.GONE);
-//        });
-//
-//        //info action
-//        dialog.findViewById(R.id.info).setOnClickListener(view13 -> mainActivityContext.openAppDetails(actApp.packageName));
-//
-//        //set name
-//        PackageManager pm = mainActivityContext.getPackageManager();
-//        String name = SettingsProvider.getAppDisplayName(mainActivityContext, actApp.packageName, actApp.loadLabel(pm));
-//        final EditText input = dialog.findViewById(R.id.app_name);
-//        input.setText(name);
-//        dialog.findViewById(R.id.ok).setOnClickListener(view12 -> {
-//            settingsProvider.setAppDisplayName(actApp, input.getText().toString());
-//            mainActivityContext.reloadUI();
-//            dialog.dismiss();
-//        });
-//
-//        // load icon
-//        ImageView tempImage = dialog.findViewById(R.id.app_icon);
-//        AbstractPlatform platform = AbstractPlatform.getPlatform(actApp);
-//        platform.loadIcon(mainActivityContext, tempImage, actApp, name);
-//
-//        tempImage.setClipToOutline(true);
-//
-//        tempImage.setOnClickListener(view1 -> {
-//            iconDrawable = actApp.loadIcon(pm);
-//            packageName = actApp.packageName;
-//            iconFile = AbstractPlatform.pkg2path(mainActivityContext, STYLES[style]+"."+actApp.packageName);
-//            if (iconFile.exists()) {
-//                iconFile.delete();
-//            }
-//            mainActivityContext.setSelectedImageView(tempImage);
-//            ImageUtils.showImagePicker(mainActivityContext, MainActivity.PICK_ICON_CODE);
-//        });
-//    }
-
-    public String getSelectedPackage() {
-        return packageName;
-    }
-
     public static File pkg2path(Context context, String pkg) {
         return new File(context.getCacheDir(), pkg + ".webp");
     }
 
     private final String ICONS_URL = "https://api.picozen.app/assets/";
-    private final String ICONS1_URL = "https://raw.githubusercontent.com/Veticia/binaries/main/banners/";
-    private static final String ICONS_FALLBACK_URL = "https://pilauncher.lwiczka.pl/get_icon.php?id=";
     protected static final HashMap<String, Drawable> iconCache = new HashMap<>();
     protected static final HashMap<String, GradientDrawable> gradientCache = new HashMap<>();
     protected static final HashSet<String> ignoredIcons = new HashSet<>();
@@ -578,7 +485,7 @@ public class AppsAdapter extends BaseAdapter
                 return;
             }
         }
-        downloadIcon(activity, pkg, name, () -> { updateIcon(holder, file, "banners."+pkg); });
+        downloadIcon(activity, pkg, name, () -> updateIcon(holder, file, "banners."+pkg));
     }
 
     public static boolean isImageFileComplete(File imageFile) {
@@ -658,21 +565,6 @@ public class AppsAdapter extends BaseAdapter
                     if (downloadIconFromUrl(ICONS_URL + pkg + "/banner.png?useBackup=1&device="+device, file)) {
                         activity.runOnUiThread(callback);
                     }
-                    //if (ignoredIcons.contains(STYLES[style] + "." + file.getName())) {
-                    //ignored icon
-                    //} else
-//                    if(downloadIconFromStore(pkg, file, "us", 0)) {
-//                        activity.runOnUiThread(callback);
-//                    } else if(downloadIconFromStore(pkg, file, "cn", 0)) {
-//                        activity.runOnUiThread(callback);
-//                    } else if (downloadIconFromUrl(ICONS1_URL + pkg + ".png", file)) {
-//                        activity.runOnUiThread(callback);
-//                    } else if (downloadIconFromUrl(ICONS_FALLBACK_URL + pkg + "&set=banners", file)) {
-//                        activity.runOnUiThread(callback);
-//                    } else {
-//                        Log.d("Missing icon", file.getName());
-//                        ignoredIcons.add("banners." + file.getName());
-//                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -730,43 +622,6 @@ public class AppsAdapter extends BaseAdapter
         }
     }
 
-    protected static boolean downloadIconFromStore(String pkg, File outputFile, String region, int style) {
-        if(isPicoHeadset()) {
-            try {
-                URL url = new URL("https://appstore-"+region+".picovr.com/api/app/v1/item/info?app_language=en&device_name=A8110&manifest_version_code=300800000&package_name=" + pkg);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-                connection.connect();
-
-                InputStream stream = connection.getInputStream();
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-
-                StringBuilder str = new StringBuilder();
-                String line = "";
-
-                while ((line = reader.readLine()) != null) {
-                    str.append(line).append("\n");
-                }
-
-                JSONObject result = new JSONObject(str.toString());
-
-                if(result.isNull("data") || result.getJSONObject("data").isNull("cover")) {
-                    return false;
-                }
-
-                String imageKey = style == 0 ? "landscape" : "square";
-                return downloadIconFromUrl(result.getJSONObject("data").getJSONObject("cover").getString(imageKey), outputFile);
-            } catch (Exception e) {
-                return false;
-            }
-        } else if(isOculusHeadset()) {
-            return false;
-        } else {
-            return false;
-        }
-    }
-
     public static boolean isMagicLeapHeadset() {
         String vendor = Build.MANUFACTURER.toUpperCase();
         return vendor.startsWith("MAGIC LEAP");
@@ -785,24 +640,20 @@ public class AppsAdapter extends BaseAdapter
     // Generate palette asynchronously and use it on a different
     // thread using onGenerated()
     public void createIconPaletteAsync(String pkg, Bitmap bitmap, ViewHolder holder) {
-        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-            public void onGenerated(Palette p) {
-                // Use generated instance
-                GradientDrawable gd = new GradientDrawable(
-                        GradientDrawable.Orientation.TOP_BOTTOM,
-                        new int[] { p.getVibrantColor(mainActivityContext.getResources().getColor(R.color.bg_med)), p.getDarkVibrantColor(mainActivityContext.getResources().getColor(R.color.bg_dark)) });
-                gd.setCornerRadius(0f);
-                gradientCache.put(pkg, gd);
-                holder.layout.findViewById(R.id.app_color_bg).setBackground(gd);
-            }
+        Palette.from(bitmap).generate(p -> {
+            // Use generated instance
+            GradientDrawable gd = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[] { p.getVibrantColor(mainActivityContext.getResources().getColor(R.color.bg_med)), p.getDarkVibrantColor(mainActivityContext.getResources().getColor(R.color.bg_dark)) });
+            gd.setCornerRadius(0f);
+            gradientCache.put(pkg, gd);
+            holder.layout.findViewById(R.id.app_color_bg).setBackground(gd);
         });
     }
 
     public static Bitmap drawableToBitmap(Drawable drawable) {
         Bitmap bitmap = null;
-
-        if (drawable instanceof BitmapDrawable) {
-            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+        if (drawable instanceof BitmapDrawable bitmapDrawable) {
             if(bitmapDrawable.getBitmap() != null) {
                 return bitmapDrawable.getBitmap();
             }

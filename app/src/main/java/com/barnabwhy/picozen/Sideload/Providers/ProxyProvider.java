@@ -4,10 +4,8 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import com.barnabwhy.picozen.MainActivity;
-import com.barnabwhy.picozen.R;
 import com.barnabwhy.picozen.SettingsProvider;
 import com.barnabwhy.picozen.Sideload.SideloadItem;
 import com.barnabwhy.picozen.Sideload.SideloadItemType;
@@ -19,7 +17,6 @@ import org.json.JSONObject;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -48,21 +45,18 @@ public class ProxyProvider extends AbstractProvider {
     }
 
     public void updateList() {
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                if (sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals("")) {
-                    itemList = new ArrayList<>();
-                    state = ProviderState.IDLE;
-                } else {
-                    itemList = getItemsAtPath(currentPath);
-                    Log.i("Items", "Size: "+itemList.size());
-                    mainActivityContext.ensureStoragePermissions();
-                }
-
-                mainActivityContext.runOnUiThread(notifyCallback);
+        Thread thread = new Thread(() -> {
+            if (sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "").equals("")) {
+                itemList = new ArrayList<>();
+                state = ProviderState.IDLE;
+            } else {
+                itemList = getItemsAtPath(currentPath);
+                Log.i("Items", "Size: "+itemList.size());
+                mainActivityContext.ensureStoragePermissions();
             }
-        };
+
+            mainActivityContext.runOnUiThread(notifyCallback);
+        });
         thread.start();
     }
 
@@ -81,9 +75,7 @@ public class ProxyProvider extends AbstractProvider {
             holder.downloadIcon.setVisibility(View.GONE);
             holder.openFolderIcon.setVisibility(View.VISIBLE);
 
-            holder.layout.setOnClickListener(view -> {
-                this.setCurrentPath(item.getPath());
-            });
+            holder.layout.setOnClickListener(view -> this.setCurrentPath(item.getPath()));
         } else {
             holder.size.setVisibility(View.VISIBLE);
             holder.downloadIcon.setVisibility(View.VISIBLE);

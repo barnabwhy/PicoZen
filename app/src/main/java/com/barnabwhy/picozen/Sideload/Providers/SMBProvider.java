@@ -121,9 +121,7 @@ public class SMBProvider extends AbstractProvider {
             holder.downloadIcon.setVisibility(View.GONE);
             holder.openFolderIcon.setVisibility(View.VISIBLE);
 
-            holder.layout.setOnClickListener(view -> {
-                this.setCurrentPath(item.getPath());
-            });
+            holder.layout.setOnClickListener(view -> this.setCurrentPath(item.getPath()));
         } else {
             holder.size.setVisibility(View.VISIBLE);
             holder.downloadIcon.setVisibility(View.VISIBLE);

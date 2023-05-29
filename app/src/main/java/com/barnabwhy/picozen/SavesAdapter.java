@@ -65,7 +65,7 @@ public class SavesAdapter extends BaseAdapter {
     public void updateAppList() {
         mainActivityContext.ensureStoragePermissions();
 
-        appList = getAppList(sharedPreferences.getInt(SettingsProvider.KEY_GROUP_SPINNER, 0));
+        appList = getAppList();
 
         TextView saveGridEmpty = mainActivityContext.findViewById(R.id.save_grid_empty);
         if(appList.size() == 0) {
@@ -82,7 +82,7 @@ public class SavesAdapter extends BaseAdapter {
 
         this.sort();
     }
-    public ArrayList<ApplicationInfo> getAppList(int group) {
+    public ArrayList<ApplicationInfo> getAppList() {
         ArrayList<ApplicationInfo> installedApps = new ArrayList<>();
         PackageManager pm = mainActivityContext.getPackageManager();
         for (ApplicationInfo app : pm.getInstalledApplications(PackageManager.GET_META_DATA)) {
@@ -113,7 +113,7 @@ public class SavesAdapter extends BaseAdapter {
     public void sort() {
         final PackageManager pm = mainActivityContext.getPackageManager();
 
-        Collections.sort(appList, (a, b) -> {
+        appList.sort((a, b) -> {
             String na;
             String nb;
             na = a.loadLabel(pm).toString().toUpperCase();
@@ -167,9 +167,7 @@ public class SavesAdapter extends BaseAdapter {
         holder.name.setText(current.loadLabel(mainActivityContext.getPackageManager()));
         holder.appIcon.setImageDrawable(current.loadIcon(mainActivityContext.getPackageManager()));
 
-        holder.layout.setOnClickListener(v -> {
-            openSaveManagerDialog(current);
-        });
+        holder.layout.setOnClickListener(v -> openSaveManagerDialog(current));
 
         return convertView;
     }
@@ -243,15 +241,11 @@ public class SavesAdapter extends BaseAdapter {
         dialog.findViewById(R.id.layout).requestLayout();
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_dialog);
 
-        dialog.setOnDismissListener(d -> {
-            dialogOverlay.setVisibility(View.GONE);
-        });
+        dialog.setOnDismissListener(d -> dialogOverlay.setVisibility(View.GONE));
 
         updateSaveManagerDialog(dialog, app);
 
-        dialog.findViewById(R.id.cancel_btn).setOnClickListener(view -> {
-            dialog.dismiss();
-        });
+        dialog.findViewById(R.id.cancel_btn).setOnClickListener(view -> dialog.dismiss());
 
         return dialog;
     }
@@ -270,14 +264,10 @@ public class SavesAdapter extends BaseAdapter {
             dialog.findViewById(R.id.delete_backup_btn).setOnClickListener(null);
             ((TextView)dialog.findViewById(R.id.backup_btn)).setText(R.string.backup);
             ((TextView)dialog.findViewById(R.id.restore_btn)).setText(R.string.restore);
-            new Thread(() -> {
-                backupSave(app, success -> {
-                    mainActivityContext.runOnUiThread(() -> {
-                        ((TextView)dialog.findViewById(R.id.backup_btn)).setText(success ? R.string.backup_success : R.string.backup_fail);
-                        updateSaveManagerDialog(dialog, app);
-                    });
-                });
-            }).start();
+            new Thread(() -> backupSave(app, success -> mainActivityContext.runOnUiThread(() -> {
+                ((TextView)dialog.findViewById(R.id.backup_btn)).setText(success ? R.string.backup_success : R.string.backup_fail);
+                updateSaveManagerDialog(dialog, app);
+            }))).start();
         });
 
         Path p_backupPath = Paths.get(backupPath);
@@ -290,14 +280,10 @@ public class SavesAdapter extends BaseAdapter {
                 dialog.findViewById(R.id.delete_backup_btn).setOnClickListener(null);
                 ((TextView)dialog.findViewById(R.id.backup_btn)).setText(R.string.backup);
                 ((TextView)dialog.findViewById(R.id.restore_btn)).setText(R.string.restore);
-                new Thread(() -> {
-                    restoreSave(app, success -> {
-                        mainActivityContext.runOnUiThread(() -> {
-                            ((TextView) dialog.findViewById(R.id.restore_btn)).setText(success ? R.string.restore_success : R.string.restore_fail);
-                            updateSaveManagerDialog(dialog, app);
-                        });
-                    });
-                }).start();
+                new Thread(() -> restoreSave(app, success -> mainActivityContext.runOnUiThread(() -> {
+                    ((TextView) dialog.findViewById(R.id.restore_btn)).setText(success ? R.string.restore_success : R.string.restore_fail);
+                    updateSaveManagerDialog(dialog, app);
+                }))).start();
             });
 
             dialog.findViewById(R.id.delete_backup_btn).setOnClickListener(view -> {
@@ -306,13 +292,7 @@ public class SavesAdapter extends BaseAdapter {
                 dialog.findViewById(R.id.delete_backup_btn).setOnClickListener(null);
                 ((TextView)dialog.findViewById(R.id.backup_btn)).setText(R.string.backup);
                 ((TextView)dialog.findViewById(R.id.restore_btn)).setText(R.string.restore);
-                new Thread(() -> {
-                    deleteSaveBackup(app, success -> {
-                        mainActivityContext.runOnUiThread(() -> {
-                            updateSaveManagerDialog(dialog, app);
-                        });
-                    });
-                }).start();
+                new Thread(() -> deleteSaveBackup(app, success -> mainActivityContext.runOnUiThread(() -> updateSaveManagerDialog(dialog, app)))).start();
             });
 
             ((View)dialog.findViewById(R.id.restore_btn).getParent()).setBackground(ResourcesCompat.getDrawable(mainActivityContext.getResources(), R.drawable.bg_list_item_s, mainActivityContext.getTheme()));

@@ -2,11 +2,9 @@ package com.barnabwhy.picozen.Sideload.Providers;
 
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.view.View;
 
 import com.barnabwhy.picozen.MainActivity;
 import com.barnabwhy.picozen.Sideload.SideloadItem;
-import com.barnabwhy.picozen.Sideload.SideloadItemType;
 import com.barnabwhy.picozen.SideloadAdapter;
 
 import java.io.File;
@@ -19,7 +17,7 @@ abstract public class AbstractProvider {
     protected final SharedPreferences sharedPreferences;
     protected final MainActivity mainActivityContext;
     protected List<SideloadItem> itemList;
-    protected Runnable notifyCallback;
+    protected final Runnable notifyCallback;
     protected boolean disabled = false;
 
     public abstract boolean usesAddress();

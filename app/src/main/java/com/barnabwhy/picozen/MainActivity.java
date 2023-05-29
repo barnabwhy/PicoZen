@@ -13,7 +13,6 @@ import androidx.core.content.res.ResourcesCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -158,9 +157,7 @@ public class MainActivity extends AppCompatActivity {
         mainView.post(() -> {
             View settingsBtn = findViewById(R.id.settings_btn);
             View settingsTooltip = findViewById(R.id.settings_tooltip);
-            settingsBtn.setOnClickListener(view -> {
-                openSettings();
-            });
+            settingsBtn.setOnClickListener(view -> openSettings());
 
             settingsBtn.setOnHoverListener((View view, MotionEvent event) -> {
                 if (event.getActionMasked() == MotionEvent.ACTION_HOVER_ENTER) {
@@ -220,9 +217,7 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             });
 
-            v.setOnClickListener(view -> {
-                selectPage(finalI);
-            });
+            v.setOnClickListener(view -> selectPage(finalI));
 
             appGridView.setAdapter(new AppsAdapter(this));
             sideloadGridView.setAdapter(new SideloadAdapter(this));
@@ -319,13 +314,11 @@ public class MainActivity extends AppCompatActivity {
         TimerTask checkForUpdatesTask = new TimerTask() {
             @Override
             public void run() {
-                handler.post(new Runnable() {
-                    public void run() {
-                        try {
-                            checkForUpdates();
-                        } catch (Exception e) {
-                            Log.e("checkForUpdatesTask", e.toString());
-                        }
+                handler.post(() -> {
+                    try {
+                        checkForUpdates();
+                    } catch (Exception e) {
+                        Log.e("checkForUpdatesTask", e.toString());
                     }
                 });
             }
@@ -374,65 +367,56 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkForUpdates() {
         Context mainContext = this;
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    URL u = new URL("https://api.picozen.app/picozen/releases/tags/" + BuildConfig.VERSION_NAME);
-                    InputStream stream = u.openStream();
-                    int bufferSize = 1024;
-                    char[] buffer = new char[bufferSize];
-                    StringBuilder out = new StringBuilder();
-                    Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
-                    for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
-                        out.append(buffer, 0, numRead);
-                    }
-                    JSONObject json = new JSONObject(out.toString());
-                    String str = json.getString("body");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final Markwon markwon = Markwon.builder(mainContext)
-                                    .usePlugin(CorePlugin.create())
-                                    .usePlugin(SoftBreakAddsNewLinePlugin.create())
-                                    .build();
-                            markwon.setMarkdown((TextView)findViewById(R.id.changelog), str);
-                        }
-                    });
-                } catch (Exception e) {
-                    Log.e("Error", e.toString());
+        Thread thread = new Thread(() -> {
+            try {
+                URL u = new URL("https://api.picozen.app/picozen/releases/tags/" + BuildConfig.VERSION_NAME);
+                InputStream stream = u.openStream();
+                int bufferSize = 1024;
+                char[] buffer = new char[bufferSize];
+                StringBuilder out = new StringBuilder();
+                Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
+                for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+                    out.append(buffer, 0, numRead);
                 }
-
-                try {
-                    URL u = new URL("https://api.picozen.app/picozen/releases/latest");
-                    InputStream stream = u.openStream();
-                    int bufferSize = 1024;
-                    char[] buffer = new char[bufferSize];
-                    StringBuilder out = new StringBuilder();
-                    Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
-                    for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
-                        out.append(buffer, 0, numRead);
-                    }
-                    JSONObject json = new JSONObject(out.toString());
-                    String str = json.getString("tag_name");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            TextView verText = (TextView)findViewById(R.id.new_version);
-                            verText.setText(String.format(str.equals(BuildConfig.VERSION_NAME) ? getResources().getString(R.string.latest_version) : getResources().getString(R.string.new_version_available), str));
-                            verText.setOnClickListener(view -> {
-                                Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/releases/"+str);
-                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                                startActivity(intent);
-                            });
-
-                        }
-                    });
-                } catch (Exception e) {
-                    Log.e("Error", e.toString());
-                }
+                JSONObject json = new JSONObject(out.toString());
+                String str = json.getString("body");
+                runOnUiThread(() -> {
+                    final Markwon markwon = Markwon.builder(mainContext)
+                            .usePlugin(CorePlugin.create())
+                            .usePlugin(SoftBreakAddsNewLinePlugin.create())
+                            .build();
+                    markwon.setMarkdown(findViewById(R.id.changelog), str);
+                });
+            } catch (Exception e) {
+                Log.e("Error", e.toString());
             }
-        };
+
+            try {
+                URL u = new URL("https://api.picozen.app/picozen/releases/latest");
+                InputStream stream = u.openStream();
+                int bufferSize = 1024;
+                char[] buffer = new char[bufferSize];
+                StringBuilder out = new StringBuilder();
+                Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
+                for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+                    out.append(buffer, 0, numRead);
+                }
+                JSONObject json = new JSONObject(out.toString());
+                String str = json.getString("tag_name");
+                runOnUiThread(() -> {
+                    TextView verText = findViewById(R.id.new_version);
+                    verText.setText(String.format(str.equals(BuildConfig.VERSION_NAME) ? getResources().getString(R.string.latest_version) : getResources().getString(R.string.new_version_available), str));
+                    verText.setOnClickListener(view -> {
+                        Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/releases/"+str);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent);
+                    });
+
+                });
+            } catch (Exception e) {
+                Log.e("Error", e.toString());
+            }
+        });
         thread.start();
     }
 
@@ -550,9 +534,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         View closeBtn = dialog.findViewById(R.id.close_btn);
-        closeBtn.setOnClickListener(view -> {
-            dialog.dismiss();
-        });
+        closeBtn.setOnClickListener(view -> dialog.dismiss());
 
         closeBtn.setOnHoverListener((View view, MotionEvent event) -> {
             if (event.getActionMasked() == MotionEvent.ACTION_HOVER_ENTER) {
@@ -568,9 +550,7 @@ public class MainActivity extends AppCompatActivity {
         TextView versionText = dialog.findViewById(R.id.version_number);
         versionText.setText(String.format(getResources().getString(R.string.version_text), BuildConfig.VERSION_NAME));
 
-        dialog.setOnDismissListener(d -> {
-            dialogOverlay.setVisibility(View.GONE);
-        });
+        dialog.setOnDismissListener(d -> dialogOverlay.setVisibility(View.GONE));
     }
 
     private final Handler handler = new Handler();

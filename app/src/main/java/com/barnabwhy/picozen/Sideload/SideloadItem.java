@@ -1,16 +1,14 @@
 package com.barnabwhy.picozen.Sideload;
 
-import android.view.View;
-
 import com.barnabwhy.picozen.SideloadAdapter;
 
 public class SideloadItem {
 
-    private SideloadItemType type;
-    private String name;
-    private String path;
-    private long size;
-    private String modifiedAt;
+    private final SideloadItemType type;
+    private final String name;
+    private final String path;
+    private final long size;
+    private final String modifiedAt;
 
     private String packageLabel;
     private String packageName;

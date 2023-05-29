@@ -7,7 +7,12 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,26 +39,50 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class SideloadAdapter extends BaseAdapter {
+
+    private static final String APK_INFO_PATH = "https://pico.doesnt-like.me/fileinfo/";
+    private static final String ICON_PATH = "https://pico.doesnt-like.me/assets/<packagename>/icon.png";
+    private static final String STORE_PATH = "https://pico.doesnt-like.me/info/";
+
     private final SharedPreferences sharedPreferences;
     private final MainActivity mainActivityContext;
 
     private AbstractProvider provider;
 
     private DownloadInfo currentDownload;
+
+    protected static final HashMap<String, JSONObject> apkInfoCache = new HashMap<>();
+    protected static final HashMap<String, Bitmap> iconCache = new HashMap<>();
 
     public AbstractProvider getProvider() {
         return provider;
@@ -62,10 +91,13 @@ public class SideloadAdapter extends BaseAdapter {
     public static class ViewHolder {
         public RelativeLayout layout;
         public TextView name;
+        public TextView info;
         public TextView modified;
         public TextView size;
         public ImageView downloadIcon;
         public ImageView openFolderIcon;
+        public ImageView sideloadIcon;
+        public String key;
     }
     private static class DownloadInfo {
         SideloadItem item;
@@ -161,10 +193,12 @@ public class SideloadAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.layout = convertView.findViewById(R.id.layout);
             holder.name = convertView.findViewById(R.id.name);
+            holder.info = convertView.findViewById(R.id.extra_info);
             holder.modified = convertView.findViewById(R.id.modified);
             holder.size = convertView.findViewById(R.id.size);
             holder.downloadIcon = convertView.findViewById(R.id.ic_download);
             holder.openFolderIcon = convertView.findViewById(R.id.ic_open_folder);
+            holder.sideloadIcon = convertView.findViewById(R.id.ic_sideload_icon);
             convertView.setTag(holder);
 
             // Set clipToOutline to true on imageView (Workaround for bug)
@@ -176,9 +210,50 @@ public class SideloadAdapter extends BaseAdapter {
 
         getProvider().setHolder(position, holder);
 
+        holder.key = getItem(position).getName();
+
         if(getType(position) != SideloadItemType.DIRECTORY) {
-            holder.layout.setOnClickListener(view -> {
+            holder.openFolderIcon.setVisibility(View.GONE);
+            holder.downloadIcon.setVisibility(View.VISIBLE);
+            holder.sideloadIcon.setVisibility(View.VISIBLE);
+            holder.sideloadIcon.setImageResource(R.drawable.ic_launcher);
+            holder.info.setVisibility(View.GONE);
+            holder.info.setText("");
+            holder.layout.setOnClickListener(view -> {});
+
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            Handler handler = new Handler(Looper.getMainLooper());
+
+            executor.execute(() -> {
+                JSONObject resp = this.getFileInfo(mainActivityContext, getItem(position).getName());
+                if (resp != null) {
+                    try {
+                        JSONObject apkInfo = resp.getJSONObject("apkInfo");
+                        String packageName = apkInfo.getString("package");
+                        String versionName = apkInfo.getString("versionName");
+                        Bitmap icon = getIcon(packageName);
+                        handler.post(() -> {
+                            try {
+                                if (holder.key == getItem(position).getName()) {   //trick: this should prevent quick gui refresh from async task
+                                    holder.name.setText(apkInfo.getString("appName"));
+                                    holder.info.setText(versionName);
+                                    holder.info.setVisibility(View.VISIBLE);
+                                    holder.sideloadIcon.setImageBitmap(icon);
+                                    holder.layout.setOnClickListener(view -> openAppDetailDialog(packageName));
+                                }
+                            } catch (Exception e) {
+                                Log.e("Error", e.toString());
+                            }
+                        });
+                    } catch (Exception e) {
+                        Log.e("Error", e.toString());
+                    }
+                }
+            });
+
+            holder.downloadIcon.setOnClickListener(view -> {
                 Thread thread = new Thread(() -> {
+
                     mainActivityContext.ensureStoragePermissions();
 
                     if(currentDownload != null)
@@ -349,6 +424,11 @@ public class SideloadAdapter extends BaseAdapter {
                 });
                 thread.start();
             });
+        } else {
+            holder.openFolderIcon.setVisibility(View.VISIBLE);
+            holder.downloadIcon.setVisibility(View.GONE);
+            holder.sideloadIcon.setVisibility(View.GONE);
+            holder.info.setVisibility(View.GONE);
         }
 
         holder.size.setText(bytesReadable(current.getSize()));
@@ -525,5 +605,183 @@ public class SideloadAdapter extends BaseAdapter {
             return appInfo.packageName;
         }
         return null;
+    }
+
+    public JSONObject getFileInfo(Context context, String filename) {
+
+        if (apkInfoCache.containsKey(filename)) {
+            return apkInfoCache.get(filename);
+        }
+
+        try {
+            final File file = new File(context.getCacheDir(), filename);
+            StringBuilder out = new StringBuilder();
+            if (file.exists()) {
+                FileInputStream fin = new FileInputStream(file);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    out.append(line).append("\n");
+                }
+                reader.close();
+                fin.close();
+            } else {
+                URL u = new URL(APK_INFO_PATH + filename);
+                InputStream stream = u.openStream();
+                char[] buffer = new char[4096];
+                Reader in = new InputStreamReader(stream, StandardCharsets.UTF_8);
+                for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+                    out.append(buffer, 0, numRead);
+                }
+
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                    writer.append(out);
+                }
+            }
+            JSONObject json = new JSONObject(out.toString());
+            if ("ok".equalsIgnoreCase(json.getString("status"))){
+                json = json.getJSONObject("data");
+                apkInfoCache.put(filename, json);
+                return json;
+            }
+            return  null;
+        } catch (FileNotFoundException e) {
+
+        } catch (Exception e) {
+            Log.e("Error", e.toString());
+        }
+        return null;
+    }
+
+    public Bitmap getIcon(String packageName) {
+
+        if (iconCache.containsKey(packageName)) {
+            return iconCache.get(packageName);
+        }
+
+        //TODO store file in local cache dir
+
+        Bitmap icon = Utils.getBitmapFromUrl(ICON_PATH.replace("<packagename>", packageName));
+        iconCache.put(packageName, icon);
+        return icon;
+    }
+
+    private void openAppDetailDialog(String appPackage) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            try {
+                JSONObject item = getStoreItem(appPackage, "us");
+                if (item == null)
+                    return;
+                Bitmap cover = Utils.getBitmapFromUrl(item.getJSONObject("cover").getString("landscape"));
+                handler.post(() -> {
+                    try {
+                        if (item != null) {
+
+                            View dialogOverlay = mainActivityContext.findViewById(R.id.dialog_overlay);
+                            dialogOverlay.setVisibility(View.VISIBLE);
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mainActivityContext, R.style.CustomDialog);
+                            builder.setView(R.layout.dialog_app_detail);
+                            AlertDialog dialog = builder.create();
+
+                            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                            dialog.show();
+
+                            DisplayMetrics displayMetrics = mainActivityContext.getResources().getDisplayMetrics();
+
+                            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                            lp.copyFrom(dialog.getWindow().getAttributes());
+                            lp.width = mainActivityContext.getPixelFromDip(480); // 600px on PICO 4
+                            lp.height = displayMetrics.heightPixels - mainActivityContext.getPixelFromDip(80); // 700px on PICO 4
+
+                            dialog.getWindow().setAttributes(lp);
+                            dialog.findViewById(R.id.layout).requestLayout();
+                            dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_dialog);
+
+                            dialog.setOnDismissListener(d -> {
+                                dialogOverlay.setVisibility(View.GONE);
+                            });
+
+                            updateAppDetailDialog(dialog, item, cover);
+
+                            dialog.findViewById(R.id.cancel_btn).setOnClickListener(view -> {
+                                dialog.dismiss();
+                            });
+
+
+                        }
+                    } catch (Exception e) {
+                        Log.e("Error", e.toString());
+                    }
+                });
+            } catch (Exception e) {
+                Log.e("Error", e.toString());
+            }
+        });
+
+    }
+
+    private void updateAppDetailDialog(AlertDialog dialog, JSONObject storeItem, Bitmap cover) {
+        try {
+            ((ImageView) dialog.findViewById(R.id.app_cover)).setImageBitmap(cover);
+            ((TextView) dialog.findViewById(R.id.app_name)).setText(storeItem.getString("name"));
+            ((TextView) dialog.findViewById(R.id.package_name)).setText(storeItem.getString("package_name"));
+
+            String description = storeItem.getJSONObject("description").getString("app_description");
+            ((TextView) dialog.findViewById(R.id.description)).setText(description);
+
+
+            JSONObject detail = storeItem.getJSONObject("detail");
+            ((TextView) dialog.findViewById(R.id.files_size)).setText(String.format(mainActivityContext.getResources().getString(R.string.files_size), bytesReadable(detail.getLong("app_size"))));
+            ((TextView) dialog.findViewById(R.id.play_modes)).setText(detail.getString("app_play_modes"));
+
+            //TODO show all detail from store
+
+        } catch (Exception e) {
+            Log.e("Error", e.toString());
+        }
+    }
+
+    protected static JSONObject getStoreItem(String pkg, String region) {
+        if(Utils.isPicoHeadset()) {
+            try {
+                //String deviceName = "A8110"; //android.os.Build.MODEL
+                //String urlStore = "https://appstore-" + region
+                //        + ".picovr.com/api/app/v1/item/info?manifest_version_code=300800000&app_language="
+                //        + Locale.getDefault().getLanguage() + "&device_name=" + deviceName
+                //        + "&package_name=" + pkg;
+
+                String urlStore = STORE_PATH + pkg + "?language=" + Locale.getDefault().getLanguage();
+
+                URL url = new URL(urlStore);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                //connection.setRequestMethod("POST");
+                connection.connect();
+                Log.d("getStoreItem", "connect");
+                InputStream stream = connection.getInputStream();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+
+                StringBuilder str = new StringBuilder();
+                String line = "";
+
+                while ((line = reader.readLine()) != null) {
+                    str.append(line).append("\n");
+                }
+
+                JSONObject result = new JSONObject(str.toString());
+
+                return result.getJSONObject("data");
+            } catch (Exception e) {
+                return null;
+            }
+        } else if(Utils.isOculusHeadset()) {
+            return null;
+        } else {
+            return null;
+        }
     }
 }

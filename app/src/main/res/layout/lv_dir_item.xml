@@ -13,8 +13,8 @@
         android:orientation="horizontal">
 
         <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
-            android:src="@drawable/ic_sideload"
-            android:id="@+id/ic_download"
+            android:src="@drawable/ic_launcher"
+            android:id="@+id/ic_sideload_icon"
             android:layout_margin="15dp" />
         <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
             android:src="@drawable/ic_open_folder"
@@ -22,15 +22,33 @@
             android:layout_margin="15dp"
             android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/name"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginVertical="15dp" />
+            android:layout_marginVertical="15dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/name"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/extra_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:text="Info"
+                android:textSize="10sp" />
+        </LinearLayout>
+
         <TextView
             android:id="@+id/modified"
             android:layout_width="wrap_content"
@@ -44,6 +62,10 @@
             android:layout_height="wrap_content"
             android:text="0B"
             android:textSize="16sp"
+            android:layout_margin="15dp" />
+        <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_sideload"
+            android:id="@+id/ic_download"
             android:layout_margin="15dp" />
     </LinearLayout>
 </RelativeLayout>

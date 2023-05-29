@@ -10,8 +10,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -33,7 +31,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.core.content.res.ResourcesCompat;
-import androidx.palette.graphics.Palette;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -72,9 +69,9 @@ public class AppsAdapter extends BaseAdapter
 
     public AppsAdapter(MainActivity context)
     {
-        if(isPicoHeadset()) {
+        if(Utils.isPicoHeadset()) {
             hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.picovr.init.overlay", "com.picovr.provision", "com.pvr.appmanager", "com.pvr.seethrough.setting", "com.pvr.scenemanager");
-        } else if(isOculusHeadset()) {
+        } else if(Utils.isOculusHeadset()) {
             hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.oculus.vrshell", "com.oculus.integrity", "com.oculus.gamingactivity", "com.oculus.assistant", "com.oculus.cvp", "com.oculus.os.chargecontrol", "com.oculus.os.clearactivity", "com.oculus.cvpservice", "com.oculus.shellenv", "com.oculus.vrshell.home", "com.oculus.guidebook", "com.android.providers.calendar", "com.oculus.systemsearch", "com.oculus.systemutilities", "com.oculus.systemactivities");
         } else {
             hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.android.providers.calendar");
@@ -469,12 +466,16 @@ public class AppsAdapter extends BaseAdapter
             Drawable appIcon = ResourcesCompat.getDrawableForDensity(resources, iconId, DisplayMetrics.DENSITY_XXXHIGH, null);
             holder.imageView.setImageDrawable(appIcon);
 
-            Bitmap icon = drawableToBitmap(appIcon);
+            Bitmap icon = Utils.drawableToBitmap(appIcon);
 
             if(gradientCache.containsKey(pkg)) {
                 holder.layout.findViewById(R.id.app_color_bg).setBackground(gradientCache.get(pkg));
             } else {
-                createIconPaletteAsync(pkg, icon, holder);
+                Utils.createIconPaletteAsync(icon, mainActivityContext.getResources(), (gd) -> {
+                    gradientCache.put(pkg, gd);
+                    holder.layout.findViewById(R.id.app_color_bg).setBackground(gd);
+                    return null;
+                });
             }
         }
 
@@ -557,7 +558,7 @@ public class AppsAdapter extends BaseAdapter
     }
 
     private void downloadIcon(final Activity activity, String pkg, @SuppressWarnings("unused") String name, final Runnable callback) {
-        final String device = isOculusHeadset() ? "oculus" : (isMagicLeapHeadset() ? "leap" : "pico");
+        final String device = Utils.isOculusHeadset() ? "oculus" : (Utils.isMagicLeapHeadset() ? "leap" : "pico");
         final File file = pkg2path(activity, "banners." + pkg);
         new Thread(() -> {
             try {
@@ -622,52 +623,4 @@ public class AppsAdapter extends BaseAdapter
         }
     }
 
-    public static boolean isMagicLeapHeadset() {
-        String vendor = Build.MANUFACTURER.toUpperCase();
-        return vendor.startsWith("MAGIC LEAP");
-    }
-
-    public static boolean isOculusHeadset() {
-        String vendor = Build.MANUFACTURER.toUpperCase();
-        return vendor.startsWith("META") || vendor.startsWith("OCULUS");
-    }
-
-    public static boolean isPicoHeadset() {
-        String vendor = Build.MANUFACTURER.toUpperCase();
-        return vendor.startsWith("PICO") || vendor.startsWith("PİCO");
-    }
-
-    // Generate palette asynchronously and use it on a different
-    // thread using onGenerated()
-    public void createIconPaletteAsync(String pkg, Bitmap bitmap, ViewHolder holder) {
-        Palette.from(bitmap).generate(p -> {
-            // Use generated instance
-            GradientDrawable gd = new GradientDrawable(
-                    GradientDrawable.Orientation.TOP_BOTTOM,
-                    new int[] { p.getVibrantColor(mainActivityContext.getResources().getColor(R.color.bg_med)), p.getDarkVibrantColor(mainActivityContext.getResources().getColor(R.color.bg_dark)) });
-            gd.setCornerRadius(0f);
-            gradientCache.put(pkg, gd);
-            holder.layout.findViewById(R.id.app_color_bg).setBackground(gd);
-        });
-    }
-
-    public static Bitmap drawableToBitmap(Drawable drawable) {
-        Bitmap bitmap = null;
-        if (drawable instanceof BitmapDrawable bitmapDrawable) {
-            if(bitmapDrawable.getBitmap() != null) {
-                return bitmapDrawable.getBitmap();
-            }
-        }
-
-        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
-            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
-        } else {
-            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        }
-
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
-    }
 }

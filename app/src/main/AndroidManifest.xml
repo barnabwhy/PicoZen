@@ -54,6 +54,10 @@
                 android:name="pvr.vrshell.mode"
                 android:value="1" />
 
+            <meta-data
+                android:name="pvr.2dtovr.mode"
+                android:value="6" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

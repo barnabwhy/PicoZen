@@ -45,6 +45,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -373,6 +374,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkForUpdates() {
         Context mainContext = this;
         Thread thread = new Thread(() -> {
+            long installVerReleaseDate = 0L;
             try {
                 URL u = new URL("https://api.picozen.app/picozen/releases/tags/" + BuildConfig.VERSION_NAME);
                 InputStream stream = u.openStream();
@@ -385,6 +387,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 JSONObject json = new JSONObject(out.toString());
                 String str = json.getString("body");
+                installVerReleaseDate = Instant.parse(json.getString("published_at")).toEpochMilli();
                 runOnUiThread(() -> {
                     final Markwon markwon = Markwon.builder(mainContext)
                             .usePlugin(CorePlugin.create())
@@ -408,9 +411,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 JSONObject json = new JSONObject(out.toString());
                 String str = json.getString("tag_name");
+
+                boolean isOlderThanLatest = installVerReleaseDate < Instant.parse(json.getString("published_at")).toEpochMilli();
+
                 runOnUiThread(() -> {
                     TextView verText = findViewById(R.id.new_version);
-                    verText.setText(String.format(str.equals(BuildConfig.VERSION_NAME) ? getResources().getString(R.string.latest_version) : getResources().getString(R.string.new_version_available), str));
+                    verText.setText(String.format(isOlderThanLatest ? getResources().getString(R.string.new_version_available) : getResources().getString(R.string.latest_version), str));
                     verText.setOnClickListener(view -> {
                         Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/releases/"+str);
                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);

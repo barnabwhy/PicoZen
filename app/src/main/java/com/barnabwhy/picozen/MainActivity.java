@@ -416,7 +416,11 @@ public class MainActivity extends AppCompatActivity {
 
                 runOnUiThread(() -> {
                     TextView verText = findViewById(R.id.new_version);
-                    verText.setText(String.format(isOlderThanLatest ? getResources().getString(R.string.new_version_available) : getResources().getString(R.string.latest_version), str));
+                    if(isOlderThanLatest) {
+                        verText.setText(String.format(getResources().getString(R.string.new_version_available), str));
+                    } else {
+                        verText.setText(String.format(getResources().getString(R.string.latest_version), BuildConfig.VERSION_NAME));
+                    }
                     verText.setOnClickListener(view -> {
                         Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/releases/"+str);
                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);

@@ -65,23 +65,31 @@ public class SMBProvider extends AbstractProvider {
 
                 server = sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "");
                 String host = "";
+                int port = SMBClient.DEFAULT_PORT;
                 String user = "";
                 String pass = "";
                 String shareName = "";
                 if (server.contains("@")) {
-                    host = server.split("@")[1].split("/")[0];
+                    String fullHost = server.split("@")[1].split("/")[0];
+                    host = fullHost.split(":")[0];
+                    if(fullHost.contains(":"))
+                        port = Integer.parseInt(fullHost.split(":")[1]);
+
                     user = server.split("@")[0].split(":")[0];
                     if (server.split("@")[0].split(":").length > 1)
                         pass = server.split("@")[0].split(":")[1];
 
                     shareName = String.join("/", Arrays.copyOfRange(server.split("@")[1].split("/"), 1, server.split("@")[1].split("/").length));
                 } else {
-                    host = server.split("/")[0];
+                    String fullHost = server.split("/")[0];
+                    host = fullHost.split(":")[0];
+                    if(fullHost.contains(":"))
+                        port = Integer.parseInt(fullHost.split(":")[1]);
                     shareName = String.join("/", Arrays.copyOfRange(server.split("/"), 1, server.split("/").length));
                 }
 
-                Log.i("SMB", "Connecting to " + host);
-                Connection connection = client.connect(host);
+                Log.i("SMB", "Connecting to " + host + ":" + port);
+                Connection connection = client.connect(host, port);
                 AuthenticationContext ac = new AuthenticationContext(user, pass.toCharArray(), null);
                 Log.i("SMB", "Authenticating as " + user);
                 session = connection.authenticate(ac);

@@ -423,6 +423,17 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                     });
 
+                    View updateDot = findViewById(R.id.update_dot);
+                    View updateButton = findViewById(R.id.update_button);
+
+                    updateDot.setVisibility(isOlderThanLatest ? View.VISIBLE : View.GONE);
+                    updateButton.setVisibility(isOlderThanLatest ? View.VISIBLE : View.GONE);
+
+                    updateButton.setOnClickListener(view -> {
+                        Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/releases/"+str);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent);
+                    });
                 });
             } catch (Exception e) {
                 Log.e("Error", e.toString());

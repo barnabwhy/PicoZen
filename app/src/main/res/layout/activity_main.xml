@@ -72,10 +72,17 @@
                     </LinearLayout>
 
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="15dp">
-                        <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
-                            android:src="@drawable/ic_about" />
+                        <RelativeLayout
+                            android:layout_width="24dp"
+                            android:layout_height="24dp" android:layout_marginEnd="10dp">
+                            <ImageView android:layout_height="24dp" android:layout_width="24dp"
+                                android:src="@drawable/ic_about" />
+                        </RelativeLayout>
                         <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
                             android:text="@string/list_about" />
+                        <View android:id="@+id/update_dot" android:background="@drawable/bg_dot"
+                            android:layout_height="12dp" android:layout_width="12dp"
+                            android:layout_margin="6dp" android:visibility="gone" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -304,13 +311,28 @@
             android:padding="15dp"
             android:background="@drawable/bg_content"
             android:visibility="gone">
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/list_about"
-                android:textStyle="bold"
-                android:textSize="35sp"
-                android:padding="15dp" />
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/list_about"
+                    android:textStyle="bold"
+                    android:textSize="35sp"
+                    android:padding="15dp"/>
+
+                <LinearLayout android:id="@+id/update_button" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:padding="15dp" android:background="@drawable/bg_dot"
+                    android:layout_margin="5dp" android:visibility="gone">
+                    <ImageView android:layout_height="24dp" android:layout_width="24dp" android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_sideload" />
+                    <TextView android:layout_width="0dp" android:layout_height="24dp" android:gravity="center_vertical" android:layout_weight="1" android:textSize="16sp"
+                        android:text="@string/update_available" />
+                </LinearLayout>
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/about_list"
                 android:layout_width="match_parent"

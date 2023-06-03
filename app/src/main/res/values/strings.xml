@@ -24,6 +24,7 @@
     <string name="enable">Enable</string>
     <string name="disable">Disable</string>
     <string name="check_for_updates">Check for updates</string>
+    <string name="update_available">Update available</string>
     <string name="check">Check</string>
     <string name="change">Change</string>
     <string name="sideload_server">Sideload server</string>

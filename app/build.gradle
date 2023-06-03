@@ -27,7 +27,7 @@ android {
         //noinspection ExpiredTargetSdkVersion
         targetSdk 29
         versionCode 69
-        versionName "0.7.0-B1"
+        versionName "0.7.0-b1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

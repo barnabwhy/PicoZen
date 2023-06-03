@@ -53,13 +53,16 @@
     <string name="backup_none">Backup: None</string>
     <string name="backup_size">Backup: %1$s</string>
     <string name="backup">Backup</string>
+    <string name="backing_up">Backing up...</string>
     <string name="restore">Restore</string>
+    <string name="restoring">Restoring...</string>
     <string name="backup_success">Backup (Done)</string>
     <string name="restore_success">Restore (Done)</string>
     <string name="backup_fail">Backup (Failed)</string>
     <string name="restore_fail">Restore (Failed)</string>
     <string name="delete_backup">Delete backup</string>
     <string name="backup_warning">WARNING: Restoring from a corrupt backup can cause data loss</string>
+    <string name="unknown_date">Unknown date</string>
     <string name="general">General</string>
     <string name="server_type">Server type:</string>
 

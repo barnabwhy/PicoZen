@@ -149,6 +149,11 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
         });
+        findViewById(R.id.link_kofi).setOnClickListener(view -> {
+            Uri uri = Uri.parse("https://ko-fi.com/barnabwhy");
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        });
 
         appGridView = findViewById(R.id.app_grid);
         sideloadGridView = findViewById(R.id.sideload_grid);

@@ -374,11 +374,13 @@
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/link_kofi"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="match_parent"
-                        android:background="@drawable/bg_app_icon"
-                        android:foregroundGravity="center">
+                        android:background="@drawable/bg_kofi"
+                        android:foregroundGravity="center"
+                        android:foreground="@drawable/ic_kofi">
                     </RelativeLayout>
 
                     <RelativeLayout

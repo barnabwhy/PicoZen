@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             Intent intent = new Intent(context, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-            //intent.putExtra("wasActive", focused);
+            intent.putExtra("wasActive", focused);
             intent.putExtra("fromAccessibilityShortcut", true);
             context.startActivity(intent);
             ((Activity) context).finish();
@@ -119,9 +119,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
-        if(intent.getBooleanExtra("fromAccessibilityShortcut", false) && !intent.getBooleanExtra("wasActive", false)) {
-            this.moveTaskToBack(true);
-        }
+//        if(intent.getBooleanExtra("fromAccessibilityShortcut", false) && intent.getBooleanExtra("wasActive", false)) {
+//            this.moveTaskToBack(true);
+//        }
     }
 
     @Override

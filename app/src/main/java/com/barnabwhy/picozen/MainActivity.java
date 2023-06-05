@@ -46,6 +46,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -497,14 +498,39 @@ public class MainActivity extends AppCompatActivity {
             dialog.dismiss();
         });
 
+        final String[] appRegions = { "us", "cn" };
+        Spinner appRegionSpinner = dialog.findViewById(R.id.app_region);
+        ((View)appRegionSpinner.getParent()).setClipToOutline(true);
+        ArrayAdapter<CharSequence> appRegionAdapter = ArrayAdapter.createFromResource(this, R.array.region_options, R.layout.spinner_item);
+        appRegionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        appRegionSpinner.setAdapter(appRegionAdapter);
+        appRegionSpinner.setSelection(Arrays.asList(appRegions).indexOf(sharedPreferences.getString(SettingsProvider.KEY_APP_REGION, "us")));
+        final MainActivity mainActivity = this;
+        appRegionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                if(!sharedPreferences.getString(SettingsProvider.KEY_APP_REGION, "us").equals(appRegions[pos])) {
+                    sharedPreferences.edit().putString(SettingsProvider.KEY_APP_REGION, appRegions[pos]).apply();
+
+                    AppsAdapter.clearAllIcons(mainActivity);
+                    ((AppsAdapter) appGridView.getAdapter()).notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         EditText sideloadHostInput = dialog.findViewById(R.id.sideload_host_input);
         View sideloadHostBtn = dialog.findViewById(R.id.sideload_host_btn);
         TextView sideloadAddressInfo = dialog.findViewById(R.id.sideload_address_info);
         Spinner sideloadTypeSpinner = dialog.findViewById(R.id.sideload_type);
         ((View)sideloadTypeSpinner.getParent()).setClipToOutline(true);
-        ArrayAdapter<CharSequence> sideloadTypeApdater = ArrayAdapter.createFromResource(this, R.array.sideload_type_options, R.layout.spinner_item);
-        sideloadTypeApdater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sideloadTypeSpinner.setAdapter(sideloadTypeApdater);
+        ArrayAdapter<CharSequence> sideloadTypeAdapter = ArrayAdapter.createFromResource(this, R.array.sideload_type_options, R.layout.spinner_item);
+        sideloadTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sideloadTypeSpinner.setAdapter(sideloadTypeAdapter);
         sideloadTypeSpinner.setSelection(sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0));
         sideloadTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

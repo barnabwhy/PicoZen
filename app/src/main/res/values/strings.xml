@@ -65,6 +65,7 @@
     <string name="unknown_date">Unknown date</string>
     <string name="general">General</string>
     <string name="server_type">Server type:</string>
+    <string name="region">Region:</string>
 
     <string name="address_format_template">(Format: %1$s)</string>
     <string-array name="address_format">
@@ -94,5 +95,10 @@
         <item>Proxied FTP</item>
         <item>FTP (Slow)</item>
         <item>SMB</item>
+    </string-array>
+
+    <string-array name="region_options">
+        <item>Global</item>
+        <item>China</item>
     </string-array>
 </resources>

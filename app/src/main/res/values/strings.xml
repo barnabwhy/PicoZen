@@ -68,6 +68,8 @@
     <string name="region">Region:</string>
 
     <string name="address_format_template">(Format: %1$s)</string>
+    <string name="quit_picozen">Quit PicoZen</string>
+    <string name="quit">Quit</string>
     <string-array name="address_format">
         <item />  <!-- EmptyProvider -->
         <item>username:password@host</item>  <!-- ProxyProvider -->

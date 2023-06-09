@@ -482,6 +482,11 @@ public class MainActivity extends AppCompatActivity {
             ((AppsAdapter) appGridView.getAdapter()).notifyDataSetChanged();
         });
 
+        View quitBtn = dialog.findViewById(R.id.quit_btn);
+        quitBtn.setOnClickListener(view -> {
+            finishAndRemoveTask();
+        });
+
         AppsAdapter appsAdapter = (AppsAdapter)appGridView.getAdapter();
 
         View toggleEditMode = dialog.findViewById(R.id.toggle_edit_mode);

@@ -107,6 +107,27 @@
                                             android:text="@string/configure" />
                                 </LinearLayout>
 
+                                <LinearLayout
+                                    android:id="@+id/quit_btn"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:background="@drawable/bg_list_item_s"
+                                    android:padding="15dp">
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_weight="1"
+                                            android:layout_height="match_parent"
+                                            android:text="@string/quit_picozen" />
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="match_parent"
+                                            android:textStyle="bold"
+                                            android:gravity="center_vertical"
+                                            android:textColor="@color/link"
+                                            android:text="@string/quit" />
+                                </LinearLayout>
+
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="match_parent"

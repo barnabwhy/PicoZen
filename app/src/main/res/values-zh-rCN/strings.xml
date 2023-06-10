@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PicoZen</string>
+    <string name="list_apps">应用</string>
+    <string name="list_tweaks">调整</string>
+    <string name="list_sideload">下载安装</string>
+    <string name="list_saves">保存</string>
+    <string name="list_about">关于</string>
+    <string name="settings">设置</string>
+    <string name="currently_in_development">当前正在开发中</string>
+    <string name="start_shortcut">使用系统无障碍导航图标打开Picozen</string>
+    <string name="shortcut_prompt">使用无障碍快捷方式打开Picozen（实验性）</string>
+    <string name="configure">配置</string>
+    <string name="refresh">刷新</string>
+    <string name="refresh_icon_cache">刷新图标</string>
+    <string name="changelog_empty">无法获取更新日志。你可能没有连接到互联网，或者正在使用预发布版本。</string>
+    <string name="changelog_header">更新日志：</string>
+    <string name="made_with_love">开发者：Barnaby</string>
+    <string name="latest_version">已安装最新版本 (v%1$s)</string>
+    <string name="new_version_available">有新版本(v%1$s)</string>
+    <string name="empty_group">空</string>
+    <string name="edit_mode">编辑模式</string>
+    <string name="enable">启用</string>
+    <string name="disable">禁用</string>
+    <string name="check_for_updates">检查更新</string>
+    <string name="check">检查</string>
+    <string name="change">应用</string>
+    <string name="sideload_server">下载安装服务器</string>
+    <string name="start_on_boot">开机启动PicoZen</string>
+    <string name="download">下载</string>
+    <string name="dismiss">废弃</string>
+    <string name="an_error_occurred">发生错误 (%1$s)</string>
+    <string name="download_cancelled">下载已取消</string>
+    <string name="extracting_zip">正在解压ZIP</string>
+    <string name="extracting_zip_progress">正在解压ZIP (%1$s)</string>
+    <string name="download_complete">下载完成</string>
+    <string name="fetch_files_error">无法获取文件</string>
+    <string name="no_files">未找到文件</string>
+    <string name="no_sideload_server">设置中未设置下载安装用的服务器</string>
+    <string name="sideload_connecting">正在连接......</string>
+    <string name="sideload_fetching">正在读取......</string>
+    <string name="install">安装</string>
+    <string name="cancel">取消</string>
+    <string name="saves_empty">未找到支持的应用</string>
+    <string name="saves_android_files_bad">安卓11及以上版本暂不支持保存管理</string>
+    <string name="name">名称</string>
+    <string name="save_manager">保存管理</string>
+    <string name="files_size">文件： %1$s</string>
+    <string name="backup_none">备份：无</string>
+    <string name="backup_size">备份： %1$s</string>
+    <string name="backup">备份</string>
+    <string name="restore">恢复</string>
+    <string name="backup_success">备份（完成）</string>
+    <string name="restore_success">恢复（完成）</string>
+    <string name="backup_fail">备份（失败）</string>
+    <string name="restore_fail">恢复（失败）</string>
+    <string name="delete_backup">删除备份</string>
+    <string name="backup_warning">警告：从损坏的备份中恢复可能会导致数据丢失</string>
+    <string name="general">常规</string>
+    <string name="server_type">服务器类型：</string>
+    <string name="address_format_template">(格式： %1$s)</string>
+    <string name="gh_repo">barnabwhy/PicoZen</string>
+    <string name="version_text">v%1$s</string>
+    <string name="update_available">有可用更新</string>
+    <string name="extracting_archive">正在提取存档</string>
+    <string name="extracting_archive_progress">正在提取存档 (%1$s)</string>
+    <string name="backing_up">正在备份......</string>
+    <string name="restoring">正在恢复......</string>
+    <string name="unknown_date">未知日期</string>
+    <string name="region">地区：</string>
+    <string name="quit_picozen">退出PicoZen</string>
+    <string name="quit">退出</string>
+    <string-array name="address_format">
+        <item />  <!-- EmptyProvider -->
+        <item>username:password@host</item>  <!-- ProxyProvider -->
+        <item>username:password@host</item>  <!-- FTPProvider -->
+        <item>username:password@host/share</item>  <!-- SMBProvider -->
+    </string-array>
+
+    <string-array name="sort_options">
+        <item>↓\t 名称</item>
+        <item>↑\t 名称</item>
+        <item>↓\t 最近打开</item>
+        <item>↑\t 最近打开</item>
+        <item>↓\t 安装日期</item>
+        <item>↑\t 安装日期</item>
+    </string-array>
+
+    <string-array name="group_options">
+        <item>☰\t 全部</item>
+        <item>★\t 收藏</item>
+        <item>—\t 隐藏</item>
+    </string-array>
+
+    <string-array name="sideload_type_options">
+        <item>无</item>
+        <item>代理 FTP</item>
+        <item>FTP (慢)</item>
+        <item>SMB</item>
+    </string-array>
+
+    <string-array name="region_options">
+        <item>全球</item>
+        <item>中国</item>
+    </string-array>
+</resources>

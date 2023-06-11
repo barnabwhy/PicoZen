@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/cover_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/app_cover"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:scaleType="centerCrop" />
+
+                <LinearLayout
+                    android:id="@+id/layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@drawable/divider"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="20dp"
+                    android:showDividers="middle">
+
+                        <TextView
+                            android:id="@+id/app_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="15dp"
+                            android:layout_marginBottom="5dp"
+                            android:paddingHorizontal="15dp"
+                            android:textSize="25sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/app_abstract"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="15dp"
+                            android:paddingHorizontal="15dp"
+                            android:textSize="14sp" />
+
+                        <ScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:overScrollMode="never"
+                            android:scrollbars="none">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:divider="@drawable/divider"
+                                    android:orientation="vertical"
+                                    android:showDividers="middle">
+
+                                        <TextView
+                                            android:id="@+id/package_name"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp"
+                                            android:visibility="gone" />
+
+                                        <TextView
+                                            android:id="@+id/version"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/files_size"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp"/>
+
+                                        <TextView
+                                            android:id="@+id/category"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/genres"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/play_modes"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/languages"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/supported_player_mode"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/control"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/supported_platforms"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/developer"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/publisher"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/web_site"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/permissions"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp" />
+
+                                        <TextView
+                                            android:id="@+id/description"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:paddingHorizontal="15dp"
+                                            android:layout_marginTop="15dp" />
+
+                                </LinearLayout>
+                        </ScrollView>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginTop="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:layout_marginBottom="20dp"
+                            android:divider="@drawable/divider"
+                            android:showDividers="middle">
+
+                                <TextView
+                                    android:id="@+id/cancel_btn"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_list_item_s"
+                                    android:padding="15dp"
+                                    android:text="@string/cancel"
+                                    android:textColor="@color/link" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    />
+
+                                <TextView
+                                    android:id="@+id/download_btn"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_list_item_s"
+                                    android:padding="15dp"
+                                    android:text="@string/download"
+                                    android:textColor="@color/link" />
+
+                        </LinearLayout>
+
+                </LinearLayout>
+
+        </LinearLayout>
+
+</RelativeLayout>

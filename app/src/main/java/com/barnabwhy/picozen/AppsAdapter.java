@@ -72,7 +72,7 @@ public class AppsAdapter extends BaseAdapter
         if(Utils.isPicoHeadset()) {
             hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.picovr.init.overlay", "com.picovr.provision", "com.pvr.appmanager", "com.pvr.seethrough.setting", "com.pvr.scenemanager");
         } else if(Utils.isOculusHeadset()) {
-            hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.oculus.vrshell", "com.oculus.integrity", "com.oculus.gamingactivity", "com.oculus.assistant", "com.oculus.cvp", "com.oculus.os.chargecontrol", "com.oculus.os.clearactivity", "com.oculus.cvpservice", "com.oculus.shellenv", "com.oculus.vrshell.home", "com.oculus.guidebook", "com.android.providers.calendar", "com.oculus.systemsearch", "com.oculus.systemutilities", "com.oculus.systemactivities");
+            hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.oculus.vrshell", "com.oculus.integrity", "com.oculus.gamingactivity", "com.oculus.assistant", "com.oculus.cvp", "com.oculus.os.chargecontrol", "com.oculus.os.clearactivity", "com.oculus.cvpservice", "com.oculus.shellenv", "com.oculus.vrshell.home", "com.oculus.guidebook", "com.android.providers.calendar", "com.oculus.systemsearch", "com.oculus.systemutilities", "com.oculus.systemactivities", "com.facebook.orca", "com.oculus.mobile_mrc_setup");
         } else {
             hiddenApps = Arrays.asList(context.getPackageName(), "com.android.traceur", "com.android.providers.calendar");
         }
@@ -559,11 +559,12 @@ public class AppsAdapter extends BaseAdapter
 
     private void downloadIcon(final Activity activity, String pkg, @SuppressWarnings("unused") String name, final Runnable callback) {
         final String device = Utils.isOculusHeadset() ? "oculus" : (Utils.isMagicLeapHeadset() ? "leap" : "pico");
+        final String region = sharedPreferences.getString(SettingsProvider.KEY_APP_REGION, "us");
         final File file = pkg2path(activity, "banners." + pkg);
         new Thread(() -> {
             try {
                 synchronized (pkg) {
-                    if (downloadIconFromUrl(ICONS_URL + pkg + "/banner.png?useBackup=1&device="+device, file)) {
+                    if (downloadIconFromUrl(ICONS_URL + pkg + "/banner.png?useBackup=1&device="+device+"&region="+region, file)) {
                         activity.runOnUiThread(callback);
                     }
                 }

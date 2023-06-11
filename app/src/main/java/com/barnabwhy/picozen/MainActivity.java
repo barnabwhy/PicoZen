@@ -45,6 +45,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -118,9 +120,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
-        if(intent.getBooleanExtra("fromAccessibilityShortcut", false) && !intent.getBooleanExtra("wasActive", false)) {
-            this.moveTaskToBack(true);
-        }
+//        if(intent.getBooleanExtra("fromAccessibilityShortcut", false) && intent.getBooleanExtra("wasActive", false)) {
+//            this.moveTaskToBack(true);
+//        }
     }
 
     @Override
@@ -146,6 +148,11 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.link_discord).setOnClickListener(view -> {
             Uri uri = Uri.parse("https://discord.gg/D4DBD2N6sA");
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        });
+        findViewById(R.id.link_kofi).setOnClickListener(view -> {
+            Uri uri = Uri.parse("https://ko-fi.com/barnabwhy");
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
         });
@@ -368,6 +375,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkForUpdates() {
         Context mainContext = this;
         Thread thread = new Thread(() -> {
+            long installVerReleaseDate = 0L;
             try {
                 URL u = new URL("https://api.picozen.app/picozen/releases/tags/" + BuildConfig.VERSION_NAME);
                 InputStream stream = u.openStream();
@@ -380,6 +388,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 JSONObject json = new JSONObject(out.toString());
                 String str = json.getString("body");
+                installVerReleaseDate = Instant.parse(json.getString("published_at")).toEpochMilli();
                 runOnUiThread(() -> {
                     final Markwon markwon = Markwon.builder(mainContext)
                             .usePlugin(CorePlugin.create())
@@ -403,15 +412,33 @@ public class MainActivity extends AppCompatActivity {
                 }
                 JSONObject json = new JSONObject(out.toString());
                 String str = json.getString("tag_name");
+
+                boolean isOlderThanLatest = installVerReleaseDate < Instant.parse(json.getString("published_at")).toEpochMilli();
+
                 runOnUiThread(() -> {
                     TextView verText = findViewById(R.id.new_version);
-                    verText.setText(String.format(str.equals(BuildConfig.VERSION_NAME) ? getResources().getString(R.string.latest_version) : getResources().getString(R.string.new_version_available), str));
+                    if(isOlderThanLatest) {
+                        verText.setText(String.format(getResources().getString(R.string.new_version_available), str));
+                    } else {
+                        verText.setText(String.format(getResources().getString(R.string.latest_version), BuildConfig.VERSION_NAME));
+                    }
                     verText.setOnClickListener(view -> {
                         Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/releases/"+str);
                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                         startActivity(intent);
                     });
 
+                    View updateDot = findViewById(R.id.update_dot);
+                    View updateButton = findViewById(R.id.update_button);
+
+                    updateDot.setVisibility(isOlderThanLatest ? View.VISIBLE : View.GONE);
+                    updateButton.setVisibility(isOlderThanLatest ? View.VISIBLE : View.GONE);
+
+                    updateButton.setOnClickListener(view -> {
+                        Uri uri = Uri.parse("https://www.github.com/barnabwhy/PicoZen/releases/"+str);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent);
+                    });
                 });
             } catch (Exception e) {
                 Log.e("Error", e.toString());
@@ -455,6 +482,11 @@ public class MainActivity extends AppCompatActivity {
             ((AppsAdapter) appGridView.getAdapter()).notifyDataSetChanged();
         });
 
+        View quitBtn = dialog.findViewById(R.id.quit_btn);
+        quitBtn.setOnClickListener(view -> {
+            finishAndRemoveTask();
+        });
+
         AppsAdapter appsAdapter = (AppsAdapter)appGridView.getAdapter();
 
         View toggleEditMode = dialog.findViewById(R.id.toggle_edit_mode);
@@ -471,14 +503,39 @@ public class MainActivity extends AppCompatActivity {
             dialog.dismiss();
         });
 
+        final String[] appRegions = { "us", "cn" };
+        Spinner appRegionSpinner = dialog.findViewById(R.id.app_region);
+        ((View)appRegionSpinner.getParent()).setClipToOutline(true);
+        ArrayAdapter<CharSequence> appRegionAdapter = ArrayAdapter.createFromResource(this, R.array.region_options, R.layout.spinner_item);
+        appRegionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        appRegionSpinner.setAdapter(appRegionAdapter);
+        appRegionSpinner.setSelection(Arrays.asList(appRegions).indexOf(sharedPreferences.getString(SettingsProvider.KEY_APP_REGION, "us")));
+        final MainActivity mainActivity = this;
+        appRegionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                if(!sharedPreferences.getString(SettingsProvider.KEY_APP_REGION, "us").equals(appRegions[pos])) {
+                    sharedPreferences.edit().putString(SettingsProvider.KEY_APP_REGION, appRegions[pos]).apply();
+
+                    AppsAdapter.clearAllIcons(mainActivity);
+                    ((AppsAdapter) appGridView.getAdapter()).notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         EditText sideloadHostInput = dialog.findViewById(R.id.sideload_host_input);
         View sideloadHostBtn = dialog.findViewById(R.id.sideload_host_btn);
         TextView sideloadAddressInfo = dialog.findViewById(R.id.sideload_address_info);
         Spinner sideloadTypeSpinner = dialog.findViewById(R.id.sideload_type);
         ((View)sideloadTypeSpinner.getParent()).setClipToOutline(true);
-        ArrayAdapter<CharSequence> sideloadTypeApdater = ArrayAdapter.createFromResource(this, R.array.sideload_type_options, R.layout.spinner_item);
-        sideloadTypeApdater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sideloadTypeSpinner.setAdapter(sideloadTypeApdater);
+        ArrayAdapter<CharSequence> sideloadTypeAdapter = ArrayAdapter.createFromResource(this, R.array.sideload_type_options, R.layout.spinner_item);
+        sideloadTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sideloadTypeSpinner.setAdapter(sideloadTypeAdapter);
         sideloadTypeSpinner.setSelection(sharedPreferences.getInt(SettingsProvider.KEY_SIDELOAD_TYPE, 0));
         sideloadTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

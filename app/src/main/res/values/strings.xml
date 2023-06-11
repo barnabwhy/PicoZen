@@ -24,6 +24,7 @@
     <string name="enable">Enable</string>
     <string name="disable">Disable</string>
     <string name="check_for_updates">Check for updates</string>
+    <string name="update_available">Update available</string>
     <string name="check">Check</string>
     <string name="change">Change</string>
     <string name="sideload_server">Sideload server</string>
@@ -52,15 +53,19 @@
     <string name="backup_none">Backup: None</string>
     <string name="backup_size">Backup: %1$s</string>
     <string name="backup">Backup</string>
+    <string name="backing_up">Backing up...</string>
     <string name="restore">Restore</string>
+    <string name="restoring">Restoring...</string>
     <string name="backup_success">Backup (Done)</string>
     <string name="restore_success">Restore (Done)</string>
     <string name="backup_fail">Backup (Failed)</string>
     <string name="restore_fail">Restore (Failed)</string>
     <string name="delete_backup">Delete backup</string>
     <string name="backup_warning">WARNING: Restoring from a corrupt backup can cause data loss</string>
+    <string name="unknown_date">Unknown date</string>
     <string name="general">General</string>
     <string name="server_type">Server type:</string>
+    <string name="region">Region:</string>
 
     <string name="detail_category">Category:</string>
     <string name="detail_control">Control:</string>
@@ -81,6 +86,8 @@
     <string name="detail_web_site">Web site:</string>
 
     <string name="address_format_template">(Format: %1$s)</string>
+    <string name="quit_picozen">Quit PicoZen</string>
+    <string name="quit">Quit</string>
     <string-array name="address_format">
         <item />  <!-- EmptyProvider -->
         <item>username:password@host</item>  <!-- ProxyProvider -->
@@ -108,5 +115,10 @@
         <item>Proxied FTP</item>
         <item>FTP (Slow)</item>
         <item>SMB</item>
+    </string-array>
+
+    <string-array name="region_options">
+        <item>Global</item>
+        <item>China</item>
     </string-array>
 </resources>

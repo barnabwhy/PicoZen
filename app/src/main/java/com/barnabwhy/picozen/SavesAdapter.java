@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -27,15 +29,22 @@ import androidx.core.content.res.ResourcesCompat;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -173,7 +182,7 @@ public class SavesAdapter extends BaseAdapter {
     }
 
     @SuppressLint("DefaultLocale")
-    private static String bytesReadable(long bytes) {
+    public static String bytesReadable(long bytes) {
         final String[] byteTypes = { "KB", "MB", "GB", "TB", "PB" };
         double size = bytes;
         String currentByteType = "B";
@@ -243,75 +252,45 @@ public class SavesAdapter extends BaseAdapter {
 
         dialog.setOnDismissListener(d -> dialogOverlay.setVisibility(View.GONE));
 
-        updateSaveManagerDialog(dialog, app);
+        updateSaveManagerDialog(dialog, app, true);
 
         dialog.findViewById(R.id.cancel_btn).setOnClickListener(view -> dialog.dismiss());
 
         return dialog;
     }
-    private void updateSaveManagerDialog(AlertDialog dialog, ApplicationInfo app) {
+    public void updateSaveManagerDialog(AlertDialog dialog, ApplicationInfo app, boolean backupAdapterReset) {
         String filesPath = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + app.packageName + "/files";
         String backupPath = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + mainActivityContext.getPackageName() + "/files/backups/" + app.packageName;
+        String backupsPath = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + mainActivityContext.getPackageName() + "/files/backups/";
+        File file = new File(backupsPath);
+        String[] backups = file.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return name.startsWith(app.packageName) && new File(current, name).isDirectory();
+            }
+        });
+
+        if(backupAdapterReset || ((GridView) dialog.findViewById(R.id.backups_list)).getAdapter() == null)
+            ((GridView) dialog.findViewById(R.id.backups_list)).setAdapter(new BackupsAdapter(mainActivityContext, this, backupsPath, app, dialog, backups));
 
         ((TextView) dialog.findViewById(R.id.app_name)).setText(app.loadLabel(mainActivityContext.getPackageManager()));
         ((TextView) dialog.findViewById(R.id.package_name)).setText(app.packageName);
         ((TextView) dialog.findViewById(R.id.files_size)).setText(String.format(mainActivityContext.getResources().getString(R.string.files_size), bytesReadable(getDirectorySize(Paths.get(filesPath)))));
-        ((TextView) dialog.findViewById(R.id.backup_size)).setText(R.string.backup_none);
 
         dialog.findViewById(R.id.backup_btn).setOnClickListener(view -> {
             dialog.findViewById(R.id.backup_btn).setOnClickListener(null);
-            dialog.findViewById(R.id.restore_btn).setOnClickListener(null);
-            dialog.findViewById(R.id.delete_backup_btn).setOnClickListener(null);
-            ((TextView)dialog.findViewById(R.id.backup_btn)).setText(R.string.backup);
-            ((TextView)dialog.findViewById(R.id.restore_btn)).setText(R.string.restore);
+            ((TextView)dialog.findViewById(R.id.backup_btn)).setText(R.string.backing_up);
             new Thread(() -> backupSave(app, success -> mainActivityContext.runOnUiThread(() -> {
                 ((TextView)dialog.findViewById(R.id.backup_btn)).setText(success ? R.string.backup_success : R.string.backup_fail);
-                updateSaveManagerDialog(dialog, app);
+                updateSaveManagerDialog(dialog, app, true);
             }))).start();
         });
-
-        Path p_backupPath = Paths.get(backupPath);
-        if(Files.exists(p_backupPath)) {
-            ((TextView) dialog.findViewById(R.id.backup_size)).setText(String.format(mainActivityContext.getResources().getString(R.string.backup_size), bytesReadable(getDirectorySize(p_backupPath))));
-
-            dialog.findViewById(R.id.restore_btn).setOnClickListener(view -> {
-                dialog.findViewById(R.id.backup_btn).setOnClickListener(null);
-                dialog.findViewById(R.id.restore_btn).setOnClickListener(null);
-                dialog.findViewById(R.id.delete_backup_btn).setOnClickListener(null);
-                ((TextView)dialog.findViewById(R.id.backup_btn)).setText(R.string.backup);
-                ((TextView)dialog.findViewById(R.id.restore_btn)).setText(R.string.restore);
-                new Thread(() -> restoreSave(app, success -> mainActivityContext.runOnUiThread(() -> {
-                    ((TextView) dialog.findViewById(R.id.restore_btn)).setText(success ? R.string.restore_success : R.string.restore_fail);
-                    updateSaveManagerDialog(dialog, app);
-                }))).start();
-            });
-
-            dialog.findViewById(R.id.delete_backup_btn).setOnClickListener(view -> {
-                dialog.findViewById(R.id.backup_btn).setOnClickListener(null);
-                dialog.findViewById(R.id.restore_btn).setOnClickListener(null);
-                dialog.findViewById(R.id.delete_backup_btn).setOnClickListener(null);
-                ((TextView)dialog.findViewById(R.id.backup_btn)).setText(R.string.backup);
-                ((TextView)dialog.findViewById(R.id.restore_btn)).setText(R.string.restore);
-                new Thread(() -> deleteSaveBackup(app, success -> mainActivityContext.runOnUiThread(() -> updateSaveManagerDialog(dialog, app)))).start();
-            });
-
-            ((View)dialog.findViewById(R.id.restore_btn).getParent()).setBackground(ResourcesCompat.getDrawable(mainActivityContext.getResources(), R.drawable.bg_list_item_s, mainActivityContext.getTheme()));
-            ((TextView)dialog.findViewById(R.id.restore_btn)).setTextColor(mainActivityContext.getResources().getColor(R.color.text, mainActivityContext.getTheme()));
-
-            ((View)dialog.findViewById(R.id.delete_backup_btn).getParent()).setBackground(ResourcesCompat.getDrawable(mainActivityContext.getResources(), R.drawable.bg_list_item_s, mainActivityContext.getTheme()));
-            ((TextView)dialog.findViewById(R.id.delete_backup_btn)).setTextColor(mainActivityContext.getResources().getColor(R.color.alert, mainActivityContext.getTheme()));
-        } else {
-            ((View)dialog.findViewById(R.id.restore_btn).getParent()).setBackground(ResourcesCompat.getDrawable(mainActivityContext.getResources(), R.drawable.bg_btn_disabled, mainActivityContext.getTheme()));
-            ((TextView)dialog.findViewById(R.id.restore_btn)).setTextColor(mainActivityContext.getResources().getColor(R.color.text_disabled, mainActivityContext.getTheme()));
-
-            ((View)dialog.findViewById(R.id.delete_backup_btn).getParent()).setBackground(ResourcesCompat.getDrawable(mainActivityContext.getResources(), R.drawable.bg_btn_disabled, mainActivityContext.getTheme()));
-            ((TextView)dialog.findViewById(R.id.delete_backup_btn)).setTextColor(mainActivityContext.getResources().getColor(R.color.text_disabled, mainActivityContext.getTheme()));
-        }
     }
 
-    private void backupSave(ApplicationInfo app, Consumer<Boolean> callback) {
+    public void backupSave(ApplicationInfo app, Consumer<Boolean> callback) {
+        DateFormat df = DateFormat.getDateTimeInstance();
         String filesPath = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + app.packageName + "/files";
-        String backupPath = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + mainActivityContext.getPackageName() + "/files/backups/" + app.packageName;
+        String backupPath = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + mainActivityContext.getPackageName() + "/files/backups/" + app.packageName + "@" + df.format(new Date());
         boolean success = true;
         try {
             if (new File(backupPath).exists()) {
@@ -325,9 +304,8 @@ public class SavesAdapter extends BaseAdapter {
         callback.accept(success);
     }
 
-    private void restoreSave(ApplicationInfo app, Consumer<Boolean> callback) {
+    public void restoreSave(String backupPath, ApplicationInfo app, Consumer<Boolean> callback) {
         String filesPath = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + app.packageName + "/files";
-        String backupPath = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + mainActivityContext.getPackageName() + "/files/backups/" + app.packageName;
         boolean success = true;
         if(!new File(backupPath).exists())
             return;
@@ -344,8 +322,7 @@ public class SavesAdapter extends BaseAdapter {
         callback.accept(success);
     }
 
-    private void deleteSaveBackup(ApplicationInfo app, Consumer<Boolean> callback) {
-        String backupPath = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + mainActivityContext.getPackageName() + "/files/backups/" + app.packageName;
+    public void deleteSaveBackup(String backupPath, Consumer<Boolean> callback) {
         boolean success = true;
         try {
             if (new File(backupPath).exists()) {

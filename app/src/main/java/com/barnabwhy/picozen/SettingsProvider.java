@@ -24,6 +24,7 @@ public class SettingsProvider
     public static final String KEY_SIDELOAD_TYPE = "KEY_SIDELOAD_TYPE";
     public static final String KEY_SIDELOAD_HOST = "KEY_SIDELOAD_HOST";
     public static final String KEY_START_ON_BOOT = "KEY_START_ON_BOOT";
+    public static final String KEY_APP_REGION = "KEY_APP_REGION";
 
     private static SettingsProvider instance;
 

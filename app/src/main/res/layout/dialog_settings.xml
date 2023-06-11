@@ -44,49 +44,6 @@
                                     android:paddingBottom="5dp" />
 
                                 <LinearLayout
-                                    android:id="@+id/refresh_icon_cache"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:background="@drawable/bg_list_item_s"
-                                    android:padding="15dp">
-                                        <TextView
-                                            android:layout_width="0dp"
-                                            android:layout_weight="1"
-                                            android:layout_height="match_parent"
-                                            android:text="@string/refresh_icon_cache" />
-                                        <TextView
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="match_parent"
-                                            android:textStyle="bold"
-                                            android:gravity="center_vertical"
-                                            android:textColor="@color/link"
-                                            android:text="@string/refresh" />
-                                </LinearLayout>
-
-                                <LinearLayout
-                                    android:id="@+id/toggle_edit_mode"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:background="@drawable/bg_list_item_s"
-                                    android:padding="15dp">
-                                        <TextView
-                                            android:layout_width="0dp"
-                                            android:layout_weight="1"
-                                            android:layout_height="match_parent"
-                                            android:text="@string/edit_mode" />
-                                        <TextView
-                                            android:id="@+id/toggle_edit_mode_btn"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="match_parent"
-                                            android:textStyle="bold"
-                                            android:gravity="center_vertical"
-                                            android:textColor="@color/link"
-                                            android:text="@string/enable" />
-                                </LinearLayout>
-
-                                <LinearLayout
                                     android:id="@+id/check_for_updates_btn"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
@@ -150,6 +107,103 @@
                                             android:text="@string/configure" />
                                 </LinearLayout>
 
+                                <LinearLayout
+                                    android:id="@+id/quit_btn"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:background="@drawable/bg_list_item_s"
+                                    android:padding="15dp">
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_weight="1"
+                                            android:layout_height="match_parent"
+                                            android:text="@string/quit_picozen" />
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="match_parent"
+                                            android:textStyle="bold"
+                                            android:gravity="center_vertical"
+                                            android:textColor="@color/link"
+                                            android:text="@string/quit" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:textStyle="bold"
+                                    android:gravity="center_vertical"
+                                    android:text="@string/list_apps"
+                                    android:paddingTop="15dp"
+                                    android:paddingHorizontal="15dp"
+                                    android:paddingBottom="5dp" />
+
+                                <LinearLayout
+                                    android:id="@+id/refresh_icon_cache"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:background="@drawable/bg_list_item_s"
+                                    android:padding="15dp">
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_weight="1"
+                                            android:layout_height="match_parent"
+                                            android:text="@string/refresh_icon_cache" />
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="match_parent"
+                                            android:textStyle="bold"
+                                            android:gravity="center_vertical"
+                                            android:textColor="@color/link"
+                                            android:text="@string/refresh" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/toggle_edit_mode"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:background="@drawable/bg_list_item_s"
+                                    android:padding="15dp">
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_weight="1"
+                                            android:layout_height="match_parent"
+                                            android:text="@string/edit_mode" />
+                                        <TextView
+                                            android:id="@+id/toggle_edit_mode_btn"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="match_parent"
+                                            android:textStyle="bold"
+                                            android:gravity="center_vertical"
+                                            android:textColor="@color/link"
+                                            android:text="@string/enable" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:background="@drawable/bg_list_item_s">
+                                        <TextView
+                                            android:padding="15dp"
+                                            android:layout_width="wrap_content"
+                                            android:textStyle="bold"
+                                            android:gravity="center_vertical"
+                                            android:layout_height="match_parent"
+                                            android:text="@string/region" />
+                                        <Spinner
+                                            android:id="@+id/app_region"
+                                            android:theme="@style/spinnerItemStyle"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:paddingHorizontal="5dp"
+                                            android:dropDownVerticalOffset="45dp"
+                                            android:popupBackground="@drawable/bg_list_item_hover_s"
+                                            android:background="@color/bg_dark"
+                                            android:spinnerMode="dropdown" />
+                                </LinearLayout>
 
                                 <TextView
                                     android:layout_width="wrap_content"

@@ -61,20 +61,27 @@ public class FTPProvider extends AbstractProvider {
                     int reply;
                     server = sharedPreferences.getString(SettingsProvider.KEY_SIDELOAD_HOST, "");
                     String host = "";
+                    int port = 21;
                     String user = "anonymous";
                     String pass = "";
                     if (server.contains("@")) {
-                        host = server.split("@")[1];
+                        String fullHost = server.split("@")[1];
+                        host = fullHost.split(":")[0];
+                        if(fullHost.contains(":"))
+                            port = Integer.parseInt(fullHost.split(":")[1]);
                         user = server.split("@")[0].split(":")[0];
                         if (server.split("@")[0].split(":").length > 1)
                             pass = server.split("@")[0].split(":")[1];
                     } else {
-                        host = server;
+                        String fullHost = server;
+                        host = fullHost.split(":")[0];
+                        if(fullHost.contains(":"))
+                            port = Integer.parseInt(fullHost.split(":")[1]);
                     }
 
-                    Log.i("FTP", "Going to connect to " + host + ".");
-                    ftp.connect(host);
-                    Log.i("FTP", "Connected to " + host + ".");
+                    Log.i("FTP", "Going to connect to " + host + ":" + port + ".");
+                    ftp.connect(host, port);
+                    Log.i("FTP", "Connected to " + host + ":" + port + ".");
                     Log.i("FTP", ftp.getReplyString());
 
                     reply = ftp.getReplyCode();

@@ -262,6 +262,7 @@ public class SideloadAdapter extends BaseAdapter {
                             ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(R.string.extracting_archive);
 
                             Thread zipThread = new Thread(() -> {
+                                AtomicLong lastExtractProgressTime = new AtomicLong();
                                 Exception error = null;
                                 File installableFile = null;
                                 File obbDir = null;
@@ -286,7 +287,14 @@ public class SideloadAdapter extends BaseAdapter {
 
                                     long uncompressedSize = getUncompressedArchiveSize(outFile);
 
-                                    extractArchive(outFile, dir, processedBytes -> mainActivityContext.runOnUiThread(() -> ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.extracting_archive_progress), bytesReadable(processedBytes) + "/" + bytesReadable(uncompressedSize)))));
+                                    extractArchive(outFile, dir, processedBytes -> {
+                                        if(processedBytes != uncompressedSize && System.currentTimeMillis() - lastProgressTime.get() < 100 || cancelled.get())
+                                            return;
+
+                                        lastProgressTime.set(System.currentTimeMillis());
+
+                                        mainActivityContext.runOnUiThread(() -> ((TextView) dialog.get().findViewById(R.id.progress_text)).setText(String.format(mainActivityContext.getResources().getString(R.string.extracting_archive_progress), bytesReadable(processedBytes) + "/" + bytesReadable(uncompressedSize))));
+                                    });
 
                                     File[] files = dir.listFiles();
                                     for (File file : Objects.requireNonNull(files)) {

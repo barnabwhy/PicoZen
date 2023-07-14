@@ -1,0 +1,105 @@
+<resources>
+    <string name="app_name">PicoZen</string>
+    <string name="list_apps">Applicazioni</string>
+    <string name="list_tweaks">Tweaks</string>
+    <string name="list_sideload">Sideload</string>
+    <string name="list_saves">Salvataggi</string>
+    <string name="list_about">About</string>
+    <string name="settings">Impostazioni</string>
+    <string name="currently_in_development">Attualmente in sviluppo</string>
+    <string name="start_shortcut">Apri PicoZen con l\'icona Libreria dalla dashboard di sistema</string>
+    <string name="shortcut_prompt">Apri PicoZen con la scorciatoia Libreria (Sperimentale)</string>
+    <string name="configure">Configura</string>
+    <string name="refresh">Aggiorna</string>
+    <string name="refresh_icon_cache">Aggiorna la cache delle icone</string>
+    <string name="changelog_empty">La changelog non può essere recuperata. Probabilmente non sei connesso ad internet o stai utilizzando una build di pre-release.</string>
+    <string name="changelog_header">Novità:</string>
+    <string name="made_with_love">Made by Barnaby</string>
+    <string name="gh_repo" translatable="false">barnabwhy/PicoZen</string>
+    <string name="latest_version">Ultima versione installata (v%1$s)</string>
+    <string name="new_version_available">Nuova versione disponibile (v%1$s)</string>
+    <string name="version_text" translatable="false">v%1$s</string>
+    <string name="empty_group">Gruppo vuoto</string>
+    <string name="edit_mode">Modalità modifica</string>
+    <string name="enable">Abilita</string>
+    <string name="disable">Disabilita</string>
+    <string name="check_for_updates">Controlla aggiornamenti</string>
+    <string name="update_available">Aggiornamento disponibile</string>
+    <string name="check">Controlla</string>
+    <string name="change">Cambia</string>
+    <string name="sideload_server">Sideload server</string>
+    <string name="start_on_boot">Start PicoZen all\'avvio del dispositivo</string>
+    <string name="download">Download</string>
+    <string name="dismiss">Ignora</string>
+    <string name="an_error_occurred">Si è verificato un errore (%1$s)</string>
+    <string name="download_cancelled">Download annullato</string>
+    <string name="extracting_zip">Estrazione ZIP</string>
+    <string name="extracting_zip_progress">Estrazione ZIP (%1$s)</string>
+    <string name="extracting_archive">Estrazione archivio</string>
+    <string name="extracting_archive_progress">Estrazione archivio (%1$s)</string>
+    <string name="download_complete">Download complete</string>
+    <string name="fetch_files_error">Impossibile recuperare i file</string>
+    <string name="no_files">Nessun file trovato</string>
+    <string name="no_sideload_server">Non estato impostato alcun Sideload server dalle impostazioni</string>
+    <string name="sideload_connecting">Connessione...</string>
+    <string name="sideload_fetching">Recupero...</string>
+    <string name="install">Installa</string>
+    <string name="cancel">Cancella</string>
+    <string name="saves_empty">Nessun app supportata trovata</string>
+    <string name="saves_android_files_bad">Saves manager non è attualmente supportato su Android 11 più recente</string>
+    <string name="name">Nome</string>
+    <string name="save_manager">Saves Manager</string>
+    <string name="files_size">Files: %1$s</string>
+    <string name="backup_none">Backup: None</string>
+    <string name="backup_size">Backup: %1$s</string>
+    <string name="backup">Backup</string>
+    <string name="backing_up">Backup in corso...</string>
+    <string name="restore">Recupero</string>
+    <string name="restoring">Recupero in corso...</string>
+    <string name="backup_success">Backup (Fatto)</string>
+    <string name="restore_success">Recupero (Fatto)</string>
+    <string name="backup_fail">Backup (Fallito)</string>
+    <string name="restore_fail">Restore (Fallito)</string>
+    <string name="delete_backup">Elimina backup</string>
+    <string name="backup_warning">ATTENZIONE: Recuperare un backup corrotto può causare perdita di dati</string>
+    <string name="unknown_date">Data sconosciuta</string>
+    <string name="general">Generale</string>
+    <string name="server_type">Tipo di server:</string>
+    <string name="region">Regione:</string>
+    <string name="address_format_template">(Formato: %1$s)</string>
+    <string name="quit_picozen">Esci da PicoZen</string>
+    <string name="quit">Esci</string>
+    <string-array name="address_format">
+        <item />  <!-- EmptyProvider -->
+        <item>username:password@host</item>  <!-- ProxyProvider -->
+        <item>username:password@host</item>  <!-- FTPProvider -->
+        <item>username:password@host/share</item>  <!-- SMBProvider -->
+    </string-array>
+
+    <string-array name="sort_options">
+        <item>↓\t Nome</item>
+        <item>↑\t Nome</item>
+        <item>↓\t Recente</item>
+        <item>↑\t Recente</item>
+        <item>↓\t Data di installazione</item>
+        <item>↑\t Data di installazione</item>
+    </string-array>
+
+    <string-array name="group_options">
+        <item>☰\t Tutti</item>
+        <item>★\t Preferiti</item>
+        <item>—\t Nascosti</item>
+    </string-array>
+
+    <string-array name="sideload_type_options">
+        <item>Nessuno</item>
+        <item>Proxied FTP</item>
+        <item>FTP (Lento)</item>
+        <item>SMB</item>
+    </string-array>
+
+    <string-array name="region_options">
+        <item>Globale</item>
+        <item>Cina</item>
+    </string-array>
+</resources>

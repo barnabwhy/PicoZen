@@ -15,10 +15,8 @@
     <string name="changelog_empty">La changelog non può essere recuperata. Probabilmente non sei connesso ad internet o stai utilizzando una build di pre-release.</string>
     <string name="changelog_header">Novità:</string>
     <string name="made_with_love">Made by Barnaby</string>
-    <string name="gh_repo" translatable="false">barnabwhy/PicoZen</string>
     <string name="latest_version">Ultima versione installata (v%1$s)</string>
     <string name="new_version_available">Nuova versione disponibile (v%1$s)</string>
-    <string name="version_text" translatable="false">v%1$s</string>
     <string name="empty_group">Gruppo vuoto</string>
     <string name="edit_mode">Modalità modifica</string>
     <string name="enable">Abilita</string>

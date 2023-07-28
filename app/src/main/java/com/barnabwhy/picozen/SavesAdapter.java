@@ -270,6 +270,9 @@ public class SavesAdapter extends BaseAdapter {
             }
         });
 
+        if(backups == null)
+            backups = new String[]{};
+
         if(backupAdapterReset || ((GridView) dialog.findViewById(R.id.backups_list)).getAdapter() == null)
             ((GridView) dialog.findViewById(R.id.backups_list)).setAdapter(new BackupsAdapter(mainActivityContext, this, backupsPath, app, dialog, backups));
 

@@ -45,3 +45,4 @@ Repository: [PicoZen-Web](https://github.com/barnabwhy/PicoZen-Wb)
 **Translators**
 - Russian: [ZetaXis](https://github.com/ZetaXis)
 - Chinese (Simplified): [heiha10](https://github.com/heiha10)
+- Italian: [stefaniscion](https://github.com/stefaniscion)

@@ -92,7 +92,7 @@
     <string-array name="sideload_type_options">
         <item>Nessuno</item>
         <item>Proxied FTP</item>
-        <item>FTP (Lento)</item>
+        <item>FTP (Rivela il tuo IP)</item>
         <item>SMB</item>
     </string-array>
 

@@ -77,7 +77,7 @@
     <string-array name="sideload_type_options">
         <item>Никакой</item>
         <item>Проксированный FTP</item>
-        <item>FTP (Медленно)</item>
+        <item>FTP (Раскрывает IP)</item>
         <item>SMB</item>
     </string-array>
     <string name="address_format_template">(Формат: %1$s)</string>

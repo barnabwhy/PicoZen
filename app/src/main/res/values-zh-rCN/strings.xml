@@ -95,7 +95,7 @@
     <string-array name="sideload_type_options">
         <item>无</item>
         <item>代理 FTP</item>
-        <item>FTP (慢)</item>
+        <item>FTP (泄露 IP)</item>
         <item>SMB</item>
     </string-array>
 

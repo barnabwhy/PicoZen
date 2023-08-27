@@ -1,0 +1,103 @@
+<resources>
+    <string name="app_name">PicoZen</string>
+    <string name="list_apps">Applikationen</string>
+    <string name="list_tweaks">Extras</string>
+    <string name="list_sideload">Sideload</string>
+    <string name="list_saves">Speicherstände</string>
+    <string name="list_about">Über / Credits</string>
+    <string name="settings">Einstellungen</string>
+    <string name="currently_in_development">Befindet sich in der Entwicklung</string>
+    <string name="start_shortcut">Start der Verknüpfung</string>
+    <string name="shortcut_prompt">Verknüpfung Fenster</string>
+    <string name="configure">Konfigurieren</string>
+    <string name="refresh">Aktualisieren</string>
+    <string name="refresh_icon_cache">Aktualisiere Icons</string>
+    <string name="changelog_empty">Es gibt keine neuen Veränderungen</string>
+    <string name="changelog_header">Veränderungen:</string>
+    <string name="made_with_love">Erstellt von Barnaby</string>
+    <string name="latest_version">Letzte Version(v%1$s)</string>
+    <string name="new_version_available">Neue Version verfügbar(v%1$s)</string>
+    <string name="empty_group">Leere Gruppe</string>
+    <string name="edit_mode">Veränderungsmodus</string>
+    <string name="enable">Aktivieren</string>
+    <string name="disable">Deaktivieren</string>
+    <string name="check_for_updates">Auf Updates überprüfen</string>
+    <string name="update_available">Updates Verfügbar</string>
+    <string name="check">Kontrollieren</string>
+    <string name="change">Verändern</string>
+    <string name="sideload_server">Sideload server</string>
+    <string name="start_on_boot">Starte PicoZen am Start des Headsets</string>
+    <string name="download">Download</string>
+    <string name="dismiss">Ignorieren</string>
+    <string name="an_error_occurred">Ein Fehler ist passiert (%1$s)</string>
+    <string name="download_cancelled">Download abgebrochen</string>
+    <string name="extracting_zip">Extrahiert ZIP</string>
+    <string name="extracting_zip_progress">Extrahiert ZIP (%1$s)</string>
+    <string name="extracting_archive">Extrahiert Archiv</string>
+    <string name="extracting_archive_progress">Extrahiert Archiv (%1$s)</string>
+    <string name="download_complete">Download fertig</string>
+    <string name="fetch_files_error">Konnte keine Dateien holen</string>
+    <string name="no_files">Keine Dateien</string>
+    <string name="no_sideload_server">Kein Sideloading Server gefunden</string>
+    <string name="sideload_connecting">Verbindet zu Server...</string>
+    <string name="sideload_fetching">Holt App...</string>
+    <string name="install">Installieren</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="saves_empty">Keine Speicherstände hier...</string>
+    <string name="saves_android_files_bad">Der Save Manager unterstützt alles über Android 11 nicht</string>
+    <string name="name">Name</string>
+    <string name="save_manager">Spielstand Manager</string>
+    <string name="files_size">Files: %1$s</string>
+    <string name="backup_none">Backup: None</string>
+    <string name="backup_size">Backup: %1$s</string>
+    <string name="backup">Backup</string>
+    <string name="backing_up">Backup im Gange...</string>
+    <string name="restore">Wiederherstellen</string>
+    <string name="restoring">Stellt wieder her...</string>
+    <string name="backup_success">Backup war ein Erfolg</string>
+    <string name="restore_success">Wiederherstellung war ein Erfolg</string>
+    <string name="backup_fail">Backup fehlgeschladen</string>
+    <string name="restore_fail">Wiederherstellen fehlgeschlagen</string>
+    <string name="delete_backup">Backup Löschen</string>
+    <string name="backup_warning">ACHTUNG: Die Wiederherstellung nach einem beschädigten Backup kann zu Datenverlust führen</string>
+    <string name="unknown_date">Unbekanntes Datum</string>
+    <string name="general">Allgemein</string>
+    <string name="server_type">Typ des Servers:</string>
+    <string name="region">Region:</string>
+    <string name="address_format_template">(Format: %1$s)</string>
+    <string name="quit_picozen">Verlasse PicoZen</string>
+    <string name="quit">Verlassen</string>
+    <string-array name="address_format">
+        <item />  <!-- EmptyProvider -->
+        <item>username:password@host</item>  <!-- ProxyProvider -->
+        <item>username:password@host</item>  <!-- FTPProvider -->
+        <item>username:password@host/share</item>  <!-- SMBProvider -->
+    </string-array>
+
+    <string-array name="sort_options">
+        <item>↓\t Vorname</item>
+        <item>↑\t Vorname</item>
+        <item>↓\t Jüngste</item>
+        <item>↑\t Jüngste</item>
+        <item>↓\t Datum der Installation</item>
+        <item>↑\t Datum der Installation</item>
+    </string-array>
+
+    <string-array name="group_options">
+        <item>☰\t Alle</item>
+        <item>★\t Favoriten</item>
+        <item>—\t Versteckt</item>
+    </string-array>
+
+    <string-array name="sideload_type_options">
+        <item>Nichts</item>
+        <item>Proxy FTP</item>
+        <item>FTP (Rivela il tuo IP)</item>
+        <item>SMB</item>
+    </string-array>
+
+    <string-array name="region_options">
+        <item>Global</item>
+        <item>China</item>
+    </string-array>
+</resources>

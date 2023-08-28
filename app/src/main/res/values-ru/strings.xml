@@ -23,6 +23,7 @@
     <string name="enable">Активировать</string>
     <string name="disable">Отключить</string>
     <string name="check_for_updates">Проверить наличие обновлений</string>
+    <string name="update_available">Доступно обновление</string>
     <string name="check">Проверить</string>
     <string name="change">Изменить</string>
     <string name="sideload_server">Адрес файлового сервера</string>
@@ -33,10 +34,12 @@
     <string name="download_cancelled">Скачивание отменено</string>
     <string name="extracting_zip">Распаковка ZIP</string>
     <string name="extracting_zip_progress">Распаковка ZIP (%1$s)</string>
+    <string name="extracting_archive">Распаковка архива</string>
+    <string name="extracting_archive_progress">Распаковка архива (%1$s)</string>
     <string name="download_complete">Скачивание завершено</string>
     <string name="fetch_files_error">Не удалось загрузить файлы</string>
     <string name="no_files">Файлы не обнаружены</string>
-    <string name="no_sideload_server">Сервер передачи данных не был настроен\\включен в настройках</string>
+    <string name="no_sideload_server">Сервер передачи данных не был настроен, или включен в настройках</string>
     <string name="sideload_connecting">Подключение...</string>
     <string name="sideload_fetching">Загрузка...</string>
     <string name="install">Установить</string>
@@ -48,14 +51,17 @@
     <string name="files_size">Файлы: %1$s</string>
     <string name="backup_none">Резервная копия: отсутствует</string>
     <string name="backup_size">Резервная копия: %1$s</string>
-    <string name="backup">Резервирование</string>
+    <string name="backup">Резервное копирование</string>
+    <string name="backing_up">Выполняется резервное копирование...</string>
     <string name="restore">Восстановление</string>
+    <string name="restoring">Идет процесс восстановления...</string>
     <string name="backup_success">Резервирование (Завершено)</string>
     <string name="restore_success">Восстановление (Завершено)</string>
     <string name="backup_fail">Резервирование (Провалено)</string>
     <string name="restore_fail">Восстановление (Провалено)</string>
     <string name="delete_backup">Удалить резервную копию</string>
     <string name="backup_warning">ПРЕДУПРЕЖДЕНИЕ: Восстановление из поврежденной резервной копии может привести к потере данных</string>
+    <string name="unknown_date">Дата неизвестна</string>
     <string name="general">Основное</string>
     <string name="server_type">Протокол передачи:</string>
 
@@ -80,5 +86,13 @@
         <item>FTP (Раскрывает IP)</item>
         <item>SMB</item>
     </string-array>
+    <string name="region">Регион:</string>
     <string name="address_format_template">(Формат: %1$s)</string>
+    <string name="quit_picozen">Закрыть PicoZen</string>
+    <string name="quit">Выход</string>
+
+    <string-array name="region_options">
+        <item>Глобальный</item>
+        <item>Китайский</item>
+    </string-array>
 </resources>
